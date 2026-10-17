@@ -14,7 +14,8 @@ test("invitado: inicio, menú y una ronda completa que guarda el avance", async 
   await nav.getByRole("button", { name: "Estudio" }).click();
   await expect(page.getByRole("heading", { name: "Estudio" })).toBeVisible();
   await nav.getByRole("button", { name: "Comentarios" }).click();
-  await expect(page.getByText("Entra con tu cuenta para leer y escribir comentarios.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "¿Cómo mejoramos UsiLab?" })).toBeVisible();
+  await expect(page.getByText("Muro de comentarios")).toHaveCount(0);
 
   // Ronda de Bacterias en fácil: 5 preguntas, todas bien.
   await nav.getByRole("button", { name: "Jugar" }).click();

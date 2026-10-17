@@ -1,9 +1,13 @@
-/** COMENTARIOS entre compañeros. Se recargan cada 30 s mientras la pantalla está abierta. */
+/**
+ * COMENTARIOS: formulario de sugerencias para todos y, con cuenta, el muro entre compañeros.
+ * El muro se recarga cada 30 s mientras la pantalla está abierta.
+ */
 import { vista } from "../lib/errores";
 import { boton, mk } from "../lib/dom";
 import { hace } from "../lib/texto";
-import { MAX, borrar, contar, porQueNo, publicar, puedePublicar, recientes, type Comentario } from "../servicios/comentarios";
+import { MAX, borrar, contar, publicar, puedePublicar, recientes, type Comentario } from "../servicios/comentarios";
 import { abrirPanel, alSalirDeVista, pintarInsignia } from "../ui/marco";
+import { formularioSugerencias } from "./sugerencias";
 
 export async function actualizarInsignia(): Promise<void> {
   const n = await contar();
@@ -13,6 +17,10 @@ export async function actualizarInsignia(): Promise<void> {
 export const mostrarComentarios = vista("Comentarios", () => {
   const p = abrirPanel("comentarios");
   p.append(mk("h2", null, "Comentarios"));
+  formularioSugerencias(p);
+  // El muro de comentarios solo existe con cuenta; sin cuenta, la sección es solo el formulario.
+  if (!puedePublicar()) return;
+  p.append(mk("h3", "sug-sep", "Muro de comentarios"));
   const lista = mk("ol", "comments");
   let activo = true;
   let cargando = false;
@@ -104,9 +112,6 @@ export const mostrarComentarios = vista("Comentarios", () => {
     f.append(ta, fila, msg);
     p.append(f);
     lista.append(mk("li", "empty", "Cargando…"));
-  } else {
-    p.append(mk("p", "note", porQueNo()));
-    lista.append(mk("li", "empty", "Todavía no hay comentarios para mostrar."));
   }
   p.append(lista);
 
