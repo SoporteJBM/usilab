@@ -1,0 +1,14 @@
+/* Comentarios. */
+.comment-form { display: flex; flex-direction: column; gap: 8px; }
+.comment-form textarea { width: 100%; font: inherit; font-family: var(--body); font-size: 16px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); resize: vertical; min-height: 90px; }
+.comment-form textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.comment-form .row { align-items: center; justify-content: space-between; }
+ol.comments { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+ol.comments li { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+ol.comments li.empty { color: var(--muted); }
+ol.comments li.mine { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+.c-head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.c-head strong { font-family: var(--display); font-size: 15px; }
+.c-head small { color: var(--muted); font-size: 12px; }
+.c-text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 16px; }
+button.c-del { border: 0; background: none; color: var(--bad); text-decoration: underline; min-height: 32px; padding: 0; align-self: flex-start; font-size: 13px; }

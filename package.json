@@ -1,0 +1,29 @@
+{
+  "name": "reto-microbiologia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Juego para estudiar Microbiología y Parasitología.",
+  "type": "module",
+  "scripts": {
+    "dev": "node build.mjs --dev",
+    "build": "npm run check && node build.mjs",
+    "check": "npm run validar && npm run tipos",
+    "validar": "tsx scripts/validar-contenido.ts",
+    "tipos": "tsc --noEmit",
+    "test": "playwright test",
+    "test:todo": "npm run check && npm test"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.0",
+    "tsx": "^4.19.0",
+    "typescript": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

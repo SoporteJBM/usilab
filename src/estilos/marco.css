@@ -1,0 +1,40 @@
+/* Marca arriba a la izquierda: en pantallas anchas queda fija en el margen; en celular va en su propia línea. */
+.marca { font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: -.01em; color: var(--fg); text-decoration: none; line-height: 1; display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; }
+.marca .dot { width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid var(--accent); position: relative; flex: none; }
+.marca .dot::after { content: ""; position: absolute; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); top: 3px; left: 4px; }
+.marca b { color: var(--accent); font-weight: 800; }
+@media (min-width: 960px) { .marca { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 26px); left: 28px; z-index: 6; } }
+@media (max-width: 959px) { .marca { margin-bottom: -10px; } }
+/* Menú superior, panel principal y pantalla de carga. */
+.topnav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; align-items: center; justify-content: center; gap: 0; background: var(--bg); padding-block: 8px; }
+.topnav::before, .topnav::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.topnav .sep { width: 32px; height: 1px; background: var(--line); flex: none; }
+.topnav button { border: 0; background: none; border-radius: 0; min-height: 56px; padding: 8px 16px; font-family: var(--display); font-size: 18px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid transparent; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.topnav button:hover { color: var(--fg); }
+.topnav button.on { color: var(--accent); border-bottom: 3px solid var(--accent); }
+.topnav .badge { font-size: 12px; letter-spacing: 0; min-width: 20px; padding: 2px 6px; border-radius: 999px; background: var(--xhard); color: #fff; font-variant-numeric: tabular-nums; }
+.topnav .badge:empty { display: none; }
+@media (max-width: 560px) { .topnav button { font-size: 14px; padding: 8px 6px; letter-spacing: .04em; min-height: 52px; } .topnav .sep { width: 8px; } .topnav::before, .topnav::after { min-width: 4px; } }
+@media (max-width: 380px) { .topnav button { font-size: 12px; padding: 8px 4px; letter-spacing: .02em; } .topnav .sep { width: 4px; } .topnav .badge { min-width: 16px; padding: 1px 4px; font-size: 10px; } }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel h2 { font-family: var(--display); margin: 0; font-size: 22px; }
+.study { white-space: pre-wrap; margin: 0; }
+#loader {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 20;
+}
+#loader[hidden] { display: none !important; }
+.fact { max-width: 480px; text-align: center; }
+.fact small { font-family: var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--hint); font-size: 12px; }
+.fact p { font-size: 21px; margin: 8px 0 0; text-wrap: balance; line-height: 1.35; }
+.fact .skip { display: block; margin-top: 18px; font-family: var(--display); font-size: 12px; color: var(--muted); }
+#loader { cursor: pointer; }
+
+/* Aviso flotante para errores y mensajes (lib/errores.ts). */
+.aviso { position: fixed; left: 50%; bottom: max(16px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 40; max-width: min(560px, calc(100vw - 32px)); padding: 12px 16px; border-radius: 10px; font-family: var(--display); font-size: 15px; line-height: 1.35; box-shadow: 0 6px 24px rgba(0,0,0,.18); background: var(--fg); color: var(--bg); cursor: pointer; }
+.aviso.error { background: var(--bad); color: #fff; }
+.aviso.ok { background: var(--accent); color: #fff; }
+.aviso[hidden] { display: none !important; }
+/* Pantalla de rescate cuando una vista falla. */
+.panel.rescate { border-color: var(--bad); }

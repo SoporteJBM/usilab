@@ -1,0 +1,44 @@
+/* Preguntas, niveles, ahorcado, microscopio. */
+.opts { display: flex; flex-direction: column; gap: 8px; }
+.opts button { text-align: left; border-radius: 6px; font-family: var(--body); font-size: 16px; }
+.opts button.right { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
+.opts button.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 16%, var(--surface)); }
+.case { margin: 0; padding: 12px 14px; border-left: 3px solid var(--hint); background: color-mix(in srgb, var(--hint) 8%, var(--surface)); }
+.hint { color: var(--hint); font-style: italic; margin: 0; }
+.feedback { margin: 0; min-height: 1.5em; font-weight: 600; }
+.feedback.ok { color: var(--accent); }
+.feedback.no { color: var(--bad); }
+.why { margin: 0; font-weight: 400; color: var(--muted); }
+.word { font-family: var(--display); font-size: 28px; letter-spacing: .12em; margin: 0; font-variant-numeric: tabular-nums; word-break: break-all; }
+.kb { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; }
+.kb button { padding: 6px 0; min-height: 40px; border-radius: 6px; }
+.kb button.hit { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
+.kb button.miss { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 16%, var(--surface)); }
+.photo { background: #000; border-radius: 6px; overflow: hidden; aspect-ratio: 3 / 4; max-height: 60vh; max-width: 100%; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+.photo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.ficha { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; padding: 12px 14px; background: color-mix(in srgb, var(--accent) 7%, var(--surface)); border-radius: 6px; font-size: 15px; }
+.ficha dt { font-family: var(--display); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.ficha dd { margin: 0; min-width: 0; }
+.levels { display: grid; grid-template-columns: 1fr; gap: 8px; }
+@media (min-width: 560px) { .levels { grid-template-columns: repeat(2, 1fr); } }
+.level { text-align: left; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 4px; border: 2px solid var(--line); min-width: 0; }
+.level strong { font-size: 18px; }
+.level span { font-family: var(--body); font-size: 15px; color: var(--muted); line-height: 1.35; }
+.level small { font-family: var(--body); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.level.f strong { color: var(--accent); } .level.m strong { color: var(--hint); } .level.d strong { color: var(--bad); }
+.level.on.f { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+.level.on.m { border-color: var(--hint); background: color-mix(in srgb, var(--hint) 12%, var(--surface)); }
+.level.on.d { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--surface)); }
+.level.x strong { color: var(--xhard); }
+.level.on.x { border-color: var(--xhard); background: color-mix(in srgb, var(--xhard) 12%, var(--surface)); }
+.menu { display: flex; flex-direction: column; gap: 8px; }
+.menu button { text-align: left; border-radius: 8px; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; }
+.menu button small { font-family: var(--body); color: var(--muted); font-size: 14px; }
+.tablewrap { overflow-x: auto; }
+table.cov { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.cov th, table.cov td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: center; white-space: nowrap; }
+table.cov th:first-child, table.cov td:first-child { text-align: left; }
+table.cov th { font-family: var(--display); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+table.cov td.grp { font-family: var(--display); font-weight: 600; color: var(--hint); padding-top: 14px; }
+table.cov .yes { color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+table.cov .no { color: var(--muted); }

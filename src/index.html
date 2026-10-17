@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Juego para estudiar Microbiología y Parasitología: preguntas por dificultad, fotos reales de microscopio, ahorcado y casos clínicos.">
+<meta name="theme-color" content="#2F7D6B">
+<title>UsiLab · Reto de Microbiología</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap">
+<link rel="stylesheet" href="__CSS__">
+</head>
+<body>
+<div class="wrap">
+  <a class="marca" href="#" aria-label="UsiLab, ir al inicio"><span class="dot" aria-hidden="true"></span><span>Usi<b>Lab</b></span></a>
+  <nav id="topnav" class="topnav" hidden aria-label="Secciones">
+    <button type="button" data-k="inicio">Inicio</button><span class="sep" aria-hidden="true"></span><button type="button" data-k="jugar">Jugar</button><span class="sep" aria-hidden="true"></span><button type="button" data-k="estudio">Estudio</button><span class="sep" aria-hidden="true"></span><button type="button" data-k="comentarios">Comentarios<span class="badge" id="nav-badge"></span></button>
+  </nav>
+
+  <header>
+    <p class="eyebrow">Microbiología y Parasitología</p>
+    <h1>Reto de Microbiología</h1>
+    <div class="stats">Puntos <strong id="score">0</strong> · Racha <strong id="streak">0</strong></div>
+    <div class="who" id="who" hidden></div>
+  </header>
+
+  <section id="login" class="panel login" aria-live="polite">
+    <h2>Bienvenido</h2>
+    <p class="note">Cargando…</p>
+  </section>
+  <section id="home" class="grid" aria-label="Estaciones" hidden></section>
+  <section id="panel" class="panel" hidden aria-live="polite"></section>
+</div>
+
+<div id="loader" hidden>
+  <div class="fact">
+    <small>¿Sabías que...?</small>
+    <p id="fact"></p>
+    <span class="skip">Toca para continuar</span>
+  </div>
+</div>
+
+<noscript><p style="padding:16px">Esta página necesita JavaScript activado.</p></noscript>
+<script type="module" src="__JS__"></script>
+</body>
+</html>

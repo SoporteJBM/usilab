@@ -1,0 +1,21 @@
+/* Inicio: los cuatro grupos del curso. */
+.reinos { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 600px) { .reinos { grid-template-columns: repeat(2, 1fr); } }
+.reino { border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; border: 1px solid var(--line); background: var(--surface); }
+.reino h3 { margin: 0; font-family: var(--display); font-size: 26px; font-weight: 800; }
+.reino .rdesc { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.35; }
+.rchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rchip { font-size: 13px; font-style: italic; padding: 3px 9px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+.rchip.more { font-style: normal; color: var(--muted); }
+.reino .rstat { color: var(--muted); font-family: var(--display); font-size: 13px; font-variant-numeric: tabular-nums; }
+.reino.bac { border-top: 5px solid var(--accent); } .reino.bac h3 { color: var(--accent); }
+.reino.hon { border-top: 5px solid var(--hint); } .reino.hon h3 { color: var(--hint); }
+.reino.vir { border-top: 5px solid var(--xhard); } .reino.vir h3 { color: var(--xhard); }
+.reino.par { border-top: 5px solid var(--bad); } .reino.par h3 { color: var(--bad); }
+.intro { display: flex; flex-direction: column; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.intro-lead { margin: 0; font-size: 18px; line-height: 1.5; text-wrap: pretty; }
+.intro-items { display: grid; grid-template-columns: 1fr; gap: 8px; }
+@media (min-width: 600px) { .intro-items { grid-template-columns: repeat(3, 1fr); } }
+.intro-item { text-align: left; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.intro-item strong { font-family: var(--display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.intro-item span { font-family: var(--body); font-size: 15px; color: var(--muted); line-height: 1.35; }
