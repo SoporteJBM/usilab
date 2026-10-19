@@ -22,9 +22,11 @@ export interface Estado {
   ultimoNivel: Record<string, Nivel>;
   /** estación → id de pregunta → veces fallada */
   errores: Record<string, Record<string, number>>;
+  /** estación → resultados del modo examen (nota sobre 20) */
+  examenes: Record<string, { mejor: number; ultima: number; intentos: number }>;
 }
 
-export const vacio = (): Estado => ({ version: 4, puntos: 0, racha: 0, dominadas: {}, rondas: {}, ahorcadoVistas: {}, ultimoNivel: {}, errores: {} });
+export const vacio = (): Estado => ({ version: 4, puntos: 0, racha: 0, dominadas: {}, rondas: {}, ahorcadoVistas: {}, ultimoNivel: {}, errores: {}, examenes: {} });
 
 const NIVELES_OK = new Set(["f", "m", "d", "x"]);
 const NIVELES_AHORCADO = new Set(["facil", "medio", "dificil", "muydificil"]);
@@ -57,6 +59,14 @@ export function sanear(x: unknown): Estado {
   e.errores = porPregunta(x.errores, (v) => { const n = Math.floor(numero(v)); return n > 0 ? n : null; });
   if (esObjeto(x.rondas)) for (const [k, v] of Object.entries(x.rondas)) { const n = Math.floor(numero(v)); if (n) e.rondas[k] = n; }
   if (esObjeto(x.ultimoNivel)) for (const [k, v] of Object.entries(x.ultimoNivel)) if (typeof v === "string" && NIVELES_OK.has(v)) e.ultimoNivel[k] = v as Nivel;
+  if (esObjeto(x.examenes)) {
+    for (const [k, v] of Object.entries(x.examenes)) {
+      if (!esObjeto(v)) continue;
+      const nota = (n: unknown) => Math.min(20, numero(n));
+      const intentos = Math.floor(numero(v.intentos));
+      if (intentos > 0) e.examenes[k] = { mejor: nota(v.mejor), ultima: nota(v.ultima), intentos };
+    }
+  }
   if (esObjeto(x.ahorcadoVistas)) {
     for (const [k, v] of Object.entries(x.ahorcadoVistas)) {
       if (NIVELES_AHORCADO.has(k) && Array.isArray(v)) e.ahorcadoVistas[k as NivelAhorcado] = v.filter((w): w is string => typeof w === "string").slice(0, 500);
@@ -110,6 +120,12 @@ export function fallo(est: string | undefined, id: string | undefined): void {
 export function sumarPuntos(puntos: number): void { estado.puntos += puntos; estado.racha += 1; guardar(); }
 export function cortarRacha(): void { estado.racha = 0; guardar(); }
 export function rondaTerminada(est: string): void { estado.rondas[est] = (estado.rondas[est] || 0) + 1; guardar(); }
+
+export function registrarExamen(est: string, nota: number): void {
+  const previo = estado.examenes[est];
+  estado.examenes[est] = { mejor: Math.max(previo?.mejor ?? 0, nota), ultima: nota, intentos: (previo?.intentos ?? 0) + 1 };
+  guardar();
+}
 
 export const dominadasDe = (est: string): number => Object.keys(estado.dominadas[est] || {}).length;
 export const estaDominada = (est: string, id: string): boolean => Boolean(estado.dominadas[est]?.[id]);

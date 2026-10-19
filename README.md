@@ -36,7 +36,7 @@ src/
     types.ts          forma que debe tener cada dato
   vistas/             pantallas
     inicio.ts, login.ts, comentarios.ts
-    jugar/            tablero, niveles, quiz (motor de preguntas), microscopio, ahorcado
+    jugar/            tablero, niveles, quiz (motor de preguntas), examen, entrenador-virus, microscopio, ahorcado
     estudio/          hub, buscador, tarjetas, errores, tablas, fichas, confundir, resúmenes, índice, agente
   servicios/          supabase.ts (llamadas seguras), sesion.ts (cuenta y sincronización), comentarios.ts
   estado/progreso.ts  puntos, dominadas y errores, con validación de datos

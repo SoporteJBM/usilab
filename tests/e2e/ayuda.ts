@@ -37,7 +37,7 @@ export async function elegirNivel(page: Page, nivel: "Fácil" | "Medio" | "Difí
 }
 
 // Respuestas correctas sacadas del mismo contenido que usa la página.
-const RESPUESTAS = new Map(todasLasPreguntas().map(({ q }) => [(q.caso ?? "") + "|" + enunciado(q), q.correcta]));
+export const RESPUESTAS = new Map(todasLasPreguntas().map(({ q }) => [(q.caso ?? "") + "|" + enunciado(q), q.correcta]));
 
 /** Responde la pregunta de opción múltiple en pantalla, bien o mal a propósito. Devuelve la correcta. */
 export async function responder(page: Page, bien: boolean): Promise<string> {

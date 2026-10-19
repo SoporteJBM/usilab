@@ -1061,6 +1061,598 @@ export const virus: Estacion = {
         "Lopinavir/ritonavir"
       ],
       "explicacion": "Maraviroc es un inhibidor de la entrada. Dolutegravir inhibe la integrasa; efavirenz es un inhibidor no análogo de la transcriptasa inversa; lopinavir/ritonavir inhibe la proteasa."
+    },
+    {
+      "id": "virus-083",
+      "nivel": "f",
+      "caso": "Niño de 4 años con fiebre leve y malestar. Luego aparecen vesículas muy pruriginosas que empezaron en el tronco; hay lesiones nuevas junto a costras.",
+      "pregunta": "¿Qué virus es?",
+      "correcta": "Virus varicela-zóster",
+      "distractores": [
+        "Sarampión",
+        "Rubéola",
+        "Molusco contagioso"
+      ],
+      "pista": "Lesiones en distintos estadios a la vez.",
+      "explicacion": "Varicela: vesículas «gota de rocío», muy pruriginosas, desde el tronco y en distintos estadios. Es un herpesvirus (ADN ds) y puede reactivarse como herpes zóster."
+    },
+    {
+      "id": "virus-084",
+      "nivel": "f",
+      "caso": "Lactante de 10 meses que va a guardería: diarrea acuosa abundante, vómitos y fiebre desde hace 2 días. Está decaído y con mucosas secas.",
+      "pregunta": "¿Cuál es el agente más probable?",
+      "correcta": "Rotavirus",
+      "distractores": [
+        "Virus sincitial respiratorio",
+        "Virus de la hepatitis A",
+        "Adenovirus respiratorio"
+      ],
+      "pista": "Principal causa de diarrea viral infantil.",
+      "explicacion": "Rotavirus (Reoviridae, ARN doble cadena): diarrea infantil por vía fecal-oral. El peligro es la deshidratación; se trata con rehidratación."
+    },
+    {
+      "id": "virus-085",
+      "nivel": "f",
+      "pregunta": "Anticuerpos IgM específicos contra un virus indican:",
+      "correcta": "Infección aguda o reciente",
+      "distractores": [
+        "Infección pasada o inmunidad",
+        "Vacunación antigua",
+        "Que el virus está latente"
+      ],
+      "pista": "Es el primer anticuerpo en aparecer.",
+      "explicacion": "IgM: infección aguda o reciente. IgG: infección pasada o inmunidad."
+    },
+    {
+      "id": "virus-086",
+      "nivel": "f",
+      "pregunta": "¿Qué virus respiratorio causa el resfriado común?",
+      "correcta": "Rinovirus",
+      "distractores": [
+        "Parainfluenza",
+        "Virus sincitial respiratorio",
+        "Influenza"
+      ],
+      "pista": "Es un picornavirus.",
+      "explicacion": "Rinovirus (Picornaviridae, ARN +): resfrío común. Parainfluenza: crup. VSR: bronquiolitis. Influenza: fiebre alta y mialgias."
+    },
+    {
+      "id": "virus-087",
+      "nivel": "f",
+      "pregunta": "La poliomielitis se transmite por vía:",
+      "correcta": "Fecal-oral",
+      "distractores": [
+        "Picadura de mosquito",
+        "Mordedura de animal",
+        "Sexual"
+      ],
+      "pista": "Como los virus entéricos.",
+      "explicacion": "Poliovirus (Picornaviridae, ARN +): fecal-oral; puede causar parálisis flácida. Se previene con vacuna."
+    },
+    {
+      "id": "virus-088",
+      "nivel": "f",
+      "pregunta": "¿Qué porcentaje del genoma humano viene de retrovirus antiguos (HERVs)?",
+      "correcta": "Cerca del 8 %",
+      "distractores": [
+        "Cerca del 50 %",
+        "Menos del 0,1 %",
+        "Cerca del 25 %"
+      ],
+      "pista": "Es menos de la décima parte.",
+      "explicacion": "Los retrovirus endógenos humanos se integraron en células germinales de nuestros ancestros hace millones de años: hoy son cerca del 8 % del genoma."
+    },
+    {
+      "id": "virus-089",
+      "nivel": "f",
+      "caso": "Brote de vómitos y diarrea en un crucero: muchos pasajeros enferman en pocos días después de comer en el mismo buffet.",
+      "pregunta": "¿Qué virus entérico se asocia típicamente a brotes?",
+      "correcta": "Norovirus",
+      "distractores": [
+        "Rotavirus",
+        "Virus de la rabia",
+        "Virus del papiloma humano"
+      ],
+      "pista": "Caliciviridae.",
+      "explicacion": "Norovirus (Caliciviridae, ARN +): fecal-oral, causa típica de brotes. El rotavirus es la diarrea infantil."
+    },
+    {
+      "id": "virus-090",
+      "nivel": "f",
+      "caso": "Turista que volvió de una zona con mosquitos: fiebre y dolor articular tan intenso que camina encorvado.",
+      "pregunta": "¿Qué virus sospechas?",
+      "correcta": "Chikungunya",
+      "distractores": [
+        "Zika",
+        "Dengue",
+        "Rabia"
+      ],
+      "pista": "Su sello son las artralgias.",
+      "explicacion": "Chikungunya (Togaviridae): artralgias. Zika: microcefalia en el embarazo. Dengue: fiebre con sangrado y riesgo de shock."
+    },
+    {
+      "id": "virus-091",
+      "nivel": "m",
+      "caso": "Niño de 3 años sin vacunas: fiebre alta, tos, coriza y conjuntivitis. En la mucosa oral hay puntos blancos. Dos días después aparece un exantema que empieza en la cara y baja.",
+      "pregunta": "¿Qué virus es?",
+      "correcta": "Sarampión",
+      "distractores": [
+        "Varicela",
+        "Rubéola",
+        "Coxsackie"
+      ],
+      "pista": "Los puntos blancos tienen nombre propio.",
+      "explicacion": "Pródromo con fiebre alta, tos, coriza y conjuntivitis + manchas de Koplik + exantema céfalo-caudal = sarampión (paramyxovirus, ARN −)."
+    },
+    {
+      "id": "virus-092",
+      "nivel": "m",
+      "caso": "Varón de 30 años mordido por un perro callejero hace 2 meses. Ahora tiene fiebre, agitación y espasmos al intentar tomar agua.",
+      "pregunta": "¿Qué virus es?",
+      "correcta": "Virus de la rabia",
+      "distractores": [
+        "Herpes simple",
+        "Poliovirus",
+        "Virus del Nilo Occidental"
+      ],
+      "pista": "Hidrofobia.",
+      "explicacion": "Rabia (Rhabdoviridae, ARN −): se transmite por mordedura y llega al SNC por los nervios periféricos. Con síntomas es fatal; se previene con vacuna."
+    },
+    {
+      "id": "virus-093",
+      "nivel": "m",
+      "caso": "Adulto con 2 días de fiebre, mialgias, tos seca y dolor de garganta sin pus. El hemograma muestra leucopenia con linfocitosis relativa. No mejoró con amoxicilina.",
+      "pregunta": "¿Qué sugiere este cuadro?",
+      "correcta": "Infección viral",
+      "distractores": [
+        "Faringitis bacteriana por estreptococo",
+        "Infección por hongos",
+        "Parasitosis intestinal"
+      ],
+      "pista": "Sin pus y con linfocitosis.",
+      "explicacion": "Fiebre + mialgias + síntomas respiratorios + leucopenia con linfocitosis, sin exudado y sin respuesta a antibióticos: pensar primero en virus."
+    },
+    {
+      "id": "virus-094",
+      "nivel": "m",
+      "caso": "Paciente con VIH que también tiene hepatitis B crónica. Va a iniciar tratamiento.",
+      "pregunta": "¿Qué esquema indica el MINSA?",
+      "correcta": "TDF + 3TC + DTG",
+      "distractores": [
+        "AZT + 3TC + LPV/r",
+        "ABC + 3TC + DTG",
+        "DRV/r + RAL + ETR"
+      ],
+      "pista": "El tenofovir también actúa contra el VHB.",
+      "explicacion": "TLD es activo frente a VIH y VHB: es el ideal en coinfectados."
+    },
+    {
+      "id": "virus-095",
+      "nivel": "m",
+      "pregunta": "¿Cuál es el riesgo aproximado de infectarse con VIH tras un pinchazo con una aguja contaminada?",
+      "correcta": "0,3 %",
+      "distractores": [
+        "15–45 %",
+        "10 %",
+        "Prácticamente 100 %"
+      ],
+      "pista": "Es menos de 1 %.",
+      "explicacion": "El riesgo ocupacional por pinchazo es ≈ 0,3 %. 15–45 % es el riesgo de transmisión vertical sin tratamiento."
+    },
+    {
+      "id": "virus-096",
+      "nivel": "m",
+      "pregunta": "¿Qué subtipo de VIH-1 es el más frecuente en América y en el Perú?",
+      "correcta": "Subtipo B",
+      "distractores": [
+        "Subtipo C",
+        "Subtipo E",
+        "Grupo O"
+      ],
+      "pista": "El C predomina en África.",
+      "explicacion": "El grupo M causa más del 90 % de infecciones. Subtipo B: América y Europa (incluye Perú). Subtipo C: la mitad de los casos del mundo, sobre todo en África."
+    },
+    {
+      "id": "virus-097",
+      "nivel": "m",
+      "pregunta": "Comparados con los virus ARN, los virus ADN:",
+      "correcta": "Replican en el núcleo, mutan menos y pueden hacer latencia",
+      "distractores": [
+        "Replican en el citoplasma y mutan más",
+        "Siempre traen su propia ARN polimerasa",
+        "Nunca integran su genoma"
+      ],
+      "pista": "Dependen más de la célula.",
+      "explicacion": "Los virus ADN replican en el núcleo usando la maquinaria de la célula: menor tasa de mutación y capacidad de latencia."
+    },
+    {
+      "id": "virus-098",
+      "nivel": "m",
+      "pregunta": "En la curva de crecimiento viral, el «burst size» es:",
+      "correcta": "El número promedio de viriones liberados por cada célula infectada",
+      "distractores": [
+        "El tiempo que dura la fase de eclipse",
+        "La dosis mínima para iniciar la infección",
+        "El tamaño del virión en nanómetros"
+      ],
+      "pista": "«Burst» = estallido.",
+      "explicacion": "Burst size: cuántos viriones libera en promedio cada célula infectada."
+    },
+    {
+      "id": "virus-099",
+      "nivel": "m",
+      "pregunta": "¿Qué cuadro causa el virus parainfluenza?",
+      "correcta": "Crup",
+      "distractores": [
+        "Bronquiolitis",
+        "Resfrío común",
+        "Conjuntivitis"
+      ],
+      "pista": "Tos «de perro» en niños.",
+      "explicacion": "Parainfluenza (Paramyxoviridae, ARN −): crup. VSR: bronquiolitis. Rinovirus: resfrío. Adenovirus: faringitis y conjuntivitis."
+    },
+    {
+      "id": "virus-100",
+      "nivel": "m",
+      "caso": "Mujer de 34 años en control: Papanicolaou normal y PCR de VPH negativa.",
+      "pregunta": "¿Cuándo repite el tamizaje?",
+      "correcta": "Co-test en 5 años",
+      "distractores": [
+        "En 12 meses",
+        "Colposcopia inmediata",
+        "En 3 años con biopsia"
+      ],
+      "pista": "Es el resultado de menor riesgo.",
+      "explicacion": "Citología normal + VPH negativo = muy bajo riesgo: repetir el co-test en 5 años."
+    },
+    {
+      "id": "virus-101",
+      "nivel": "m",
+      "pregunta": "¿Por qué el VPH no pasa por la placenta ni por la leche materna?",
+      "correcta": "Porque no produce viremia: se queda en el epitelio",
+      "distractores": [
+        "Porque tiene envoltura lipídica frágil",
+        "Porque solo infecta varones",
+        "Porque la vacuna lo impide en todas las madres"
+      ],
+      "pista": "No circula por la sangre.",
+      "explicacion": "El VPH se transmite por contacto piel-piel o mucosa-mucosa. La vía vertical solo ocurre en el parto vaginal."
+    },
+    {
+      "id": "virus-102",
+      "nivel": "m",
+      "pregunta": "En el Papanicolaou, las clue cells (células epiteliales cubiertas de bacilos) indican:",
+      "correcta": "Vaginosis bacteriana por Gardnerella",
+      "distractores": [
+        "Infección por VPH",
+        "Herpes simple",
+        "Candidiasis"
+      ],
+      "pista": "No es un virus.",
+      "explicacion": "Hallazgos no neoplásicos del PAP: clue cells → Gardnerella; hifas y esporas → Candida; multinucleación con moldes nucleares → herpes; coilocitos → VPH."
+    },
+    {
+      "id": "virus-103",
+      "nivel": "m",
+      "pregunta": "¿Qué antiviral se usa contra la hepatitis C?",
+      "correcta": "Sofosbuvir",
+      "distractores": [
+        "Oseltamivir",
+        "Aciclovir",
+        "Maraviroc"
+      ],
+      "pista": "Es un antiviral de acción directa (AAD).",
+      "explicacion": "Hepatitis C: sofosbuvir, ledipasvir, daclatasvir, glecaprevir/pibrentasvir. Hepatitis B: tenofovir, entecavir, lamivudina, IFN-α."
+    },
+    {
+      "id": "virus-104",
+      "nivel": "m",
+      "pregunta": "¿Qué ventaja tiene el LIA frente al Western blot para confirmar VIH?",
+      "correcta": "Es más estandarizado y automatizable",
+      "distractores": [
+        "Detecta el virus antes que la PCR",
+        "No necesita suero del paciente",
+        "Se lee con microscopio de fluorescencia"
+      ],
+      "pista": "Usa proteínas recombinantes en líneas.",
+      "explicacion": "El LIA usa proteínas recombinantes fijas en líneas, es rápido y reproducible: es la confirmatoria recomendada. El WB está obsoleto en varios países."
+    },
+    {
+      "id": "virus-105",
+      "nivel": "d",
+      "caso": "Paciente de 40 años con fiebre, cefalea, confusión y convulsiones. El LCR tiene linfocitos y la resonancia muestra compromiso del lóbulo temporal.",
+      "pregunta": "¿Qué virus sospechas y qué examen lo confirma?",
+      "correcta": "Herpes simple; PCR en LCR",
+      "distractores": [
+        "Rabia; cultivo de LCR",
+        "Poliovirus; hemocultivo",
+        "VIH; Western blot"
+      ],
+      "explicacion": "Encefalitis temporal = herpes simple. LCR con linfocitos orienta a virus y la PCR en LCR es el gold standard. Se trata con aciclovir."
+    },
+    {
+      "id": "virus-106",
+      "nivel": "d",
+      "caso": "Varón de 50 años de la costa norte del Perú con HTLV-1: linfocitosis con células de núcleo multilobulado, adenopatías generalizadas, hepatoesplenomegalia, lesiones en la piel e hipercalcemia.",
+      "pregunta": "¿Qué forma de ATLL es?",
+      "correcta": "Aguda",
+      "distractores": [
+        "Indolente",
+        "Crónica",
+        "Linfomatosa"
+      ],
+      "explicacion": "Forma aguda: leucocitosis con células en flor, compromiso sistémico e hipercalcemia; pronóstico muy malo. La crónica no tiene hipercalcemia; la indolente solo afecta piel o pulmón; la linfomatosa tiene adenopatías sin células tumorales en sangre."
+    },
+    {
+      "id": "virus-107",
+      "nivel": "d",
+      "caso": "Paciente con VIH en TARV con buena adherencia. La carga viral, que estaba indetectable, sube y se mantiene alta en dos controles.",
+      "pregunta": "Según el MINSA, ¿qué esquema sigue?",
+      "correcta": "AZT + 3TC + LPV/r",
+      "distractores": [
+        "Seguir con TDF + 3TC + DTG",
+        "DRV/r + RAL + ETR directo",
+        "Suspender el tratamiento"
+      ],
+      "explicacion": "Fallo virológico documentado con buena adherencia: segunda línea con zidovudina + lamivudina + lopinavir/ritonavir. DRV/r + RAL + ETR es tercera línea, tras genotipificación."
+    },
+    {
+      "id": "virus-108",
+      "nivel": "d",
+      "caso": "Paciente con VIH, CD4 de 80 células/mm³, con fiebre, cefalea y déficit focal. La tomografía muestra lesiones cerebrales y se diagnostica toxoplasmosis cerebral.",
+      "pregunta": "¿En qué fase de la infección está?",
+      "correcta": "SIDA",
+      "distractores": [
+        "Síndrome retroviral agudo",
+        "Latencia clínica",
+        "Fase sintomática inicial con inmunidad conservada"
+      ],
+      "explicacion": "CD4 < 200 o una infección definitoria (toxoplasmosis cerebral, Pneumocystis, TB extrapulmonar, candidiasis esofágica, CMV, Cryptococcus) = SIDA. Con CD4 < 50 el riesgo es muy alto."
+    },
+    {
+      "id": "virus-109",
+      "nivel": "d",
+      "pregunta": "¿Qué diferencia hay entre neuroinvasión y neurovirulencia?",
+      "correcta": "Neuroinvasión es llegar al SNC; neurovirulencia es causar enfermedad en él",
+      "distractores": [
+        "Son sinónimos",
+        "Neuroinvasión es infectar neuronas periféricas; neurovirulencia, las centrales",
+        "Neurovirulencia es la velocidad de replicación en el LCR"
+      ],
+      "explicacion": "Un virus puede llegar al SNC (neuroinvasión) por vía hematógena o por nervios, y causar o no daño ahí (neurovirulencia)."
+    },
+    {
+      "id": "virus-110",
+      "nivel": "d",
+      "pregunta": "¿Por qué vía llega la rabia al sistema nervioso central?",
+      "correcta": "Diseminación neuronal retrógrada por nervios periféricos",
+      "distractores": [
+        "Diseminación hematógena atravesando la barrera hematoencefálica",
+        "Por el líquido cefalorraquídeo desde la nariz",
+        "Por linfocitos infectados"
+      ],
+      "explicacion": "La rabia sube por los nervios periféricos desde la mordedura. Otros virus llegan por la sangre y atraviesan la barrera hematoencefálica."
+    },
+    {
+      "id": "virus-111",
+      "nivel": "d",
+      "pregunta": "¿En qué enfermedades el daño lo produce sobre todo la respuesta inmune y no el virus directamente?",
+      "correcta": "Hepatitis viral y dengue grave",
+      "distractores": [
+        "Poliomielitis y resfrío común",
+        "Verrugas comunes y molusco contagioso",
+        "Rotavirus y norovirus"
+      ],
+      "explicacion": "Daño indirecto o inmunopatología: hepatitis viral y dengue grave. El poliovirus, en cambio, destruye las células directamente."
+    },
+    {
+      "id": "virus-112",
+      "nivel": "d",
+      "pregunta": "¿Por qué la coinfección VIH–VHB empeora el pronóstico?",
+      "correcta": "Acelera la enfermedad hepática",
+      "distractores": [
+        "Hace que el VHB se vuelva oncogénico por primera vez",
+        "Impide usar tenofovir",
+        "Hace que el VIH se transmita por saliva"
+      ],
+      "explicacion": "Las coinfecciones son un determinante del huésped: la coinfección VIH–VHB acelera el daño hepático."
+    },
+    {
+      "id": "virus-113",
+      "nivel": "d",
+      "pregunta": "¿Qué hallazgo histológico es típico del herpes?",
+      "correcta": "Cuerpos de inclusión de Cowdry",
+      "distractores": [
+        "Células gigantes multinucleadas del sarampión",
+        "Coilocitos",
+        "Células en flor"
+      ],
+      "explicacion": "Cowdry: inclusiones intranucleares del herpes. Células gigantes multinucleadas: sarampión. Coilocitos: VPH. Células en flor: ATLL."
+    },
+    {
+      "id": "virus-114",
+      "nivel": "d",
+      "pregunta": "¿Cómo actúa la amantadina?",
+      "correcta": "Inhibe el desnudamiento: impide que se libere el genoma viral dentro de la célula",
+      "distractores": [
+        "Inhibe la neuraminidasa",
+        "Bloquea la integrasa",
+        "Es un análogo de nucleósido"
+      ],
+      "explicacion": "Amantadina y rimantadina inhiben el desnudamiento. Oseltamivir y zanamivir inhiben la neuraminidasa."
+    },
+    {
+      "id": "virus-115",
+      "nivel": "d",
+      "pregunta": "¿Qué es el palivizumab?",
+      "correcta": "Un anticuerpo monoclonal contra el virus sincitial respiratorio",
+      "distractores": [
+        "Un inhibidor de la proteasa del VIH",
+        "Una vacuna contra el VPH",
+        "Un análogo de nucleósido contra el CMV"
+      ],
+      "explicacion": "Palivizumab es un anticuerpo monoclonal que bloquea la entrada del VSR. Para VSR también se usa ribavirina."
+    },
+    {
+      "id": "virus-116",
+      "nivel": "d",
+      "pregunta": "¿Con qué virus simio está más emparentado el VIH-2?",
+      "correcta": "SIV de los monos mangabey (SIVsmm)",
+      "distractores": [
+        "SIV de los chimpancés (SIVcpz)",
+        "HTLV-2",
+        "Virus linfotrópico bovino"
+      ],
+      "explicacion": "VIH-1 viene del SIV de chimpancés; VIH-2, del SIV de los monos mangabey, que viven donde el VIH-2 es más prevalente (África occidental)."
+    },
+    {
+      "id": "virus-117",
+      "nivel": "d",
+      "pregunta": "Según la norma del MINSA, ¿qué meta de carga viral se busca con el TARV?",
+      "correcta": "Indetectable (menos de 200 copias/mL) con CD4 en aumento",
+      "distractores": [
+        "Menos de 10 000 copias/mL",
+        "Que la carga viral baje a la mitad",
+        "CD4 menor de 200"
+      ],
+      "explicacion": "Meta: carga viral indetectable (< 200 copias/mL) y CD4 en aumento progresivo (> 500 células/µL). La carga viral se controla a los 6 meses y luego cada 6 meses."
+    },
+    {
+      "id": "virus-118",
+      "nivel": "d",
+      "caso": "Mujer de 45 años: citología HSIL y VPH de alto riesgo positivo.",
+      "pregunta": "¿Qué se hace?",
+      "correcta": "Colposcopia y/o biopsia",
+      "distractores": [
+        "Repetir co-test en 3 años",
+        "Repetir en 12 meses",
+        "Vacunar y controlar en 5 años"
+      ],
+      "explicacion": "HSIL con VPH positivo es una lesión de alto grado con virus oncogénico: colposcopia y biopsia. Si se confirma NIC 2–3, escisión (LEEP o conización)."
+    },
+    {
+      "id": "virus-119",
+      "nivel": "d",
+      "pregunta": "¿Qué genotipos agrega la vacuna nonavalente frente a la tetravalente?",
+      "correcta": "31, 33, 45, 52 y 58",
+      "distractores": [
+        "6 y 11",
+        "1, 2 y 4",
+        "16 y 18"
+      ],
+      "explicacion": "Gardasil 9 cubre 6, 11, 16, 18, 31, 33, 45, 52 y 58. La tetravalente del MINSA cubre 6, 11, 16 y 18; la bivalente, 16 y 18."
+    },
+    {
+      "id": "virus-120",
+      "nivel": "x",
+      "caso": "Mujer de 38 años de la Amazonía peruana, con debilidad progresiva de ambas piernas desde hace 2 años, hiperreflexia, Babinski positivo, dolor lumbar y urgencia urinaria. Serología anti-HTLV-1 positiva.",
+      "pregunta": "¿Cuál es el diagnóstico y cómo se produce el daño?",
+      "correcta": "Paraparesia espástica tropical (HAM/TSP): la respuesta inmune contra linfocitos infectados desmieliniza la médula",
+      "distractores": [
+        "ATLL con infiltración medular por células en flor",
+        "Esclerosis por infección directa de neuronas por HTLV-1",
+        "Neurosífilis por coinfección"
+      ],
+      "explicacion": "HAM/TSP afecta a menos del 1 % de los infectados: el virus infecta CD4 que entran al SNC, y la respuesta citotóxica daña los cordones laterales y anteriores. No hay cura: corticoides, interferón y rehabilitación."
+    },
+    {
+      "id": "virus-121",
+      "nivel": "x",
+      "caso": "Gestante de 28 semanas en una zona con agua no potable: ictericia, malestar y deterioro rápido de la función hepática.",
+      "pregunta": "¿Qué virus hepatotropo sospechas primero?",
+      "correcta": "Hepatitis E",
+      "distractores": [
+        "Hepatitis A",
+        "Hepatitis C",
+        "Hepatitis B"
+      ],
+      "explicacion": "La E (Hepeviridae, ARN +) y la A se transmiten por vía fecal-oral, pero la E es la que se vuelve grave en gestantes. B y C son por sangre y tienden a la cronicidad."
+    },
+    {
+      "id": "virus-122",
+      "nivel": "x",
+      "caso": "Gestante con HTLV-1 detectado en el control prenatal pregunta cómo evitar contagiar a su bebé.",
+      "pregunta": "¿Qué medida reduce más el riesgo?",
+      "correcta": "Evitar o acortar la lactancia materna",
+      "distractores": [
+        "Cesárea programada",
+        "Vacunar al recién nacido",
+        "Dar zidovudina al bebé por 6 semanas"
+      ],
+      "explicacion": "El HTLV-1 pasa en los linfocitos de la leche y el riesgo aumenta con la lactancia prolongada (10–25 % en hijos de madres positivas). Por eso Japón hace control prenatal obligatorio."
+    },
+    {
+      "id": "virus-123",
+      "nivel": "x",
+      "pregunta": "¿Qué antiviral contra la influenza inhibe la polimerasa, en lugar de la neuraminidasa?",
+      "correcta": "Baloxavir marboxil",
+      "distractores": [
+        "Oseltamivir",
+        "Zanamivir",
+        "Peramivir"
+      ],
+      "explicacion": "Antiinfluenza: inhibidores de neuraminidasa (oseltamivir, zanamivir, peramivir) e inhibidor de polimerasa (baloxavir marboxil)."
+    },
+    {
+      "id": "virus-124",
+      "nivel": "x",
+      "pregunta": "¿En qué células se cultiva el virus influenza?",
+      "correcta": "Células MDCK",
+      "distractores": [
+        "Células HeLa",
+        "Células H9",
+        "Agar sangre"
+      ],
+      "explicacion": "El cultivo viral usa líneas celulares específicas: influenza en MDCK, enterovirus en HeLa. Es lento, costoso y requiere BSL-2 o más. Las células H9 se usan en la IFI del VIH."
+    },
+    {
+      "id": "virus-125",
+      "nivel": "x",
+      "pregunta": "¿Qué antiviral sirve contra los poxvirus (viruela del mono)?",
+      "correcta": "Tecovirimat",
+      "distractores": [
+        "Oseltamivir",
+        "Sofosbuvir",
+        "Raltegravir"
+      ],
+      "explicacion": "Poxvirus: tecovirimat, cidofovir y brincidofovir. El cidofovir también se usa en adenovirus graves de inmunodeprimidos."
+    },
+    {
+      "id": "virus-126",
+      "nivel": "x",
+      "pregunta": "¿Dónde se encuentra sobre todo el HTLV-2 en el Perú?",
+      "correcta": "En pueblos indígenas amazónicos (Shipibo-Conibo, Matsés) y usuarios de drogas inyectables",
+      "distractores": [
+        "En donantes de sangre de Lima",
+        "En gestantes de la costa sur",
+        "Solo en casos importados de Japón"
+      ],
+      "explicacion": "El HTLV-1 es endémico en todo el Perú (donantes 0,4–1 %, gestantes 0,6–1,2 %). El HTLV-2 se concentra en pueblos amazónicos y usuarios de drogas IV."
+    },
+    {
+      "id": "virus-127",
+      "nivel": "x",
+      "pregunta": "En el cáncer anal, ¿qué genotipo de VPH predomina?",
+      "correcta": "VPH 16, en más del 85 % de los casos",
+      "distractores": [
+        "VPH 6",
+        "VPH 18, en más del 85 %",
+        "VPH 1 y 2"
+      ],
+      "explicacion": "VPH 16 domina en ano (> 85 %), pene (> 70 %) y orofaringe (70–90 %). En vulva: 16 y 33. En vagina: 16 y 18."
+    },
+    {
+      "id": "virus-128",
+      "nivel": "x",
+      "caso": "Mujer de 26 años sin síntomas pide un co-test (citología + PCR de VPH) porque una amiga se lo hizo.",
+      "pregunta": "¿Qué le explicas?",
+      "correcta": "A su edad no se recomienda: muchas infecciones por VPH son transitorias y llevarían a procedimientos innecesarios",
+      "distractores": [
+        "Debe hacérselo cada año desde ahora",
+        "Solo sirve si ya tiene verrugas",
+        "Es obligatorio antes de vacunarse"
+      ],
+      "explicacion": "El co-test se recomienda de 30 a 65 años. Antes de los 30, las infecciones transitorias son muy frecuentes; solo cerca del 10 % persiste más de 12–24 meses."
     }
   ]
 };

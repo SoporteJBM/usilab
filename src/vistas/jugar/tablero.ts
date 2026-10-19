@@ -11,6 +11,8 @@ import { elegirModo } from "./niveles";
 import { aItem, jugarPreguntas } from "./quiz";
 import { mostrarMicroscopio } from "./microscopio";
 import { menuAhorcado } from "./ahorcado";
+import { introExamen, PREGUNTAS_EXAMEN } from "./examen";
+import { mostrarEntrenadorVirus } from "./entrenador-virus";
 
 const TAMANO_RONDA: Record<string, number> = { casos: 4 };
 
@@ -62,7 +64,7 @@ export const iniciarRonda = vista("la ronda", (id: string, k: Nivel) => {
   });
 });
 
-interface Tarjeta { id: string; nombre: string; descripcion: string; resumen: string; nota: string; jugar?: () => void; textoJugar?: string; total: number; hechas: number }
+interface Tarjeta { id: string; nombre: string; descripcion: string; resumen: string; nota: string; jugar?: () => void; textoJugar?: string; total: number; hechas: number; examen?: () => void }
 
 function tarjetas(): Tarjeta[] {
   const deEstacion = (st: Estacion): Tarjeta => ({
@@ -70,10 +72,15 @@ function tarjetas(): Tarjeta[] {
     total: st.preguntas.length, hechas: dominadasDe(st.id),
     nota: st.preguntas.length ? dominadasDe(st.id) + " de " + st.preguntas.length + " dominadas · 4 niveles" : "Solo lectura",
     jugar: st.preguntas.length ? () => elegirNivel(st.id) : undefined,
+    examen: st.preguntas.length >= PREGUNTAS_EXAMEN ? () => introExamen(st.id, mostrarTablero) : undefined,
   });
   const palabras = Object.values(AHORCADO).reduce((n, l) => n + l.length, 0);
   return [
-    ...ESTACIONES.map(deEstacion),
+    ...ESTACIONES.flatMap((st) => st.id !== "virus" ? [deEstacion(st)] : [deEstacion(st), {
+      id: "entrenador-virus", nombre: "Entrenador de Virus", descripcion: "Baltimore, VIH paso a paso, CD4, esquemas, co-test y proteínas",
+      resumen: "Ejercicios cortos para fijar lo que más se pregunta de Virus. Cada ronda sale distinta.", total: 0, hechas: 0,
+      nota: "6 ejercicios", jugar: () => mostrarEntrenadorVirus(mostrarTablero), textoJugar: "Entrenar",
+    }]),
     { ...MICROSCOPIO, total: 0, hechas: 0, nota: FOTOS.length + " fotos reales · " + AGENTES_MICROSCOPIO.length + " estructuras", jugar: mostrarMicroscopio, textoJugar: "Entrar" },
     { id: "ahorcado", nombre: "Ahorcado", descripcion: "Adivina el agente con su pista", resumen: AHORCADO_RESUMEN, total: 0, hechas: 0, nota: palabras + " palabras en 4 niveles", jugar: menuAhorcado },
     deEstacion(CASOS),
@@ -95,6 +102,7 @@ export const mostrarTablero = vista("el tablero", () => {
     card.append(mk("p", "note", t.nota));
     const fila = mk("div", "row");
     fila.append(boton("Estudiar", "ghost", () => mostrarResumen(t.id)));
+    if (t.examen) fila.append(boton("Examen", "ghost", t.examen));
     if (t.jugar) fila.append(boton(t.textoJugar ?? "Jugar", "primary", t.jugar));
     card.append(fila);
     home.append(card);

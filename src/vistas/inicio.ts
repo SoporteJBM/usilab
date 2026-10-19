@@ -11,6 +11,8 @@ import { abrirPanel } from "../ui/marco";
 import { gruposConMaterial, listaDeAgentes } from "./estudio/indice";
 import { jugarTarjetas } from "./estudio/tarjetas";
 import { elegirNivel, mostrarTablero } from "./jugar/tablero";
+import { introExamen, PREGUNTAS_EXAMEN } from "./jugar/examen";
+import { mostrarEntrenadorVirus } from "./jugar/entrenador-virus";
 
 const gruposDe = (nombre: string) => {
   const sec = INDICE.find((s) => s.titulo === nombre);
@@ -68,6 +70,9 @@ export const mostrarReino = vista("el grupo", (nombre: string) => {
       boton("Practicar " + nombre.toLowerCase(), "primary", () => elegirNivel(st.id)),
       boton("Tarjetas de repaso", "ghost", () => jugarTarjetas(st.preguntas.map((q) => ({ est: st, q })), nombre, () => mostrarReino(nombre))),
     );
+    const volverAqui = () => mostrarReino(nombre);
+    if (st.preguntas.length >= PREGUNTAS_EXAMEN) fila.append(boton("Modo examen", "ghost", () => introExamen(st.id, volverAqui)));
+    if (st.id === "virus") fila.append(boton("Entrenador de Virus", "ghost", () => mostrarEntrenadorVirus(volverAqui)));
     const res = mk("details", "topic");
     res.append(mk("summary", null, "Resumen del tema"), mk("p", "study", st.resumen));
     p.append(fila, res);
