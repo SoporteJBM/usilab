@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  AGENTES_MICROSCOPIO, AHORCADO, AHORCADO_PUNTOS, CASOS, DATOS_CURIOSOS, ESTACIONES, FOTOS, INDICE, PARES, PERFILES, REINOS, TABLAS,
+  AGENTES_MICROSCOPIO, AHORCADO, AHORCADO_PUNTOS, CASOS, DATOS_CURIOSOS, ESTACIONES, FLUJOGRAMAS, FOTOS, INDICE, PARES, PERFILES, REINOS, TABLAS,
   type Estacion, type NivelAhorcado,
 } from "../src/content";
 
@@ -111,6 +111,20 @@ NIVELES_A.forEach((k) => {
     if (palabras.has(w.palabra)) aviso(`Ahorcado: "${w.palabra}" está en ${palabras.get(w.palabra)} y en ${k}.`);
     palabras.set(w.palabra, k);
   });
+});
+
+// ---- Flujogramas ----
+const idsFlujo = new Set<string>();
+FLUJOGRAMAS.forEach((f) => {
+  if (idsFlujo.has(f.id)) error(`Flujograma "${f.id}": id repetido.`);
+  idsFlujo.add(f.id);
+  if (vacio(f.titulo) || vacio(f.consigna)) error(`Flujograma "${f.id}": falta título o consigna.`);
+  if (f.pasos.length < 3) error(`Flujograma "${f.titulo}": necesita al menos 3 pasos.`);
+  if (f.claves.length < 3) error(`Flujograma "${f.titulo}": necesita al menos 3 claves para autoevaluarse.`);
+  const textos = f.pasos.map((p) => norm(p.texto));
+  if (new Set(textos).size !== textos.length) error(`Flujograma "${f.titulo}": hay pasos repetidos (al armarlo no se distinguirían).`);
+  f.intrusos.forEach((t) => { if (textos.includes(norm(t))) error(`Flujograma "${f.titulo}": el paso falso "${t}" es igual a un paso real.`); });
+  if (!f.intrusos.length) aviso(`Flujograma "${f.titulo}": no tiene pasos falsos.`);
 });
 
 // ---- Datos curiosos ----

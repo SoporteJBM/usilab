@@ -10,6 +10,8 @@ import { conDatoCurioso } from "../../ui/cargando";
 import { abrirPanel } from "../../ui/marco";
 import { jugarPreguntas, type ItemQuiz } from "./quiz";
 import { mostrarTablero } from "./tablero";
+import { mostrarFlujogramas } from "../estudio/flujogramas";
+import { FLUJOGRAMAS } from "../../content";
 
 const POR_RONDA = 10;
 const PUNTOS = 10;
@@ -152,6 +154,10 @@ export const mostrarEntrenadorVirus = vista("el entrenador de virus", (volver: (
     b.append(mk("span", null, e.titulo), mk("small", null, e.detalle));
     menu.append(b);
   }
+  const flujos = boton("", null, () => mostrarFlujogramas(() => mostrarEntrenadorVirus(volver), "jugar"));
+  flujos.dataset.ejercicio = "flujogramas";
+  flujos.append(mk("span", null, "Flujogramas (preguntas abiertas)"), mk("small", null, FLUJOGRAMAS.filter((f) => f.tema === "Virus").length + " flujogramas: respóndelos o ármalos en orden"));
+  menu.append(flujos);
   p.append(menu, boton("Volver", "ghost", volver));
 });
 

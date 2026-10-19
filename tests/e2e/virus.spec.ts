@@ -103,7 +103,7 @@ test("entrenador de virus: se abre desde Inicio y se juega una ronda", async ({ 
   await comoInvitado(page);
   await page.locator(".reino.vir").getByRole("button", { name: "Ver todo" }).click();
   await page.getByRole("button", { name: "Entrenador de Virus" }).click();
-  await expect(page.locator(".menu button")).toHaveCount(6);
+  await expect(page.locator(".menu button")).toHaveCount(7);
   for (const id of ["baltimore", "cd4", "dx", "tarv", "cotest", "proteinas"]) {
     await page.locator(`.menu button[data-ejercicio="${id}"]`).click();
     await page.locator("#loader").click();

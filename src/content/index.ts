@@ -8,3 +8,4 @@ export { PERFILES } from "./perfiles";
 export { INDICE, REINOS } from "./indice";
 export { TABLAS } from "./tablas";
 export { NIVELES, PUNTOS, PISTA, NOMBRE_NIVEL } from "./niveles";
+export { FLUJOGRAMAS, type Flujograma, type PasoFlujo } from "./flujogramas";

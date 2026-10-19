@@ -32,12 +32,12 @@ src/
     estaciones/       una estación por archivo: hongos.ts, bacterias.ts, casos.ts…
     microscopio.ts    estructuras, pares "No confundir" y fotos
     perfiles.ts       página de cada agente (Escherichia coli, Candida…)
-    ahorcado.ts, indice.ts, tablas.ts, datos-curiosos.ts, niveles.ts
+    ahorcado.ts, indice.ts, tablas.ts, flujogramas.ts, entrenador-virus.ts, datos-curiosos.ts, niveles.ts
     types.ts          forma que debe tener cada dato
   vistas/             pantallas
     inicio.ts, login.ts, comentarios.ts
     jugar/            tablero, niveles, quiz (motor de preguntas), examen, entrenador-virus, microscopio, ahorcado
-    estudio/          hub, buscador, tarjetas, errores, tablas, fichas, confundir, resúmenes, índice, agente
+    estudio/          hub, buscador, tarjetas, errores, flujogramas, tablas, fichas, confundir, resúmenes, índice, agente
   servicios/          supabase.ts (llamadas seguras), sesion.ts (cuenta y sincronización), comentarios.ts
   estado/progreso.ts  puntos, dominadas y errores, con validación de datos
   lib/                errores.ts, almacen.ts (localStorage seguro), dom.ts, azar.ts, texto.ts
