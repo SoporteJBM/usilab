@@ -100,3 +100,6 @@ ol.flujo-armado li.mal .flujo-elegido { border-color: var(--hint); background: c
 ol.flujo-armado li.intruso .flujo-elegido { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--surface)); text-decoration: line-through; }
 .flujo-banco { display: flex; flex-direction: column; gap: 6px; }
 .flujo-ficha { border-style: dashed; }
+
+.flujo-tema { margin: 18px 0 4px; font-size: 1.05rem; }
+.flujo-tema:first-child { margin-top: 0; }

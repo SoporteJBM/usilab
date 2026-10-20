@@ -68,3 +68,15 @@ test("los flujogramas también se abren desde el Entrenador de Virus", async ({ 
   await page.getByRole("button", { name: "← Volver" }).click();
   await expect(page.getByRole("heading", { name: "Entrenador de Virus" })).toBeVisible();
 });
+
+test("los flujogramas de Hongos aparecen agrupados y se abren con su modelo", async ({ page }) => {
+  const hongos = FLUJOGRAMAS.filter((f) => f.tema === "Hongos");
+  expect(hongos.length).toBe(11);
+  await abrirLista(page);
+  await expect(page.locator("h3.flujo-tema")).toHaveText(["Virus", "Hongos"]);
+  const muguet = hongos.find((f) => f.id === "hongos-muguet")!;
+  await page.locator(".flujo-item", { hasText: muguet.titulo }).getByRole("button", { name: "Responder" }).click();
+  await page.getByRole("button", { name: "Ver modelo y autoevaluarme" }).click();
+  await expect(page.locator("ol.flujo > li")).toHaveCount(muguet.pasos.length);
+  await expect(page.locator("ul.flujo-claves input")).toHaveCount(muguet.claves.length);
+});

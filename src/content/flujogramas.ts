@@ -1,5 +1,7 @@
 // Flujogramas para practicar con preguntas abiertas.
-// Fuentes: Teoría 10 (Introducción a los virus) y Teoría 11 (VIH, HTLV y VPH).
+import { FLUJOGRAMAS_HONGOS } from "./flujogramas-hongos";
+
+// Fuentes (Virus): Teoría 10 (Introducción a los virus) y Teoría 11 (VIH, HTLV y VPH).
 
 export interface PasoFlujo {
   texto: string;
@@ -12,6 +14,8 @@ export interface PasoFlujo {
 export interface Flujograma {
   id: string;
   tema: string;
+  /** Subgrupo dentro del tema (p. ej. «Levaduras» en Hongos). */
+  grupo?: string;
   titulo: string;
   /** La pregunta abierta, como la pondría el profesor. */
   consigna: string;
@@ -23,7 +27,7 @@ export interface Flujograma {
   intrusos: string[];
 }
 
-export const FLUJOGRAMAS: Flujograma[] = [
+const FLUJOGRAMAS_VIRUS: Flujograma[] = [
   {
     id: "vih-dx-adulto",
     tema: "Virus",
@@ -246,3 +250,5 @@ export const FLUJOGRAMAS: Flujograma[] = [
     intrusos: ["El ARN − se traduce directamente", "Los virus ADN usan transcriptasa inversa siempre"],
   },
 ];
+
+export const FLUJOGRAMAS: Flujograma[] = [...FLUJOGRAMAS_VIRUS, ...FLUJOGRAMAS_HONGOS];

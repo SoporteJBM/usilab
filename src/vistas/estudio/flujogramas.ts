@@ -39,9 +39,14 @@ export const mostrarFlujogramas = vista("los flujogramas", (volver: () => void =
   p.append(boton("← Volver", "ghost back", volver), mk("h2", null, "Flujogramas"));
   p.append(mk("p", "note", "Preguntas abiertas como las del examen. Respóndelas en papel o aquí, compara con el modelo y revisa qué claves incluiste. También puedes armarlos ordenando los pasos."));
   const lista = mk("div", "results");
+  let temaActual = "";
   for (const f of FLUJOGRAMAS) {
+    if (f.tema !== temaActual) {
+      temaActual = f.tema;
+      lista.append(mk("h3", "flujo-tema", temaActual));
+    }
     const c = mk("div", "result flujo-item");
-    c.append(mk("small", null, f.tema + " · " + f.pasos.length + " pasos"), mk("strong", null, f.titulo), mk("p", "study", f.consigna));
+    c.append(mk("small", null, (f.grupo ?? f.tema) + " · " + f.pasos.length + " pasos"), mk("strong", null, f.titulo), mk("p", "study", f.consigna));
     const fila = mk("div", "row");
     const atras = () => mostrarFlujogramas(volver, seccion);
     fila.append(
