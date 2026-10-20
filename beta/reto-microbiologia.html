@@ -93,6 +93,7 @@ button:disabled { opacity: .45; cursor: default; }
 .fact p { font-size: 21px; margin: 8px 0 0; text-wrap: balance; line-height: 1.35; }
 .fact .skip { display: block; margin-top: 18px; font-family: var(--display); font-size: 12px; color: var(--muted); }
 #loader { cursor: pointer; }
+#fact-seguir { margin-top: 22px; min-width: 160px; }
 .word { font-family: var(--display); font-size: 28px; letter-spacing: .12em; margin: 0; font-variant-numeric: tabular-nums; word-break: break-all; }
 .kb { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; }
 .kb button { padding: 6px 0; min-height: 40px; border-radius: 6px; }
@@ -439,7 +440,8 @@ table.cov .no { color: var(--muted); }
   <div class="fact">
     <small>¿Sabías que...?</small>
     <p id="fact"></p>
-    <span class="skip">Toca para continuar</span>
+    <button type="button" id="fact-seguir" class="primary">Continuar</button>
+    <span class="skip">Toca la pantalla o presiona Enter</span>
   </div>
 </div>
 
@@ -2687,10 +2689,13 @@ function go(fn, topic) {
   lastFact = f;
   $("#fact").textContent = f;
   loader.hidden = false;
+  // Se queda hasta que el alumno toque la pantalla o presione Enter (o Espacio).
   let done = false;
-  const finish = () => { if (done) return; done = true; loader.hidden = true; loader.onclick = null; fn(); };
+  const tecla = (e) => { if (!e.repeat && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); finish(); } };
+  const finish = () => { if (done) return; done = true; loader.hidden = true; loader.onclick = null; document.removeEventListener("keydown", tecla); fn(); };
   loader.onclick = finish;
-  setTimeout(finish, 3200);
+  // Un poco de espera para que el Enter que abrió el juego no salte el dato.
+  setTimeout(() => { if (done) return; document.addEventListener("keydown", tecla); const b = $("#fact-seguir"); if (b) b.focus({ preventScroll: true }); }, 250);
 }
 
 // FLUJOGRAMA EVALUADO: el alumno hace el flujograma en papel, le toma una foto y Claude lo corrige

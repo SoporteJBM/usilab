@@ -120,3 +120,19 @@ test("la marca MiUsiLab está arriba a la izquierda y lleva al inicio", async ({
   await marca.click();
   await expect(page.locator("#topnav button.on")).toHaveText("Inicio");
 });
+
+test("el «¿Sabías que...?» espera a que el alumno toque o presione Enter", async ({ page }) => {
+  await abrir(page);
+  await comoInvitado(page);
+  await page.locator(".reino.bac").getByRole("button", { name: "Ver todo" }).click();
+  await page.locator(".idx-item", { hasText: "Escherichia coli" }).click();
+  await page.getByRole("button", { name: /Practicar solo Escherichia coli/ }).click();
+  const loader = page.locator("#loader");
+  await expect(loader).toBeVisible();
+  await page.waitForTimeout(4000); // antes se iba solo a los 3,2 s
+  await expect(loader).toBeVisible();
+  await expect(page.locator("#fact-seguir")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(loader).toBeHidden();
+  await expect(page.locator(".opts button").first()).toBeVisible();
+});
