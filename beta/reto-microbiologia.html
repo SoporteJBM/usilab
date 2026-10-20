@@ -197,6 +197,7 @@ figure.fg { margin: 0; display: flex; flex-direction: column; align-items: stret
 .fg-muestra .fg-dec { padding: 8px 24px; clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%); }
 details.fe-modelo > summary, details.fs-exp > summary { font-family: var(--display); }
 details.fe-modelo[open] figure.fg { margin-bottom: 4px; }
+h3.fs-area { font-family: var(--display); font-size: 19px; margin: 12px 0 0; scroll-margin-top: 80px; }
 ol.fs-flujo { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 24px; }
 ol.fs-flujo li { position: relative; border: 1.5px solid var(--accent); border-radius: 12px; padding: 12px 14px; background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
 ol.fs-flujo li:not(:last-child)::after { content: "↓"; position: absolute; left: 50%; bottom: -24px; transform: translateX(-50%); line-height: 24px; color: var(--muted); font-family: var(--display); }
@@ -922,12 +923,12 @@ function pickLevel(id) {
     const ids = st.bank.map((q, i) => (q.n === k ? i : -1)).filter((i) => i >= 0);
     return ids.length + " preguntas · " + ids.filter((i) => m[i]).length + " dominadas · rondas de " + roundSize(st, k);
   }, (k) => go(() => startRound(id, k), id), showHome, id);
-  if (id === "virus" && typeof elegirModoFlujo === "function") {
+  if ((id === "virus" || id === "hongos") && typeof elegirModoFlujo === "function") {
     const p = $("#panel");
-    const nota = mk("p", "note", "Cada ronda de Virus incluye un flujograma en papel (con foto) que se corrige según el nivel. Para practicar solo flujogramas:");
+    const nota = mk("p", "note", "Cada ronda de " + st.name + " incluye un flujograma en papel (con foto) que se corrige según el nivel. Para practicar solo flujogramas:");
     const b = mk("button", "fj-modo", ""); b.type = "button";
     b.append(mk("strong", null, "Modo flujogramas"), mk("span", null, "Siempre en papel con foto; Claude corrige. Fácil: 4 criterios · Medio: 6 · Difícil: 8 · Muy difícil: 8 con nivel de examen final"));
-    b.onclick = () => elegirModoFlujo();
+    b.onclick = () => elegirModoFlujo(null, undefined, id);
     const fila = p.querySelector(".row");
     p.insertBefore(nota, fila); p.insertBefore(b, fila);
   }
@@ -937,7 +938,7 @@ function startRound(id, k) {
   const st = getStation(id);
   const items = pickRound(st, k).map((i) => toItem(st.bank[i], i));
   // Virus: una de las preguntas de cada ronda es de flujograma, evaluada según el nivel.
-  if (id === "virus" && items.length >= 2 && typeof itemFlujo === "function") items.splice(Math.floor(Math.random() * items.length), 1, itemFlujo(k));
+  if ((id === "virus" || id === "hongos") && items.length >= 2 && typeof itemFlujo === "function") items.splice(Math.floor(Math.random() * items.length), 1, itemFlujo(k, null, id));
   runQuiz(st.name + " · " + NOMBRE_NIVEL[k], items, PTS[k] * (id === "casos" ? 2 : 1), {
     station: id,
     hint: HINT[k],
@@ -1426,11 +1427,12 @@ function renderHome() {
   const fe = mk("article", "station fe-station");
   const h = flujoHistorial(), hechos = Object.keys(h).length;
   fe.append(mk("h2", null, "Flujograma evaluado"), mk("p", null, "Haz el flujograma de un caso en papel, mándale la foto a Claude y te corrige según el nivel."));
-  fe.append(mk("p", "note", FLUJO_CASOS.length + " casos · " + hechos + " hechos · nota sobre 20"));
+  fe.append(mk("p", "note", FLUJO_CASOS.filter((c) => c.area === "virus").length + " casos de Virus · " + FLUJO_CASOS.filter((c) => c.area === "hongos").length + " de Hongos · nota sobre 20"));
   const feRow = mk("div", "row");
   const feSol = mk("button", "ghost", "Ver soluciones"); feSol.onclick = () => showFlujoSoluciones();
-  const feJug = mk("button", "primary", "Jugar"); feJug.onclick = () => elegirModoFlujo(null, showHome);
-  feRow.append(feSol, feJug); fe.append(feRow);
+  const feVir = mk("button", "primary", "Virus"); feVir.onclick = () => elegirModoFlujo(null, showHome, "virus");
+  const feHon = mk("button", "primary", "Hongos"); feHon.onclick = () => elegirModoFlujo(null, showHome, "hongos");
+  feRow.append(feSol, feVir, feHon); fe.append(feRow);
   home.append(fe);
 }
 
@@ -2316,7 +2318,7 @@ function showReino(nombre) {
   const jug = mk("button", "primary", "Practicar " + nombre.toLowerCase()); jug.onclick = () => pickLevel(st.id);
   const tar = mk("button", "ghost", "Tarjetas de repaso"); tar.onclick = () => runFlash(st.bank.map((q, i) => ({ st, q, i })), nombre);
   row.append(jug, tar);
-  if (nombre === "Virus") { const fe = mk("button", "ghost", "Flujograma evaluado"); fe.onclick = () => elegirModoFlujo(null, () => showReino(nombre)); const fs = mk("button", "ghost", "Flujogramas resueltos"); fs.onclick = () => showFlujoSoluciones(() => showReino(nombre)); row.append(fe, fs); }
+  if (nombre === "Virus" || nombre === "Hongos") { const ar = nombre === "Virus" ? "virus" : "hongos"; const fe = mk("button", "ghost", "Flujograma evaluado"); fe.onclick = () => elegirModoFlujo(null, () => showReino(nombre), ar); const fs = mk("button", "ghost", "Flujogramas resueltos"); fs.onclick = () => showFlujoSoluciones(() => showReino(nombre), ar); row.append(fe, fs); }
   p.append(row);
   const res = mk("details", "topic"); res.append(mk("summary", null, "Resumen del tema"), mk("p", "study", st.study));
   p.append(res);
@@ -2995,6 +2997,279 @@ function flujoModeloTexto(id) {
   ).join("\n");
 }
 
+// FLUJOGRAMAS DE HONGOS: casos, clave por criterio y flujograma gráfico.
+// Fuente: material de la estación Hongos (prácticas 4, 5 y 6, banco de laboratorio y fichas revisadas por Mafer).
+const FLUJO_CASOS_HONGOS = [
+  {
+    id: "muguet", tema: "Levaduras", area: "hongos",
+    caso: "Varón de 32 años con VIH sin tratamiento. Desde hace una semana tiene ardor en la boca y placas blancas en la lengua y el paladar que se desprenden al rasparlas y dejan la base roja.",
+    clave: {
+      sintomas: "Placas blancas en lengua, paladar y mucosa oral que se desprenden y dejan base roja; ardor o dolor al comer.",
+      zona: "Mucosa oral (orofaringe).",
+      enfermedad: "Candidiasis oral (muguet) por Candida albicans, favorecida por la inmunosupresión del VIH.",
+      patogenia: "Candida albicans es una levadura de la flora normal. Con inmunosupresión (VIH, CD4 bajos), antibióticos o corticoides prolifera, forma pseudohifas y coloniza la mucosa formando las placas.",
+      diagnostico: "Clínico; examen directo (KOH o Gram): levaduras con pseudohifas. Cultivo en Sabouraud. Tubo germinal positivo a las 2–3 horas a 37 °C; en agar harina de maíz, clamidoconidias (solo C. albicans).",
+      tratamiento: "Nistatina oral en suspensión; tratar la causa (iniciar TARV en el VIH).",
+      prevencion: "Controlar la inmunosupresión (TARV), evitar antibióticos o corticoides innecesarios. Complicaciones: candidiasis esofágica (definitoria de SIDA) y diseminación."
+    },
+    grafico: [
+      ["ini", "patogenia", "Candida albicans: levadura de la flora normal"],
+      ["dec", "patogenia", "¿Hay inmunosupresión (VIH, CD4 bajos), antibióticos o corticoides?", "No → sigue como flora, sin enfermedad"],
+      ["pro", "patogenia", "Prolifera y forma pseudohifas en la mucosa"],
+      ["pro", "zona", "Mucosa oral (orofaringe)"],
+      ["pro", "sintomas", "Placas blancas que se desprenden y dejan base roja; ardor"],
+      ["pro", "enfermedad", "Candidiasis oral (muguet)"],
+      ["pro", "diagnostico", "Examen directo: levaduras + pseudohifas · Sabouraud · tubo germinal +"],
+      ["pro", "tratamiento", "Nistatina oral en suspensión + tratar la causa (TARV)"],
+      ["fin", "prevencion", "Controlar la inmunosupresión · Complicación: candidiasis esofágica (SIDA), diseminación"]
+    ]
+  },
+  {
+    id: "candidemia", tema: "Levaduras", area: "hongos",
+    caso: "Mujer de 60 años en UCI con catéter venoso central desde hace 2 semanas, recibiendo antibióticos de amplio espectro. Tiene fiebre que no baja con los antibióticos. En el hemocultivo crecen levaduras.",
+    clave: {
+      sintomas: "Fiebre persistente que no responde a antibióticos; puede haber hipotensión o shock.",
+      zona: "Sangre (fungemia), a partir del catéter venoso central; puede sembrar otros órganos.",
+      enfermedad: "Candidemia asociada a catéter (candidiasis invasiva).",
+      patogenia: "Los antibióticos de amplio espectro eliminan la flora bacteriana y Candida prolifera; el catéter es la puerta de entrada y se cubre de levaduras, que pasan a la sangre.",
+      diagnostico: "Hemocultivo con levaduras. Identificación: tubo germinal (positivo en C. albicans), agar harina de maíz (clamidoconidias). Importa la especie: C. glabrata tolera mal los azoles y C. krusei resiste el fluconazol.",
+      tratamiento: "Equinocandina y retirar el catéter.",
+      prevencion: "Retirar catéteres que no se usan, usar antibióticos solo cuando hacen falta. Complicaciones: siembra en otros órganos, shock, muerte. Si la levadura es Rhodotorula, las equinocandinas no sirven (anfotericina B)."
+    },
+    grafico: [
+      ["ini", "patogenia", "Antibióticos de amplio espectro + catéter venoso central"],
+      ["pro", "patogenia", "Candida prolifera y coloniza el catéter → pasa a la sangre"],
+      ["pro", "zona", "Sangre (fungemia) desde el catéter"],
+      ["pro", "sintomas", "Fiebre que no baja con antibióticos"],
+      ["pro", "enfermedad", "Candidemia asociada a catéter"],
+      ["pro", "diagnostico", "Hemocultivo: levaduras → identificar la especie (tubo germinal, harina de maíz)"],
+      ["dec", "diagnostico", "¿Es Candida?", "Rhodotorula (rosada, tubo germinal −) → retirar catéter + anfotericina B"],
+      ["pro", "tratamiento", "Equinocandina + retirar el catéter"],
+      ["fin", "prevencion", "Retirar catéteres innecesarios, uso racional de antibióticos · Complicaciones: siembra en órganos, shock"]
+    ]
+  },
+  {
+    id: "aspergilosis", tema: "Mohos hialinos", area: "hongos",
+    caso: "Paciente de 45 años con leucemia, neutropénico tras quimioterapia. Fiebre persistente, tos y dolor torácico. La TAC muestra un nódulo pulmonar con signo del halo y el galactomanano es positivo.",
+    clave: {
+      sintomas: "Fiebre persistente pese a antibióticos, tos, dolor torácico (puede haber hemoptisis).",
+      zona: "Pulmón.",
+      enfermedad: "Aspergilosis pulmonar invasiva por Aspergillus fumigatus.",
+      patogenia: "Se inhalan los conidios del ambiente. En el neutropénico no se eliminan: germinan en hifas hialinas septadas que invaden el tejido pulmonar.",
+      diagnostico: "TAC con signo del halo; galactomanano positivo. Cultivo en Sabouraud: colonia blanca que se vuelve verde azulada; microscopio: hifas hialinas septadas con conidióforo, vesícula y fiálides uniseriadas (cabeza aspergilar). Crece hasta 50 °C.",
+      tratamiento: "Voriconazol.",
+      prevencion: "Proteger al neutropénico de la exposición a conidios. Complicaciones: diseminación, hemoptisis, muerte. La resistencia a azoles se asocia a mutaciones en cyp51A; A. terreus resiste la anfotericina B."
+    },
+    grafico: [
+      ["ini", "patogenia", "Inhalación de conidios de Aspergillus fumigatus"],
+      ["dec", "patogenia", "¿El paciente es neutropénico?", "No → los conidios se eliminan (en asmáticos: ABPA; en cavernas: aspergiloma)"],
+      ["pro", "patogenia", "Conidios germinan → hifas hialinas septadas que invaden el tejido"],
+      ["pro", "zona", "Pulmón"],
+      ["pro", "sintomas", "Fiebre persistente, tos, dolor torácico"],
+      ["pro", "enfermedad", "Aspergilosis pulmonar invasiva"],
+      ["pro", "diagnostico", "TAC: signo del halo · galactomanano + · cultivo: cabeza aspergilar"],
+      ["pro", "tratamiento", "Voriconazol"],
+      ["fin", "prevencion", "Proteger al neutropénico de los conidios · Complicaciones: diseminación, hemoptisis"]
+    ]
+  },
+  {
+    id: "mucormicosis", tema: "Mucorales", area: "hongos",
+    caso: "Varón de 58 años con diabetes mal controlada, ingresa en cetoacidosis. Tiene dolor facial, congestión nasal, fiebre y una escara negra en el paladar. En los días siguientes aparece edema periorbitario.",
+    clave: {
+      sintomas: "Dolor facial, congestión nasal, fiebre, escara negra en paladar o cornetes; luego compromiso de la órbita y alteración neurológica.",
+      zona: "Senos paranasales, paladar, órbita y cerebro (forma rinocerebral).",
+      enfermedad: "Mucormicosis rinocerebral por Rhizopus (mucorales).",
+      patogenia: "Se inhalan las esporas. La cetoacidosis libera hierro, que el hongo aprovecha (la deferoxamina también le entrega hierro). Las hifas invaden y necrosan el tejido, por eso la escara negra.",
+      diagnostico: "Biopsia o cultivo: hifas anchas no septadas en cinta, ramificadas en ángulo recto; en cultivo, colonia algodonosa blanca con puntos negros (esporangios) y rizoides. En la forma pulmonar, TAC con halo invertido.",
+      tratamiento: "Anfotericina B liposomal + desbridamiento quirúrgico urgente + corregir la cetoacidosis.",
+      prevencion: "Control de la diabetes. El voriconazol no cubre mucorales. Complicaciones: invasión de órbita y cerebro, muerte."
+    },
+    grafico: [
+      ["ini", "patogenia", "Inhalación de esporas de Rhizopus"],
+      ["pro", "patogenia", "Cetoacidosis libera hierro → el hongo crece"],
+      ["pro", "patogenia", "Hifas anchas no septadas invaden y necrosan el tejido"],
+      ["pro", "zona", "Senos paranasales y paladar → órbita → cerebro"],
+      ["pro", "sintomas", "Dolor facial, congestión, fiebre, escara negra en el paladar"],
+      ["pro", "enfermedad", "Mucormicosis rinocerebral"],
+      ["pro", "diagnostico", "Biopsia/cultivo: hifas anchas no septadas, esporangios y rizoides"],
+      ["dec", "diagnostico", "¿Son hifas anchas no septadas (mucoral)?", "No → otro moho (p. ej. Aspergillus: voriconazol)"],
+      ["pro", "tratamiento", "Anfotericina B liposomal + desbridamiento urgente + corregir cetoacidosis (el voriconazol no cubre mucorales)"],
+      ["fin", "prevencion", "Control de la diabetes · Complicaciones: invasión de órbita y cerebro, muerte"]
+    ]
+  },
+  {
+    id: "queratitis-fusarium", tema: "Mohos hialinos", area: "hongos",
+    caso: "Agricultor de 40 años que sufrió un golpe en el ojo con una rama hace 10 días. Tiene dolor, ojo rojo y visión borrosa. En la córnea hay una úlcera de bordes plumosos con hipopión.",
+    clave: {
+      sintomas: "Dolor ocular, ojo rojo, visión borrosa; úlcera corneal de bordes plumosos con hipopión.",
+      zona: "Córnea (ojo).",
+      enfermedad: "Queratitis fúngica por Fusarium.",
+      patogenia: "Trauma vegetal (o lentes de contacto) que inocula el hongo del ambiente en la córnea; las hifas hialinas septadas invaden el estroma.",
+      diagnostico: "Raspado corneal: hifas hialinas septadas. Cultivo en Sabouraud: crecimiento rápido, colonia algodonosa blanca, rosada o púrpura; microscopio: macroconidias en canoa o media luna, multiseptadas, de pared delgada y lisa.",
+      tratamiento: "Natamicina tópica (alternativa: voriconazol).",
+      prevencion: "Protección ocular en el campo, higiene de lentes de contacto. Complicaciones: perforación corneal, pérdida de visión; en neutropénicos, fusariosis diseminada (voriconazol con o sin anfotericina B)."
+    },
+    grafico: [
+      ["ini", "patogenia", "Trauma vegetal en el ojo (o lentes de contacto)"],
+      ["pro", "patogenia", "Inoculación de Fusarium → hifas invaden el estroma corneal"],
+      ["pro", "zona", "Córnea"],
+      ["pro", "sintomas", "Dolor, ojo rojo, visión borrosa; úlcera de bordes plumosos con hipopión"],
+      ["pro", "enfermedad", "Queratitis por Fusarium"],
+      ["pro", "diagnostico", "Raspado corneal + Sabouraud: macroconidias en canoa, multiseptadas"],
+      ["pro", "tratamiento", "Natamicina tópica (alternativa: voriconazol)"],
+      ["fin", "prevencion", "Protección ocular · Complicaciones: perforación, pérdida de visión; diseminada en neutropénicos"]
+    ]
+  },
+  {
+    id: "tinea-capitis", tema: "Dermatofitos", area: "hongos",
+    caso: "Niño de 7 años que tiene un gato. Desde hace un mes tiene placas redondas sin pelo en el cuero cabelludo, con descamación y picazón. Con la lámpara de Wood las placas brillan.",
+    clave: {
+      sintomas: "Placas de alopecia redondas con descamación y prurito; si se inflama mucho, querion.",
+      zona: "Cuero cabelludo y pelo (piel queratinizada).",
+      enfermedad: "Tinea capitis por Microsporum canis (dermatofito zoofílico).",
+      patogenia: "Contagio desde el gato o perro (zoofílico). El dermatofito se alimenta de queratina e invade el pelo y la capa córnea.",
+      diagnostico: "Lámpara de Wood positiva; examen directo con KOH del pelo; cultivo en Sabouraud: macroconidios en huso de pared gruesa y rugosa, con muchos tabiques.",
+      tratamiento: "Griseofulvina oral (no basta el tópico en el cuero cabelludo); revisar y tratar a la mascota.",
+      prevencion: "Tratar a la mascota, no compartir peines ni gorras. Complicación: querion, que no se trata solo con tópico ni se drena como absceso; alopecia cicatricial."
+    },
+    grafico: [
+      ["ini", "patogenia", "Contacto con gato o perro infectado"],
+      ["pro", "patogenia", "Microsporum canis (zoofílico) invade el pelo: se alimenta de queratina"],
+      ["pro", "zona", "Cuero cabelludo y pelo"],
+      ["pro", "sintomas", "Placas sin pelo, con descamación y picazón"],
+      ["pro", "enfermedad", "Tinea capitis por Microsporum canis"],
+      ["pro", "diagnostico", "Lámpara de Wood + · KOH · Sabouraud: macroconidios en huso, pared gruesa y rugosa"],
+      ["dec", "tratamiento", "¿Compromete el pelo?", "No (solo piel) → puede bastar un antifúngico tópico"],
+      ["pro", "tratamiento", "Griseofulvina oral (el tópico no basta) + revisar a la mascota"],
+      ["fin", "prevencion", "Tratar a la mascota, no compartir peines · Complicación: querion (no drenarlo)"]
+    ]
+  },
+  {
+    id: "onicomicosis", tema: "Dermatofitos", area: "hongos",
+    caso: "Mujer de 50 años con pie de atleta crónico. Las uñas del dedo gordo de ambos pies están engrosadas, amarillentas y se desmoronan. Usa calzado cerrado todo el día.",
+    clave: {
+      sintomas: "Uñas engrosadas, amarillentas, quebradizas; descamación y picazón entre los dedos (tinea pedis crónica).",
+      zona: "Uñas y piel de los pies.",
+      enfermedad: "Onicomicosis y tinea pedis por Trichophyton rubrum.",
+      patogenia: "Dermatofito antropofílico que se contagia en pisos húmedos (duchas, piscinas); invade la queratina de la piel y la uña, favorecido por humedad y calzado cerrado.",
+      diagnostico: "KOH de la uña: hifas septadas; cultivo en Sabouraud: colonia blanca con reverso rojo vinoso; microscopio: hifas delgadas con pocos conidios, microconidios en lágrima pegados a la hifa.",
+      tratamiento: "Terbinafina oral por 12 semanas, más tratamiento tópico en la piel.",
+      prevencion: "Pies secos, calzado ventilado, sandalias en duchas públicas. Complicaciones: recurrencia, dolor, sobreinfección bacteriana."
+    },
+    grafico: [
+      ["ini", "patogenia", "Contagio en pisos húmedos (duchas, piscinas)"],
+      ["pro", "patogenia", "Trichophyton rubrum invade la queratina (humedad + calzado cerrado)"],
+      ["pro", "zona", "Piel de los pies → uñas"],
+      ["pro", "sintomas", "Uñas engrosadas y amarillas; descamación entre los dedos"],
+      ["pro", "enfermedad", "Onicomicosis + tinea pedis por T. rubrum"],
+      ["pro", "diagnostico", "KOH: hifas septadas · Sabouraud: reverso rojo vinoso"],
+      ["pro", "tratamiento", "Terbinafina oral 12 semanas + tópico en la piel"],
+      ["fin", "prevencion", "Pies secos, calzado ventilado · Complicación: recurrencia"]
+    ]
+  },
+  {
+    id: "esporotricosis", tema: "Dimórficos", area: "hongos",
+    caso: "Jardinero de 45 años que se pinchó con un rosal hace un mes. En el dorso de la mano tiene un nódulo que se ulceró, y ahora aparecen otros nódulos en cadena que suben por el antebrazo.",
+    clave: {
+      sintomas: "Nódulo en el sitio del pinchazo que se ulcera; nódulos en cadena que siguen el trayecto linfático.",
+      zona: "Piel y tejido subcutáneo, y vasos linfáticos del miembro.",
+      enfermedad: "Esporotricosis linfocutánea por Sporothrix schenckii.",
+      patogenia: "Hongo dimórfico de inoculación: entra por pinchazo con rosal o madera. En el ambiente (25 °C) es moho; en el cuerpo (37 °C) se vuelve levadura y avanza por los linfáticos.",
+      diagnostico: "Cultivo a 25 °C: hifas delgadas septadas con conidios en margarita o roseta. En tejido (37 °C): levaduras en forma de puro.",
+      tratamiento: "Itraconazol por 3 a 6 meses (alternativa: yoduro de potasio).",
+      prevencion: "Guantes al manipular plantas y madera. Complicaciones: diseminación en inmunodeprimidos, cronicidad."
+    },
+    grafico: [
+      ["ini", "patogenia", "Pinchazo con rosal o madera"],
+      ["pro", "patogenia", "Inoculación de Sporothrix (moho a 25 °C → levadura a 37 °C)"],
+      ["pro", "zona", "Piel, subcutáneo y linfáticos del miembro"],
+      ["pro", "sintomas", "Nódulo que se ulcera + nódulos en cadena por los linfáticos"],
+      ["pro", "enfermedad", "Esporotricosis linfocutánea"],
+      ["pro", "diagnostico", "Cultivo 25 °C: conidios en margarita · tejido: levaduras en puro"],
+      ["pro", "tratamiento", "Itraconazol 3–6 meses (alternativa: yoduro de potasio)"],
+      ["fin", "prevencion", "Guantes con plantas y madera · Complicación: diseminación en inmunodeprimidos"]
+    ]
+  },
+  {
+    id: "histoplasmosis", tema: "Dimórficos", area: "hongos",
+    caso: "Varón de 35 años con VIH y CD4 bajos. Hace un mes visitó cuevas con murciélagos en Tingo María. Tiene fiebre, baja de peso, hepatoesplenomegalia y pancitopenia.",
+    clave: {
+      sintomas: "Fiebre, baja de peso, hepatoesplenomegalia, pancitopenia (forma diseminada).",
+      zona: "Pulmón (entrada) y sistema reticuloendotelial: hígado, bazo, médula ósea (macrófagos).",
+      enfermedad: "Histoplasmosis diseminada por Histoplasma capsulatum, en paciente con VIH.",
+      patogenia: "Se inhalan los conidios de suelos con guano de murciélagos (cuevas). Es dimórfico: a 37 °C se vuelve levadura que vive dentro de los macrófagos; con la inmunosupresión del VIH se disemina.",
+      diagnostico: "En tejido: levaduras pequeñas dentro de los macrófagos. Cultivo a 25 °C (fase moho): macroconidias tuberculadas, redondas con espinas.",
+      tratamiento: "Anfotericina B liposomal y luego itraconazol.",
+      prevencion: "Evitar cuevas con murciélagos si hay inmunosupresión; TARV. Complicaciones: falla multiorgánica, muerte."
+    },
+    grafico: [
+      ["ini", "patogenia", "Inhalación de conidios en cuevas con murciélagos (Tingo María)"],
+      ["pro", "patogenia", "Dimórfico: a 37 °C se vuelve levadura dentro de los macrófagos"],
+      ["dec", "patogenia", "¿Hay inmunosupresión (VIH)?", "No → infección leve o asintomática"],
+      ["pro", "zona", "Pulmón → hígado, bazo, médula ósea"],
+      ["pro", "sintomas", "Fiebre, baja de peso, hepatoesplenomegalia, pancitopenia"],
+      ["pro", "enfermedad", "Histoplasmosis diseminada"],
+      ["pro", "diagnostico", "Tejido: levaduras en macrófagos · cultivo 25 °C: macroconidias tuberculadas"],
+      ["pro", "tratamiento", "Anfotericina B liposomal → luego itraconazol"],
+      ["fin", "prevencion", "Evitar cuevas si hay VIH, TARV · Complicación: falla multiorgánica"]
+    ]
+  },
+  {
+    id: "paracoccidioidomicosis", tema: "Dimórficos", area: "hongos",
+    caso: "Agricultor de 50 años de la selva, fumador. Tiene tos crónica desde hace meses con baciloscopías negativas, úlceras en la boca de aspecto moriforme y adenopatías cervicales.",
+    clave: {
+      sintomas: "Tos crónica, úlceras orales moriformes, adenopatías; baja de peso.",
+      zona: "Pulmón (entrada), mucosa oral y ganglios linfáticos.",
+      enfermedad: "Paracoccidioidomicosis por Paracoccidioides brasiliensis.",
+      patogenia: "Hongo dimórfico del suelo de zonas rurales de la selva; se inhala y en el cuerpo (37 °C) se vuelve levadura; desde el pulmón se disemina a mucosas y ganglios.",
+      diagnostico: "Examen directo o biopsia: levadura madre grande con múltiples gemaciones alrededor («rueda de timón»). BK negativa la diferencia de tuberculosis.",
+      tratamiento: "Itraconazol por 6 a 12 meses; en casos graves, anfotericina B.",
+      prevencion: "Diagnóstico temprano en agricultores con tos crónica y BK negativa. Complicaciones: fibrosis pulmonar, lesiones crónicas de mucosa."
+    },
+    grafico: [
+      ["ini", "patogenia", "Inhalación del hongo del suelo rural (selva)"],
+      ["pro", "patogenia", "Dimórfico: a 37 °C se vuelve levadura → se disemina desde el pulmón"],
+      ["pro", "zona", "Pulmón → mucosa oral y ganglios"],
+      ["pro", "sintomas", "Tos crónica, úlceras orales moriformes, adenopatías"],
+      ["dec", "diagnostico", "¿Baciloscopía negativa?", "No (BK positiva) → pensar en tuberculosis"],
+      ["pro", "enfermedad", "Paracoccidioidomicosis"],
+      ["pro", "diagnostico", "Directo o biopsia: levadura en «rueda de timón»"],
+      ["pro", "tratamiento", "Itraconazol 6–12 meses; grave: anfotericina B"],
+      ["fin", "prevencion", "Diagnóstico temprano en agricultores · Complicación: fibrosis pulmonar"]
+    ]
+  },
+  {
+    id: "otomicosis", tema: "Mohos hialinos", area: "hongos",
+    caso: "Nadadora de 22 años con picazón y sensación de oído tapado desde hace dos semanas. En el conducto auditivo externo se ve una secreción con puntos negros, como algodón con pimienta.",
+    clave: {
+      sintomas: "Prurito ótico, sensación de oído tapado, secreción con puntos negros; puede haber dolor leve.",
+      zona: "Conducto auditivo externo.",
+      enfermedad: "Otomicosis (otitis externa fúngica) por Aspergillus niger.",
+      patogenia: "La humedad del conducto (natación) favorece que el moho ambiental colonice el cerumen y la piel del conducto; los conidios negros dan el aspecto típico.",
+      diagnostico: "Otoscopia; examen directo y cultivo en Sabouraud: colonia cubierta de conidios negros, reverso incoloro o marfil; microscopio: hifas hialinas septadas con cabeza aspergilar biseriada.",
+      tratamiento: "Limpieza del conducto y clotrimazol tópico.",
+      prevencion: "Secar bien los oídos después de nadar, no usar hisopos. Complicaciones: recurrencia, perforación timpánica."
+    },
+    grafico: [
+      ["ini", "patogenia", "Humedad en el oído (natación)"],
+      ["pro", "patogenia", "Aspergillus niger del ambiente coloniza el conducto"],
+      ["pro", "zona", "Conducto auditivo externo"],
+      ["pro", "sintomas", "Picazón, oído tapado, secreción con puntos negros"],
+      ["pro", "enfermedad", "Otomicosis por Aspergillus niger"],
+      ["pro", "diagnostico", "Otoscopia + Sabouraud: colonia negra, cabeza aspergilar biseriada"],
+      ["pro", "tratamiento", "Limpieza del conducto + clotrimazol tópico"],
+      ["fin", "prevencion", "Secar los oídos tras nadar, no usar hisopos · Complicación: recurrencia"]
+    ]
+  }
+];
+// Se suman a los casos y gráficos de Virus.
+FLUJO_CASOS_HONGOS.forEach((c) => {
+  if (!FLUJO_CASOS.some((x) => x.id === c.id)) FLUJO_CASOS.push({ id: c.id, tema: c.tema, area: c.area, caso: c.caso, clave: c.clave });
+  FLUJO_GRAFICOS[c.id] = c.grafico;
+});
+FLUJO_CASOS.forEach((c) => { if (!c.area) c.area = "virus"; });
+const FLUJO_AREAS = { virus: { nombre: "Virus", fuente: "las teorías 10 y 11 de Virus" }, hongos: { nombre: "Hongos", fuente: "el material de Hongos del curso (prácticas y banco de laboratorio)" } };
+
 // PREGUNTAS DE FLUJOGRAMA: siempre en papel y con FOTO; Claude corrige.
 // Lo que cambia con el nivel es qué se pide y qué tan estricta es la corrección.
 const FLUJO_ESCALA = 4; // cada criterio se califica de 0 a 4; la nota se lleva a 20
@@ -3023,8 +3298,8 @@ const FLUJO_NIVEL = {
 
 function nombreEnfermedad(c) { return c.clave.enfermedad.split(/[.(:]/)[0].trim(); }
 
-function itemFlujo(k, casoId) {
-  const casos = FLUJO_CASOS.filter((c) => FLUJO_GRAFICOS[c.id]);
+function itemFlujo(k, casoId, area) {
+  const casos = FLUJO_CASOS.filter((c) => FLUJO_GRAFICOS[c.id] && (!area || c.area === area));
   const c = casos.find((x) => x.id === casoId) || casos[Math.floor(Math.random() * casos.length)];
   return { flujo: true, nivel: k, nombre: FLUJO_NIVEL[k].nombre, c };
 }
@@ -3042,7 +3317,7 @@ function promptFlujo(c, k) {
     "",
     N.rigor,
     "",
-    "CRITERIOS A EVALUAR, con la CLAVE de lo visto en clase (teorías 10 y 11). Evalúa SOLO contra esta clave y SOLO estos criterios:",
+    "CRITERIOS A EVALUAR, con la CLAVE de lo visto en clase (" + (FLUJO_AREAS[c.area] || FLUJO_AREAS.virus).fuente + "). Evalúa SOLO contra esta clave y SOLO estos criterios:",
     rubrica,
     "",
     "FLUJOGRAMA MODELO (la solución gráfica oficial). Compara la ESTRUCTURA de la foto con este: qué nodos tiene, en qué orden, si las flechas unen causa y efecto y si las decisiones tienen salidas Sí y No:",
@@ -3206,17 +3481,20 @@ function jugarItemFlujo(p, titulo, i, total, it, base, alResponder, alSeguir, al
 }
 
 // MODO FLUJOGRAMAS: ronda de 3 flujogramas (o 1 si se eligió un caso) del nivel elegido.
-function elegirModoFlujo(casoId, volver) {
-  const back = volver || (() => pickLevel("virus"));
+function elegirModoFlujo(casoId, volver, area) {
+  const caso = casoId ? FLUJO_CASOS.find((c) => c.id === casoId) : null;
+  const ar = area || (caso && caso.area) || "virus";
+  const back = volver || (() => pickLevel(ar));
   const h = flujoHistorial();
-  showLevelPicker(casoId ? "Flujograma · " + nombreEnfermedad(FLUJO_CASOS.find((c) => c.id === casoId)) : "Modo flujogramas · Virus",
+  showLevelPicker(caso ? "Flujograma · " + nombreEnfermedad(caso) : "Modo flujogramas · " + FLUJO_AREAS[ar].nombre,
     (k) => FLUJO_NIVEL[k].desc + (casoId && h[casoId + ":" + k] ? " · tu mejor nota: " + h[casoId + ":" + k].mejor + "/20" : ""),
-    (k) => go(() => rondaFlujo(k, casoId, back), "virus"), back, "flujo-virus");
+    (k) => go(() => rondaFlujo(k, casoId, back, ar), ar), back, "flujo-" + ar);
 }
-function rondaFlujo(k, casoId, volver) {
-  const casos = casoId ? [FLUJO_CASOS.find((c) => c.id === casoId)] : shuffle(FLUJO_CASOS.filter((c) => FLUJO_GRAFICOS[c.id])).slice(0, 3);
-  runQuiz("Flujogramas · " + NOMBRE_NIVEL[k], casos.map((c) => itemFlujo(k, c.id)), PTS[k], {
-    station: "virus", onExit: volver || showHome, onAgain: () => elegirModoFlujo(casoId, volver)
+function rondaFlujo(k, casoId, volver, area) {
+  const ar = area || "virus";
+  const casos = casoId ? [FLUJO_CASOS.find((c) => c.id === casoId)] : shuffle(FLUJO_CASOS.filter((c) => FLUJO_GRAFICOS[c.id] && c.area === ar)).slice(0, 3);
+  runQuiz("Flujogramas · " + FLUJO_AREAS[ar].nombre + " · " + NOMBRE_NIVEL[k], casos.map((c) => itemFlujo(k, c.id)), PTS[k], {
+    station: ar, onExit: volver || showHome, onAgain: () => elegirModoFlujo(casoId, volver, ar)
   });
 }
 
@@ -3240,22 +3518,33 @@ function usarSample() {
 
 // Orden del flujograma modelo (la lógica que se pide): de la causa a la consecuencia.
 const FLUJO_ORDEN = ["patogenia", "zona", "sintomas", "enfermedad", "diagnostico", "tratamiento", "prevencion"];
-function showFlujoSoluciones(volver) {
+function showFlujoSoluciones(volver, area) {
   const back = volver || showStudyHub;
   const p = openPanel(); setCrumb("Estudiar");
   const b = mk("button", "ghost back", "← Volver"); b.onclick = back;
   p.append(b, mk("h2", null, "Flujogramas resueltos"));
   p.append(mk("p", "note", "La solución de cada caso del juego «Flujograma evaluado», en el orden en que debe ir el flujograma. Estúdiala y luego ponte a prueba en Jugar."));
   const h = flujoHistorial();
-  const lista = mk("div", "results");
-  FLUJO_CASOS.forEach((c) => {
-    const card = mk("button", "result fe-caso");
-    const r = h[c.id];
-    card.append(mk("small", null, c.tema + " · " + c.clave.enfermedad.split(/[.(:]/)[0] + (r ? " · tu mejor nota " + r.mejor + "/20" : "")), mk("p", "study", c.caso));
-    card.onclick = () => showFlujoSolucion(c.id, () => showFlujoSoluciones(volver));
-    lista.append(card);
+  const mejor = (id) => Math.max(0, ...["f", "m", "d", "x"].map((k) => (h[id + ":" + k] || {}).mejor || 0));
+  const areas = area ? [area] : Object.keys(FLUJO_AREAS);
+  if (!area) {
+    const nav = mk("div", "chips");
+    areas.forEach((a) => { const bt = mk("button", "chip", FLUJO_AREAS[a].nombre); bt.onclick = () => { const el = document.getElementById("fs-" + a); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }; nav.append(bt); });
+    p.append(nav);
+  }
+  areas.forEach((a) => {
+    const casos = FLUJO_CASOS.filter((c) => c.area === a);
+    const t = mk("h3", "fs-area", FLUJO_AREAS[a].nombre + " · " + casos.length + " casos"); t.id = "fs-" + a;
+    const lista = mk("div", "results");
+    casos.forEach((c) => {
+      const card = mk("button", "result fe-caso");
+      const r = mejor(c.id);
+      card.append(mk("small", null, c.tema + " · " + nombreEnfermedad(c) + (r ? " · tu mejor nota " + r + "/20" : "")), mk("p", "study", c.caso));
+      card.onclick = () => showFlujoSolucion(c.id, () => showFlujoSoluciones(volver, area));
+      lista.append(card);
+    });
+    p.append(t, lista);
   });
-  p.append(lista);
 }
 function showFlujoSolucion(id, volver) {
   const c = FLUJO_CASOS.find((x) => x.id === id);
