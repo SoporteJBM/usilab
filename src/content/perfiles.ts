@@ -69,6 +69,7 @@ export const PERFILES: Record<string, Perfil> = {
     "tratamiento": "Lo principal es la rehidratación."
   },
   "Staphylococcus aureus y MRSA": {
+    "apunte": "micro-resistentes",
     "queEs": "Coco Gram positivo en racimos, catalasa positivo y coagulasa positivo.",
     "reconoce": "Hemólisis beta en agar sangre. La catalasa lo separa de Streptococcus y la coagulasa, de los demás estafilococos.",
     "produce": "Infecciones de piel y heridas, bacteriemia, neumonía.",
@@ -88,6 +89,7 @@ export const PERFILES: Record<string, Perfil> = {
     "datoExamen": "Tiene resistencia natural a las cefalosporinas. Se vuelve resistente a vancomicina cambiando D-Ala-D-Ala por D-Ala-D-Lac."
   },
   "Mycobacterium tuberculosis": {
+    "apunte": "micro-tuberculosis",
     "queEs": "Bacilo ácido-alcohol resistente (BAAR). Su pared rica en ácidos micólicos no se tiñe bien con Gram.",
     "reconoce": "Ziehl-Neelsen: bacilos rojos o fucsia, a veces en cordones, sobre fondo azul (retienen la fucsina y resisten el alcohol-ácido). En Löwenstein-Jensen u Ogawa: colonias rugosas, secas, crema, 'en coliflor', a las 3–8 semanas, porque se replica cada 18–24 horas.",
     "produce": "Tuberculosis pulmonar: tos de más de 2 semanas, baja de peso, sudoración nocturna, hemoptisis.",
@@ -107,28 +109,33 @@ export const PERFILES: Record<string, Perfil> = {
     "diagnostico": "Frotis de sangre con bacilos dentro de los hematíes."
   },
   "MRSA": {
+    "apunte": "micro-resistentes",
     "queEs": "Staphylococcus aureus resistente a meticilina.",
     "reconoce": "Sin halo alrededor de oxacilina o de cefoxitina en el antibiograma.",
     "tratamiento": "Vancomicina; alternativas: linezolid o daptomicina (no en neumonía).",
     "datoExamen": "El gen mecA codifica PBP2a: es resistente a todos los β-lactámicos."
   },
   "BLEE": {
+    "apunte": "micro-resistentes",
     "queEs": "Betalactamasa de espectro extendido, típica de E. coli y Klebsiella.",
     "reconoce": "Resistencia a cefotaxima, ceftriaxona y aztreonam, con sinergia (el halo se agranda) hacia el disco de amoxicilina-clavulánico; sensible a carbapenémicos.",
     "tratamiento": "Infección grave: carbapenémico (meropenem). Cistitis no complicada: fosfomicina.",
     "datoExamen": "El clavulánico la inhibe y es sensible a cefoxitina: así se distingue de AmpC."
   },
   "AmpC": {
+    "apunte": "micro-resistentes",
     "queEs": "Betalactamasa que no se inhibe con clavulánico.",
     "reconoce": "Resistente a cefoxitina y sin sinergia con clavulánico; suele seguir sensible a cefepime y carbapenémicos.",
     "datoExamen": "Diferencia con BLEE: la BLEE se inhibe con clavulánico y es sensible a cefoxitina."
   },
   "Carbapenemasa (KPC)": {
+    "apunte": "micro-resistentes",
     "queEs": "Enzima que destruye incluso los carbapenémicos, típica de Klebsiella pneumoniae.",
     "reconoce": "Sin halo alrededor de ningún disco, ni siquiera imipenem ni meropenem. Si el halo es reducido pero 'sensible', se confirma con pruebas como Carba NP o mCIM.",
     "tratamiento": "Ceftazidima-avibactam o colistina, con infectología."
   },
   "Candida albicans": {
+    "apunte": "micro-candida",
     "queEs": "Levadura. La más importante de las Candida.",
     "reconoce": "Pseudohifas con blastoconidias en racimos y clamidoconidias redondas de pared gruesa en la punta (agar harina de maíz). Tubo germinal positivo a las 2–3 horas a 37 °C.",
     "produce": "Muguet (placas blancas que se desprenden y dejan la base roja), vulvovaginitis, intertrigo, candidemia por catéter y candiduria en diabéticos con sonda.",
@@ -137,6 +144,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Candida albicans"
   },
   "Rhodotorula": {
+    "fotos": [{ "archivo": "img/rhodotorula.jpg", "pie": "Rhodotorula: colonias naranja-salmón en placa", "fuente": "atlas" }],
     "queEs": "Levadura oportunista. Las especies de importancia médica son R. mucilaginosa (rubra), R. glutinis y R. minuta.",
     "reconoce": "Al Gram, levadura Gram positiva ovoide, con o sin yema. Colonias cremosas y rosadas por su pigmento carotenoide. Tubo germinal negativo.",
     "produce": "Fungemia en inmunocomprometidos o con catéter; rara en personas sanas.",
@@ -144,12 +152,14 @@ export const PERFILES: Record<string, Perfil> = {
     "datoExamen": "Es naturalmente resistente a fluconazol y a las equinocandinas: a diferencia de Candida, esos fármacos no sirven."
   },
   "Cryptococcus": {
+    "apunte": "micro-cryptococcus",
     "queEs": "Levadura capsulada.",
     "produce": "Meningitis (criptococosis meníngea), sobre todo en pacientes inmunosuprimidos.",
     "tratamiento": "Inducción: anfotericina B más flucitosina.",
     "datoExamen": "Las equinocandinas no tienen actividad útil contra Cryptococcus."
   },
   "Aspergillus fumigatus": {
+    "apunte": "micro-aspergillus",
     "queEs": "Moho hialino, el Aspergillus más frecuente e importante.",
     "reconoce": "Hifas hialinas septadas; conidióforo largo con vesícula y fiálides uniseriadas en 180°. Colonia blanca que se vuelve verde azulada a gris, aterciopelada; crece de 25 °C hasta 50 °C.",
     "produce": "Aspergilosis invasiva en neutropénicos (TAC con signo del halo; galactomanano positivo), aspergiloma (bola fúngica en una caverna, con media luna de aire) y aspergilosis broncopulmonar alérgica (asma, eosinofilia, IgE alta, bronquiectasias centrales).",
@@ -158,6 +168,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Aspergillus"
   },
   "Aspergillus niger": {
+    "apunte": "micro-aspergillus",
     "queEs": "Moho hialino con conidios negros.",
     "reconoce": "Hifas hialinas estrechamente septadas y cabeza aspergilar biseriada. Colonias cubiertas por conidios negros, reverso incoloro o marfil.",
     "produce": "Otitis externa (otomicosis), con secreción negra, típica en nadadores, y aspergiloma.",
@@ -165,11 +176,13 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Aspergillus"
   },
   "Aspergillus flavus": {
+    "apunte": "micro-aspergillus",
     "queEs": "Aspergillus de ambientes cálidos.",
     "produce": "Aspergilosis invasiva y sinusitis.",
     "datoExamen": "Produce aflatoxinas, asociadas a cáncer hepático."
   },
   "Aspergillus terreus": {
+    "apunte": "micro-aspergillus",
     "queEs": "Aspergillus que causa aspergilosis invasiva en inmunodeprimidos.",
     "tratamiento": "Voriconazol.",
     "datoExamen": "Es resistente a la anfotericina B."
@@ -183,6 +196,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Penicillium"
   },
   "Fusarium": {
+    "apunte": "micro-fusarium",
     "queEs": "Moho hialino septado.",
     "reconoce": "Macroconidias en canoa o media luna, hialinas y multiseptadas; microconidias pequeñas. Colonias de crecimiento rápido, algodonosas, blancas, crema, rosadas o púrpura.",
     "produce": "Queratitis por trauma vegetal o lentes de contacto (úlcera de bordes plumosos, hipopión) y fusariosis diseminada en neutropénicos.",
@@ -191,6 +205,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Fusarium"
   },
   "Rhizopus (mucormicosis)": {
+    "apunte": "micro-zigomicetos",
     "queEs": "Hongo mucoral (cenocítico).",
     "reconoce": "Hifas anchas, no septadas o escasamente septadas, en cinta, ramificadas en ángulo recto; esporangios redondos y rizoides. Colonia algodonosa blanca con puntos negros (los esporangios); crece hasta 50 °C.",
     "produce": "Mucormicosis rinocerebral, la más frecuente: diabético con cetoacidosis, dolor facial, congestión, escara negra en el paladar o los cornetes; invade órbita y cerebro. Forma pulmonar: TAC con halo invertido.",
@@ -213,6 +228,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Alternaria"
   },
   "Trichophyton rubrum": {
+    "apunte": "micro-dermatofitos",
     "queEs": "Dermatofito.",
     "reconoce": "Hifas septadas delgadas con pocos conidios; si aparecen, microconidios en lágrima pegados a la hifa. Colonia blanca con reverso rojo vinoso.",
     "produce": "Tinea pedis crónica, onicomicosis, tinea cruris y corporis.",
@@ -220,6 +236,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Trichophyton rubrum"
   },
   "Trichophyton mentagrophytes": {
+    "apunte": "micro-dermatofitos",
     "queEs": "Dermatofito.",
     "reconoce": "Microconidios redondos en racimos, como uvas, e hifas en espiral.",
     "produce": "Tinea pedis inflamatoria, tinea corporis, tinea barbae y querion.",
@@ -227,6 +244,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Trichophyton mentagrophytes"
   },
   "Microsporum canis": {
+    "apunte": "micro-dermatofitos",
     "queEs": "Dermatofito zoofílico.",
     "reconoce": "Macroconidios en huso, de pared gruesa y rugosa, con muchos tabiques.",
     "produce": "Tinea capitis en niños con gatos o perros (placas de alopecia con descamación; lámpara de Wood positiva) y tinea corporis.",
@@ -234,6 +252,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Microsporum canis"
   },
   "Epidermophyton floccosum": {
+    "apunte": "micro-dermatofitos",
     "queEs": "Dermatofito.",
     "reconoce": "Macroconidios en mazo, de pared lisa y 2 a 4 células, en grupos. Sin microconidios.",
     "produce": "Tinea pedis, cruris, corporis y onicomicosis.",
@@ -242,6 +261,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Epidermophyton floccosum"
   },
   "Histoplasma capsulatum": {
+    "apunte": "micro-histoplasma",
     "queEs": "Hongo dimórfico.",
     "reconoce": "Fase moho: macroconidias tuberculadas (redondas, con espinas). En tejido: levaduras pequeñas dentro de los macrófagos.",
     "produce": "Histoplasmosis: se adquiere en cuevas con murciélagos (Tingo María). En VIH se disemina: fiebre, baja de peso, hepatoesplenomegalia y pancitopenia.",
@@ -249,6 +269,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Histoplasma capsulatum"
   },
   "Paracoccidioides brasiliensis": {
+    "apunte": "micro-paracoccidioides",
     "queEs": "Hongo dimórfico.",
     "reconoce": "Levadura madre grande con múltiples gemaciones alrededor: 'rueda de timón'.",
     "produce": "Paracoccidioidomicosis: agricultor de la selva con tos crónica y BK negativa, úlceras orales moriformes y adenopatías.",
@@ -256,6 +277,7 @@ export const PERFILES: Record<string, Perfil> = {
     "fichaMicroscopio": "Paracoccidioides brasiliensis"
   },
   "Sporothrix schenckii": {
+    "apunte": "micro-sporothrix",
     "queEs": "Hongo dimórfico de inoculación.",
     "reconoce": "Fase moho (25 °C): hifas delgadas septadas con conidios en margarita o roseta en la punta. En tejido: levaduras en forma de puro.",
     "produce": "Esporotricosis linfocutánea: pinchazo con rosal o madera, nódulo que se ulcera y nódulos en cadena que suben por los linfáticos.",
@@ -461,5 +483,35 @@ export const PERFILES: Record<string, Perfil> = {
     "produce": "Sarcoma de Kaposi: nódulos y placas rojo-violáceas; células fusiformes con hematíes en pequeños vasos.",
     "contagio": "Sexual y saliva.",
     "datoExamen": "Infecta células endoteliales e induce angiogénesis (IL-6, VEGF). En VIH prolifera sin control y la proteína Tat del VIH lo potencia."
+  },
+  "Blastomyces dermatitidis": {
+    "queEs": "Hongo dimórfico térmico de Norteamérica (EE. UU. y Canadá). Causa la blastomicosis; no confundir con la «blastomicosis sudamericana», que es Paracoccidioides.",
+    "reconoce": "A 25–30 °C es moho con conidios en «paleta» (lollipop). A 37 °C, en el tejido, es una levadura grande (8–15 µm), de pared gruesa y refringente, con gemación única de base ancha.",
+    "produce": "Pulmonar: desde nada hasta neumonía grave. La forma extrapulmonar más frecuente es la piel, con lesiones verrugosas; también hueso, aparato genitourinario y, rara vez, SNC.",
+    "contagio": "Inhalación al remover tierra húmeda y arenosa cerca del agua: construcción, excavación, tala, caza y campamentos (Grandes Lagos, ríos Ohio y Misisipi).",
+    "diagnostico": "Levadura de base ancha en esputo, tejido o lesión de piel. El cultivo es la prueba de referencia; la PCR confirma la forma diseminada.",
+    "tratamiento": "No viene en el seminario. Referencia: itraconazol en casos leves a moderados; anfotericina B si es grave o hay compromiso del SNC.",
+    "datoExamen": "Base ancha = Blastomyces. Gemación múltiple en timón = Paracoccidioides. Pequeña dentro del macrófago = Histoplasma.",
+    "apunte": "micro-blastomyces"
+  },
+  "Cromoblastomicosis (Fonsecaea pedrosoi)": {
+    "queEs": "Micosis subcutánea crónica por hongos dematiáceos (con melanina): Fonsecaea pedrosoi (la principal en América), F. monophora, Cladophialophora carrionii, Phialophora verrucosa y Rhinocladiella.",
+    "reconoce": "En el KOH: cuerpos muriformes o escleróticos, células redondas color café de 6–12 µm con tabiques en varias direcciones. En cultivo: moho oscuro que crece lento (2–4 semanas).",
+    "produce": "Placas verrugosas en coliflor con puntos negros, nódulos o lesiones tumorales, sobre todo en las piernas. Crónica; las cicatrices retraen la piel.",
+    "contagio": "Trauma con espinas, astillas o material vegetal. En Perú, sobre todo agricultores de la Amazonía (Ucayali, San Martín).",
+    "diagnostico": "KOH 10–20 % de raspado o costras (cuerpos muriformes) y cultivo en agar Sabouraud para identificar la especie.",
+    "tratamiento": "No viene en la clase; es difícil y prolongado. Referencia: itraconazol, a veces con medidas físicas o cirugía en lesiones pequeñas.",
+    "datoExamen": "Agricultor de la Amazonía con placa verrugosa en coliflor en la pierna y cuerpos muriformes café en el KOH = cromoblastomicosis.",
+    "apunte": "micro-cromoblastomicosis"
+  },
+  "Pneumocystis jirovecii": {
+    "queEs": "Hongo oportunista que afecta casi solo al pulmón. Antes se lo consideraba protozoo; hoy es del reino Fungi.",
+    "reconoce": "Tres formas: trófica, quiste (asco, de ~7 µm, redondo o en media luna, en racimos) y esporozoíto. Giemsa tiñe las tróficas pero no la pared del quiste; Gomori-Grocott tiñe los quistes.",
+    "produce": "Neumonía en VIH con CD4 < 200, trasplantados, cáncer hematológico o uso de corticoides: fiebre, tos seca, disnea progresiva e hipoxemia; vidrio esmerilado bilateral.",
+    "contagio": "Inhalación; las formas tróficas se adhieren a los neumocitos tipo I.",
+    "diagnostico": "Lavado broncoalveolar (la muestra de elección) con Grocott o inmunofluorescencia directa; PCR del gen mtLSU rRNA.",
+    "tratamiento": "TMP-SMX (cotrimoxazol) por 21 días. Alternativas: pentamidina (más tóxica) y atovacuona (menos eficaz).",
+    "datoExamen": "VIH con CD4 < 200 + tos seca + hipoxemia + vidrio esmerilado = Pneumocystis → LBA con Grocott y TMP-SMX 21 días. Es un hongo, no un protozoo.",
+    "apunte": "micro-pneumocystis"
   }
 };

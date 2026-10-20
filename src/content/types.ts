@@ -53,6 +53,17 @@ export interface Foto {
   agente: string;
   numero: number;
   archivo: string;
+  /** "laboratorio": foto tomada en el curso; "atlas": imagen de referencia de un atlas de microbiología. */
+  fuente: "laboratorio" | "atlas";
+  /** Nombre completo si la foto es de una especie concreta (p. ej. "Aspergillus niger"). */
+  especie?: string;
+}
+
+/** Foto suelta con su pie (medios de cultivo, colonias). */
+export interface FotoPie {
+  archivo: string;
+  pie: string;
+  fuente: "laboratorio" | "atlas";
 }
 
 export interface Perfil {
@@ -65,6 +76,10 @@ export interface Perfil {
   datoExamen?: string;
   /** Nombre del AgenteMicroscopio relacionado (para fotos y "No confundir"). */
   fichaMicroscopio?: string;
+  /** Fotos propias de la ficha (colonias, placas), además de las del microscopio. */
+  fotos?: FotoPie[];
+  /** Id del apunte con el resumen completo de este agente. */
+  apunte?: string;
 }
 
 export interface ItemIndice {
@@ -83,6 +98,11 @@ export interface Tabla {
   titulo: string;
   columnas: string[];
   filas: string[][];
+  /** Grupo para ordenar las tablas en Estudio (p. ej. "Laboratorio", "Tuberculosis", "Hongos"). */
+  grupo?: string;
+  /** Nota corta bajo el título. */
+  nota?: string;
+  fotos?: FotoPie[];
 }
 
 export interface Reino {
@@ -101,3 +121,28 @@ export interface PalabraAhorcado {
 }
 
 export type NivelAhorcado = "facil" | "medio" | "dificil" | "muydificil";
+
+/** Bloque de un apunte. Texto con **negrita** y *cursiva*. */
+export type Bloque =
+  | { t: "h"; texto: string }
+  | { t: "p"; texto: string }
+  /** Items que empiezan con dos espacios son subpuntos del anterior. */
+  | { t: "lista"; orden?: boolean; items: string[] }
+  | { t: "tabla"; columnas: string[]; filas: string[][] };
+
+export interface Apunte {
+  id: string;
+  grupo: string;
+  titulo: string;
+  subtitulo: string;
+  bloques: Bloque[];
+}
+
+/** Tarjeta de repaso suelta (no es pregunta del juego). */
+export interface Tarjeta {
+  id: string;
+  tema: string;
+  pregunta: string;
+  respuesta: string;
+  detalle: string;
+}

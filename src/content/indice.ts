@@ -111,8 +111,25 @@ export const INDICE: SeccionIndice[] = [
             "busqueda": "Paracoccidioid"
           },
           {
+            "nombre": "Blastomyces dermatitidis",
+            "busqueda": "Blastomyces|blastomicosis"
+          },
+          {
             "nombre": "Sporothrix schenckii",
             "busqueda": "Sporothrix|esporotricosis"
+          },
+          {
+            "nombre": "Cromoblastomicosis (Fonsecaea pedrosoi)",
+            "busqueda": "Fonsecaea|cromoblastomicosis|cuerpos muriformes"
+          }
+        ]
+      },
+      {
+        "grupo": "Pneumocystis",
+        "items": [
+          {
+            "nombre": "Pneumocystis jirovecii",
+            "busqueda": "Pneumocystis"
           }
         ]
       }

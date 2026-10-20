@@ -85,7 +85,7 @@ function tarjetas(): Tarjeta[] {
       resumen: "Ejercicios cortos para fijar lo que más se pregunta de Virus. Cada ronda sale distinta.", total: 0, hechas: 0,
       nota: "6 ejercicios", jugar: () => mostrarEntrenadorVirus(mostrarTablero), textoJugar: "Entrenar",
     }]),
-    { ...MICROSCOPIO, total: 0, hechas: 0, nota: FOTOS.length + " fotos reales · " + AGENTES_MICROSCOPIO.length + " estructuras", jugar: mostrarMicroscopio, textoJugar: "Entrar" },
+    { ...MICROSCOPIO, total: 0, hechas: 0, nota: FOTOS.length + " fotos · " + AGENTES_MICROSCOPIO.length + " estructuras", jugar: mostrarMicroscopio, textoJugar: "Entrar" },
     deEstacion(CASOS),
   ];
 }

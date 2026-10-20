@@ -27,7 +27,8 @@ function opciones(correcta: string, pool: string[], n: number): string[] {
 }
 
 function itemsFoto(k: Nivel): ItemQuiz[] {
-  const hongos = AGENTES_MICROSCOPIO.filter((x) => x.grupo === "Hongos").map((x) => x.nombre);
+  // Las opciones son del mismo grupo de la foto (hongos con hongos, sedimento con sedimento).
+  const delGrupo = (g: string) => AGENTES_MICROSCOPIO.filter((x) => x.grupo === g || (g === "Bacterias" && x.grupo === "Hongos")).map((x) => x.nombre);
   // Ronda equilibrada: una foto de cada agente y el resto sin repetir foto.
   const porAgente = new Map<string, typeof FOTOS>();
   for (const f of mezclar(FOTOS)) porAgente.set(f.agente, [...(porAgente.get(f.agente) ?? []), f]);
@@ -37,7 +38,7 @@ function itemsFoto(k: Nivel): ItemQuiz[] {
   return mezclar(ronda).flatMap((f) => {
     const ag = agente(f.agente);
     if (!ag) return [];
-    const ops = opciones(f.agente, hongos, N_OPCIONES[k]);
+    const ops = opciones(f.agente, delGrupo(ag.grupo), N_OPCIONES[k]);
     return [{ img: f.archivo, pregunta: "¿Qué es? (foto " + f.numero + ")", opciones: ops, respuesta: ops.indexOf(f.agente), pista: ag.clave, ficha: ag }];
   });
 }
@@ -79,14 +80,14 @@ function jugar(nombre: string, generar: (k: Nivel) => ItemQuiz[]): void {
 
 export const mostrarMicroscopio = vista("el microscopio", () => {
   const p = abrirPanel("jugar");
-  p.append(mk("h2", null, "Microscopio"), mk("p", "note", "Fotos reales del laboratorio del curso."));
+  p.append(mk("h2", null, "Microscopio"), mk("p", "note", "Fotos del laboratorio del curso y de atlas de microbiología. Toca una foto para verla en grande."));
   const menu = mk("div", "menu");
   const conFoto = new Set(FOTOS.map((f) => f.agente)).size;
   const opcionesMenu: [string, string, () => void][] = [
-    ["Identificar fotos", "Ronda de 10 fotos reales al azar, " + FOTOS.length + " en total", () => jugar("Identificar fotos", itemsFoto)],
+    ["Identificar fotos", "Ronda de 10 fotos al azar, " + FOTOS.length + " en total", () => jugar("Identificar fotos", itemsFoto)],
     ["Por criterio", "Te describo lo que se ve; tú dices qué es (" + AGENTES_MICROSCOPIO.length + " estructuras)", () => jugar("Por criterio", itemsCriterio)],
     ["Pares que se confunden", PARES.length + " pares donde más se pierden puntos", () => jugar("Pares que se confunden", itemsPares)],
-    ["Ahorcado con fotos", "Mira la foto real y adivina qué hongo es, letra por letra (" + totalAhorcado("microscopio") + " rondas en 4 niveles)", () => menuAhorcado("microscopio", mostrarMicroscopio)],
+    ["Ahorcado con fotos", "Mira la foto y adivina qué hongo es, letra por letra (" + totalAhorcado("microscopio") + " rondas en 4 niveles)", () => menuAhorcado("microscopio", mostrarMicroscopio)],
     ["Mapa de cobertura", "Qué tenemos de cada estructura: foto " + conFoto + " de " + AGENTES_MICROSCOPIO.length, () => mostrarCobertura(mostrarMicroscopio, "jugar")],
   ];
   for (const [t, s, fn] of opcionesMenu) {
@@ -102,7 +103,7 @@ export const mostrarCobertura = vista("el mapa de cobertura", (volver: () => voi
   p.append(mk("h2", null, "Mapa de cobertura"));
   const conteo = new Map<string, number>();
   FOTOS.forEach((f) => conteo.set(f.agente, (conteo.get(f.agente) ?? 0) + 1));
-  p.append(mk("p", "note", "Fotos reales en " + conteo.size + " de " + AGENTES_MICROSCOPIO.length + " estructuras. Las demás se practican con el criterio escrito. Cada práctica nueva puede llenar una casilla de foto."));
+  p.append(mk("p", "note", "Hay fotos en " + conteo.size + " de " + AGENTES_MICROSCOPIO.length + " estructuras. Las demás se practican con el criterio escrito. Cada práctica nueva puede llenar una casilla de foto."));
   const wrap = mk("div", "tablewrap");
   const t = mk("table", "cov");
   const head = mk("tr");

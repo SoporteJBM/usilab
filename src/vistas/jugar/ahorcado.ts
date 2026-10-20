@@ -35,21 +35,25 @@ interface FuenteAhorcado {
 }
 
 /**
- * Microscopio: la respuesta es el nombre completo con que se registró la foto (p. ej. CANDIDA ALBICANS).
- * Fácil: Candida albicans y Fusarium; Medio: Aspergillus y Cladosporium; Difícil: los Trichophyton;
- * todos con el criterio de la ficha como pista. Muy difícil: cualquiera de las fotos, sin criterio.
+ * Microscopio: solo las fotos de hongos. La respuesta es el nombre completo con que se registró la foto
+ * (la especie si la foto la tiene, p. ej. ASPERGILLUS NIGER). Fácil, Medio y Difícil llevan el criterio de
+ * la ficha como pista. Muy difícil: cualquiera de las fotos de hongos, sin criterio.
  */
 const NIVEL_FOTO: Record<string, NivelAhorcado> = {
-  "Candida albicans": "facil", "Fusarium": "facil", "Aspergillus": "medio", "Cladosporium": "medio",
-  "Trichophyton rubrum": "dificil", "Trichophyton mentagrophytes": "dificil",
+  "Candida albicans": "facil", "Fusarium": "facil", "Rhizopus": "facil", "Penicillium": "facil",
+  "Aspergillus": "medio", "Cladosporium": "medio", "Alternaria": "medio", "Sporothrix schenckii": "medio",
+  "Trichophyton rubrum": "dificil", "Trichophyton mentagrophytes": "dificil", "Epidermophyton floccosum": "dificil",
+  "Microsporum canis": "dificil", "Histoplasma capsulatum": "dificil", "Paracoccidioides brasiliensis": "dificil",
 };
+const DERMATOFITOS = ["Trichophyton rubrum", "Trichophyton mentagrophytes", "Epidermophyton floccosum", "Microsporum canis"];
 function ahorcadoMicroscopio(): FuenteAhorcado {
   const niveles: Record<NivelAhorcado, PalabraAhorcado[]> = { facil: [], medio: [], dificil: [], muydificil: [] };
   for (const f of FOTOS) {
     const ag = AGENTES_MICROSCOPIO.find((a) => a.nombre === f.agente);
-    const nombre = f.agente.toUpperCase();
+    if (!ag || ag.grupo !== "Hongos") continue;
+    const nombre = (f.especie ?? f.agente).toUpperCase();
     const nivel = NIVEL_FOTO[f.agente];
-    if (nivel && ag) niveles[nivel].push({ id: "foto" + f.numero, palabra: nombre, pista: (ag.grupo === "Hongos" && nombre.startsWith("TRICHOPHYTON") ? "Dermatofito. " : "") + ag.criterio, foto: f.archivo });
+    if (nivel) niveles[nivel].push({ id: "foto" + f.numero, palabra: nombre, pista: (DERMATOFITOS.includes(f.agente) ? "Dermatofito. " : "") + ag.criterio, foto: f.archivo });
     niveles.muydificil.push({ id: "foto-x" + f.numero, palabra: nombre, pista: "Solo la foto: fíjate en las hifas, los conidios y cómo se agrupan.", foto: f.archivo });
   }
   return { nombre: "Microscopio", imagen: true, pregunta: "¿Qué hongo es? (nombre completo)", niveles };

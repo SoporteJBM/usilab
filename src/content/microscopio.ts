@@ -5,7 +5,7 @@ import type { AgenteMicroscopio, Foto, Par, TemaLectura } from "./types";
 export const MICROSCOPIO: TemaLectura = {
   "id": "microscopio",
   "nombre": "Microscopio",
-  "descripcion": "Fotos reales del laboratorio, criterios y pares que se confunden",
+  "descripcion": "Fotos del laboratorio y de atlas, criterios y pares que se confunden",
   "resumen": "Para reconocer una lámina, mira tres cosas: si las hifas tienen tabiques, qué forma tienen los conidios y dónde están. El mapa de cobertura muestra qué tenemos de cada estructura."
 };
 
@@ -223,66 +223,261 @@ export const PARES: Par[] = [
   }
 ];
 
-/** Fotos reales del laboratorio (carpeta public/img). */
+/** Fotos del laboratorio del curso y de atlas de referencia (carpeta public/img). */
 export const FOTOS: Foto[] = [
   {
     "agente": "Cladosporium",
     "numero": 2,
-    "archivo": "img/foto-02.jpg"
+    "archivo": "img/foto-02.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Trichophyton rubrum",
     "numero": 9,
-    "archivo": "img/foto-09.jpg"
+    "archivo": "img/foto-09.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Trichophyton rubrum",
     "numero": 11,
-    "archivo": "img/foto-11.jpg"
+    "archivo": "img/foto-11.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Trichophyton mentagrophytes",
     "numero": 15,
-    "archivo": "img/foto-15.jpg"
+    "archivo": "img/foto-15.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Trichophyton mentagrophytes",
     "numero": 24,
-    "archivo": "img/foto-24.jpg"
+    "archivo": "img/foto-24.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Trichophyton mentagrophytes",
     "numero": 27,
-    "archivo": "img/foto-27.jpg"
+    "archivo": "img/foto-27.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Fusarium",
     "numero": 32,
-    "archivo": "img/foto-32.jpg"
+    "archivo": "img/foto-32.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Fusarium",
     "numero": 35,
-    "archivo": "img/foto-35.jpg"
+    "archivo": "img/foto-35.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Fusarium",
     "numero": 37,
-    "archivo": "img/foto-37.jpg"
+    "archivo": "img/foto-37.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Aspergillus",
     "numero": 46,
-    "archivo": "img/foto-46.jpg"
+    "archivo": "img/foto-46.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Candida albicans",
     "numero": 58,
-    "archivo": "img/foto-58.jpg"
+    "archivo": "img/foto-58.jpg",
+    "fuente": "laboratorio"
   },
   {
     "agente": "Candida albicans",
     "numero": 59,
-    "archivo": "img/foto-59.jpg"
+    "archivo": "img/foto-59.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Candida albicans",
+    "numero": 101,
+    "archivo": "img/foto-101.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Candida albicans",
+    "numero": 102,
+    "archivo": "img/foto-102.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Aspergillus",
+    "numero": 103,
+    "archivo": "img/foto-103.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Aspergillus",
+    "numero": 104,
+    "archivo": "img/foto-104.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Aspergillus",
+    "numero": 105,
+    "archivo": "img/foto-105.jpg",
+    "fuente": "laboratorio",
+    "especie": "Aspergillus niger"
+  },
+  {
+    "agente": "Aspergillus",
+    "numero": 106,
+    "archivo": "img/foto-106.jpg",
+    "fuente": "atlas",
+    "especie": "Aspergillus fumigatus"
+  },
+  {
+    "agente": "Aspergillus",
+    "numero": 107,
+    "archivo": "img/foto-107.jpg",
+    "fuente": "atlas",
+    "especie": "Aspergillus niger"
+  },
+  {
+    "agente": "Fusarium",
+    "numero": 108,
+    "archivo": "img/foto-108.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Fusarium",
+    "numero": 109,
+    "archivo": "img/foto-109.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Trichophyton rubrum",
+    "numero": 110,
+    "archivo": "img/foto-110.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Trichophyton rubrum",
+    "numero": 111,
+    "archivo": "img/foto-111.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Epidermophyton floccosum",
+    "numero": 112,
+    "archivo": "img/foto-112.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Epidermophyton floccosum",
+    "numero": 113,
+    "archivo": "img/foto-113.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Alternaria",
+    "numero": 114,
+    "archivo": "img/foto-114.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Alternaria",
+    "numero": 115,
+    "archivo": "img/foto-115.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Paracoccidioides brasiliensis",
+    "numero": 116,
+    "archivo": "img/foto-116.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Paracoccidioides brasiliensis",
+    "numero": 117,
+    "archivo": "img/foto-117.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Sporothrix schenckii",
+    "numero": 118,
+    "archivo": "img/foto-118.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Sporothrix schenckii",
+    "numero": 119,
+    "archivo": "img/foto-119.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Sporothrix schenckii",
+    "numero": 120,
+    "archivo": "img/foto-120.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Rhizopus",
+    "numero": 121,
+    "archivo": "img/foto-121.jpg",
+    "fuente": "atlas"
+  },
+  {
+    "agente": "Histoplasma capsulatum",
+    "numero": 122,
+    "archivo": "img/foto-122.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Histoplasma capsulatum",
+    "numero": 123,
+    "archivo": "img/foto-123.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Microsporum canis",
+    "numero": 124,
+    "archivo": "img/foto-124.jpg",
+    "fuente": "laboratorio"
+  },
+  {
+    "agente": "Penicillium",
+    "numero": 125,
+    "archivo": "img/foto-125.jpg",
+    "fuente": "atlas"
+  },
+  {
+    "agente": "Mycobacterium tuberculosis",
+    "numero": 126,
+    "archivo": "img/foto-126.jpg",
+    "fuente": "atlas"
+  },
+  {
+    "agente": "Células epiteliales escamosas",
+    "numero": 127,
+    "archivo": "img/foto-127.jpg",
+    "fuente": "atlas"
+  },
+  {
+    "agente": "Trichomonas vaginalis",
+    "numero": 128,
+    "archivo": "img/foto-128.jpg",
+    "fuente": "atlas"
+  },
+  {
+    "agente": "Levaduras en orina",
+    "numero": 129,
+    "archivo": "img/foto-129.jpg",
+    "fuente": "atlas"
+  },
+  {
+    "agente": "Hematíes",
+    "numero": 130,
+    "archivo": "img/foto-130.jpg",
+    "fuente": "atlas"
   }
 ];

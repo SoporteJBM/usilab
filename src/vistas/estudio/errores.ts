@@ -13,7 +13,7 @@ import { conDatoCurioso } from "../../ui/cargando";
 import { abrirPanel } from "../../ui/marco";
 import { aItem, jugarPreguntas } from "../jugar/quiz";
 import { encabezado } from "./comun";
-import { jugarTarjetas } from "./tarjetas";
+import { dePregunta, jugarTarjetas } from "./tarjetas";
 
 const POR_RONDA = 10;
 
@@ -32,7 +32,7 @@ export const mostrarErrores = vista("Mis errores", () => {
     boton("Practicar mis errores (" + Math.min(lista.length, POR_RONDA) + ")", "primary", () => conDatoCurioso(() => {
       jugarPreguntas("Mis errores", ronda(), 10, { seccion: "estudio", alSalir: mostrarErrores, otraVez: mostrarErrores, textoVolver: "Ver mis errores" });
     }, "casos")),
-    boton("Como tarjetas", "ghost", () => jugarTarjetas(lista.map(({ est, q }) => ({ est, q })), "Mis errores", mostrarErrores)),
+    boton("Como tarjetas", "ghost", () => jugarTarjetas(lista.map(({ est, q }) => dePregunta({ est, q })), "Mis errores", mostrarErrores)),
   );
   p.append(fila);
 

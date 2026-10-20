@@ -10,7 +10,7 @@ test("invitado: inicio, menú y una ronda completa que guarda el avance", async 
   // Menú superior
   const nav = page.locator("#topnav");
   await nav.getByRole("button", { name: "Jugar" }).click();
-  await expect(page.locator("#home .station")).toHaveCount(10);
+  await expect(page.locator("#home .station")).toHaveCount(12); // con Tuberculosis y Resistencia
   await expect(page.locator("#home .atajo")).toHaveCount(2);
   await nav.getByRole("button", { name: "Estudio" }).click();
   await expect(page.getByRole("heading", { name: "Estudio" })).toBeVisible();

@@ -1,5 +1,5 @@
 // Casos clínicos
-// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas.
+// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso, preguntas revisadas y banco de teoría (TB, resistencia y micología).
 import type { Estacion } from "../types";
 
 export const casos: Estacion = {
@@ -499,6 +499,205 @@ export const casos: Estacion = {
         "Infección por Campylobacter"
       ],
       "explicacion": "Salmonella tendría centro negro en XLD; Campylobacter necesita su propio medio en microaerofilia."
+    },
+    {
+      "id": "casos-038",
+      "nivel": "d",
+      "caso": "Varón de 35 años, tos de 3 semanas, baja de peso, sudoración nocturna. ZN: 15 BAAR en 100 campos.",
+      "pregunta": "¿Diagnóstico y conducta?",
+      "correcta": "TB pulmonar, baciloscopía (+); esquema 2HRZE/4HR",
+      "distractores": [
+        "Neumonía bacteriana; amoxicilina",
+        "TB latente; isoniazida",
+        "Histoplasmosis; itraconazol",
+        "Aspergiloma; cirugía"
+      ],
+      "explicacion": "10–99/100 campos = +."
+    },
+    {
+      "id": "casos-039",
+      "nivel": "m",
+      "caso": "Mujer de 30 años con derrame pleural. El líquido es un exudado con 85 % de linfocitos y ADA de 60 U/L.",
+      "correcta": "TB pleural",
+      "distractores": [
+        "Mesotelioma",
+        "Neumonía",
+        "Empiema",
+        "Insuficiencia cardiaca"
+      ],
+      "pista": "Exudado linfocítico con ADA alto.",
+      "explicacion": "Exudado linfocítico + ADA alto."
+    },
+    {
+      "id": "casos-040",
+      "nivel": "m",
+      "caso": "Varón con VIH, cefalea de 3 semanas, fiebre, confusión. LCR: tinta china (+), antígeno capsular (+).",
+      "pregunta": "¿Diagnóstico y tratamiento?",
+      "correcta": "Meningitis criptocócica; anfotericina B + flucitosina",
+      "distractores": [
+        "Histoplasmosis",
+        "Meningitis TB; HRZE",
+        "Meningitis bacteriana; ceftriaxona",
+        "Toxoplasmosis"
+      ],
+      "pista": "Tinta china y antígeno capsular positivos.",
+      "explicacion": "Inducción 2 semanas."
+    },
+    {
+      "id": "casos-041",
+      "nivel": "m",
+      "caso": "Leucemia con neutropenia febril persistente; TAC: nódulo con signo del halo; galactomanano (+).",
+      "pregunta": "¿Diagnóstico y tratamiento?",
+      "correcta": "Aspergilosis invasiva; voriconazol",
+      "distractores": [
+        "Fusariosis; fluconazol",
+        "Mucormicosis",
+        "Neumocistosis; TMP-SMX",
+        "TB"
+      ],
+      "pista": "Galactomanano positivo y signo del halo.",
+      "explicacion": "Galactomanano (+)."
+    },
+    {
+      "id": "casos-042",
+      "nivel": "d",
+      "caso": "Leucemia mieloide aguda, neutropenia febril, galactomanano (–), nódulos cutáneos dolorosos con centro necrótico y hemocultivo con hongo filamentoso.",
+      "pregunta": "¿Diagnóstico y tratamiento?",
+      "correcta": "Fusariosis; voriconazol ± anfotericina B",
+      "distractores": [
+        "Aspergilosis",
+        "Histoplasmosis",
+        "Mucormicosis",
+        "Candidemia"
+      ],
+      "explicacion": "Fusarium: hemocultivo positivo en ~40 %, galactomanano negativo y nódulos cutáneos necróticos. Se trata con voriconazol ± anfotericina B."
+    },
+    {
+      "id": "casos-043",
+      "nivel": "d",
+      "caso": "Mujer con vaginitis candidiásica recurrente que no responde a fluconazol; levaduras sin pseudohifas.",
+      "pregunta": "¿Qué especie de Candida sospechas?",
+      "correcta": "C. glabrata",
+      "distractores": [
+        "C. dubliniensis",
+        "Gardnerella",
+        "Trichomonas",
+        "C. albicans"
+      ],
+      "explicacion": "No forma hifas, poca sensibilidad a azoles."
+    },
+    {
+      "id": "casos-044",
+      "nivel": "d",
+      "caso": "Agricultor de Ucayali con placa verrugosa en coliflor y puntos negros en la pierna, de años de evolución; KOH: cuerpos muriformes café.",
+      "correcta": "Cromoblastomicosis (Fonsecaea pedrosoi)",
+      "distractores": [
+        "Carcinoma",
+        "Tiña",
+        "Esporotricosis",
+        "Paracoccidioidomicosis"
+      ],
+      "explicacion": "Células fumagoides."
+    },
+    {
+      "id": "casos-045",
+      "nivel": "m",
+      "caso": "Adulto con pie de atleta crónico en ambos pies, una mano afectada y uñas gruesas amarillas; colonia con reverso rojo vinoso.",
+      "pregunta": "¿Agente y tratamiento?",
+      "correcta": "T. rubrum; terbinafina",
+      "distractores": [
+        "M. canis; griseofulvina",
+        "Candida; fluconazol",
+        "Fusarium",
+        "E. floccosum; nistatina"
+      ],
+      "pista": "Síndrome de una mano y dos pies.",
+      "explicacion": "Síndrome de una mano y dos pies."
+    },
+    {
+      "id": "casos-046",
+      "nivel": "m",
+      "caso": "Paciente con VIH, CD4 = 150, tos seca, disnea, hipoxemia; TAC: vidrio esmerilado bilateral; LBA con quistes en Grocott.",
+      "pregunta": "¿Diagnóstico y tratamiento?",
+      "correcta": "Neumonía por Pneumocystis; TMP-SMX 21 días",
+      "distractores": [
+        "TB; HRZE",
+        "Criptococosis",
+        "Histoplasmosis",
+        "Aspergilosis; voriconazol"
+      ],
+      "pista": "CD4 < 200 y quistes con Grocott.",
+      "explicacion": "CD4 < 200."
+    },
+    {
+      "id": "casos-047",
+      "nivel": "d",
+      "caso": "Paciente inmunocompetente que vive en una zona con eucaliptos. Tiene una masa pulmonar que simula un tumor (criptococoma).",
+      "pregunta": "¿Qué especie es la más probable?",
+      "correcta": "C. gattii",
+      "distractores": [
+        "C. neoformans var. grubii",
+        "Histoplasma",
+        "Aspergillus",
+        "Blastomyces"
+      ],
+      "explicacion": "C. gattii en inmunocompetentes."
+    },
+    {
+      "id": "casos-048",
+      "nivel": "d",
+      "caso": "Klebsiella resistente a meropenem e imipenem. Hodge modificado positivo y sinergia con ácido borónico.",
+      "pregunta": "¿Qué mecanismo de resistencia tiene?",
+      "correcta": "KPC (carbapenemasa)",
+      "distractores": [
+        "BLEE",
+        "AmpC",
+        "Metalo-betalactamasa",
+        "MRSA"
+      ],
+      "explicacion": "Borónico = KPC."
+    },
+    {
+      "id": "casos-049",
+      "nivel": "m",
+      "caso": "Paciente con adenopatía cervical de 2 meses, indolora, que fistuliza y drena material caseoso.",
+      "pregunta": "¿Diagnóstico y prueba de elección?",
+      "correcta": "TB ganglionar (escrófula); PAAF/biopsia + Xpert",
+      "distractores": [
+        "Mononucleosis",
+        "Linfoma",
+        "Histoplasmosis aguda",
+        "Esporotricosis"
+      ],
+      "pista": "Adenopatía cervical que fistuliza: se necesita tejido.",
+      "explicacion": "Granulomas caseificantes."
+    },
+    {
+      "id": "casos-050",
+      "nivel": "m",
+      "caso": "Paciente con dolor dorsal crónico, giba y absceso paravertebral; RM: espondilodiscitis de dos vértebras.",
+      "correcta": "Mal de Pott (TB vertebral)",
+      "distractores": [
+        "Metástasis",
+        "Osteoporosis",
+        "Mieloma",
+        "Hernia discal"
+      ],
+      "pista": "Giba y absceso al lado de la columna.",
+      "explicacion": "RM de elección."
+    },
+    {
+      "id": "casos-051",
+      "nivel": "d",
+      "caso": "Mujer de 24 años con disuria. ECO: nitritos +, leucocitos 30 por campo. Urocultivo: 150 colonias (asa de 0.001 mL), rosadas en MacConkey. Antibiograma: CTX y CRO resistentes con sinergia con AMC; imipenem sensible.",
+      "pregunta": "¿Diagnóstico y tratamiento?",
+      "correcta": "ITU por E. coli BLEE, 1.5 × 10⁵ UFC/mL; carbapenémico (o fosfomicina si es cistitis)",
+      "distractores": [
+        "ITU por MRSA; vancomicina",
+        "Contaminación; repetir la muestra",
+        "ITU por E. coli sensible; ceftriaxona"
+      ],
+      "explicacion": "150 × 1000 = 1.5 × 10⁵ → significativa. Resistencia a cefalosporinas de 3.ª generación + sinergia con AMC + imipenem sensible = BLEE."
     }
   ]
 };

@@ -22,6 +22,22 @@ export const DATOS_CURIOSOS: Record<string, string[]> = {
     "Campylobacter necesita microaerofilia y puede tardar hasta 72 horas en crecer.",
     "Una orina verde puede deberse a Pseudomonas aeruginosa."
   ],
+  "tuberculosis": [
+    "Robert Koch descubrió el bacilo de la tuberculosis en 1882; la BCG llegó en 1908.",
+    "En zonas de alta prevalencia, cada paciente BAAR positivo contagia a unas 20 personas antes de ser diagnosticado.",
+    "La TB laríngea es de las formas más contagiosas: elimina bacilos directamente desde las cuerdas vocales.",
+    "El MODS reconoce a M. tuberculosis porque crece formando cuerdas, gracias al cord factor.",
+    "La pirazinamida eleva el ácido úrico: está contraindicada en un paciente con gota.",
+    "El PPD positivo dice «infectado», no «enfermo»."
+  ],
+  "resistencia": [
+    "El MRSA no rompe el antibiótico: cambia su blanco. Su PBP2a no deja que se una ningún betalactámico.",
+    "Se usa cefoxitina, y no oxacilina, para buscar MRSA en disco porque induce mejor la resistencia.",
+    "AmpC es traicionera: el paciente empieza sensible y se vuelve resistente mientras recibe ceftriaxona.",
+    "Si una Klebsiella no da halo ni con imipenem ni con meropenem, hay que sospechar carbapenemasa (KPC).",
+    "MALDI-TOF identifica la especie en horas, pero no reemplaza al antibiograma.",
+    "Un resultado «sensible» in vitro también puede fallar en el paciente: siempre se correlaciona con la clínica."
+  ],
   "virus": [
     "El VIH usa el receptor CD4 y un correceptor (CCR5 o CXCR4) para entrar a la célula.",
     "Fiebre con vesículas en boca, palmas y plantas en un lactante sugiere Coxsackie: enfermedad mano-pie-boca.",

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { AHORCADOS, FLUJOGRAMAS, FOTOS } from "../../src/content";
+import { AGENTES_MICROSCOPIO, AHORCADOS, FLUJOGRAMAS, FOTOS } from "../../src/content";
 import { ocultarRespuesta } from "../../src/lib/texto";
 import { abrir, comoInvitado, elegirNivel, erroresDePagina, responder, saltarDato, sinScrollHorizontal } from "./ayuda";
 
@@ -46,7 +46,9 @@ test("microscopio: ahorcado con fotos (nombre completo) y visor con zoom", async
   await comoInvitado(page);
   await abrirEstacion(page, "Microscopio");
   await page.getByRole("button", { name: /Ahorcado con fotos/ }).click();
-  await expect(page.locator(".level.x small")).toContainText(FOTOS.length + " fotos");
+  // El ahorcado con fotos usa solo las fotos de hongos.
+  const fotosHongos = FOTOS.filter((f) => AGENTES_MICROSCOPIO.find((a) => a.nombre === f.agente)?.grupo === "Hongos").length;
+  await expect(page.locator(".level.x small")).toContainText(fotosHongos + " fotos");
   await elegirNivel(page, "Fácil");
   const img = page.locator(".hang-img img");
   await expect(img).toBeVisible();

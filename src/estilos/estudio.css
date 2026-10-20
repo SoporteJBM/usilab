@@ -100,3 +100,27 @@ ol.flujo-armado li.intruso .flujo-elegido { border-color: var(--bad); background
 
 .flujo-tema { margin: 18px 0 4px; font-size: 1.05rem; }
 .flujo-tema:first-child { margin-top: 0; }
+.thumb { position: relative; }
+.thumb .marca-atlas { position: absolute; left: 4px; bottom: 4px; font-family: var(--display); font-size: 10px; letter-spacing: .04em; padding: 1px 6px; border-radius: 999px; background: rgba(0,0,0,.65); color: #fff; pointer-events: none; }
+
+/* Apuntes de teoría */
+h3.hub-sec { margin-top: 6px; }
+.apuntes-lista .tool span:empty { display: none; }
+.tool.apuntes { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+.ap-titulo { text-wrap: balance; }
+.ap-indice { margin-top: -4px; }
+.ap-indice .chip { min-height: 34px; padding: 4px 12px; font-size: 13px; }
+article.apunte { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+article.apunte .ap-sub { font-family: var(--display); font-size: 18px; margin: 14px 0 0; padding-bottom: 4px; border-bottom: 1px solid var(--line); scroll-margin-top: 80px; }
+article.apunte .ap-p { margin: 0; font-size: 17px; line-height: 1.55; }
+article.apunte .ap-lista { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 5px; line-height: 1.5; }
+article.apunte .ap-sublista { margin: 4px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 3px; font-size: 16px; color: var(--muted); }
+article.apunte .ap-sublista strong, article.apunte .ap-sublista em { color: var(--fg); }
+article.apunte strong { font-weight: 700; }
+.ap-nav { justify-content: space-between; margin-top: 8px; }
+.ap-nav button { max-width: 100%; white-space: normal; text-align: left; }
+.tabla-temas .chip.on { font-weight: 700; }
+.tabla-atajos .chip { min-height: 34px; padding: 4px 12px; font-size: 13px; }
+h3.hub-sec { font-family: var(--display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 10px 0 -4px; }
+.tabla-atajos { padding-top: 10px; border-top: 1px dashed var(--line); }
+.tabla-atajos::before { content: "Ir a:"; font-family: var(--display); font-size: 13px; color: var(--muted); align-self: center; }

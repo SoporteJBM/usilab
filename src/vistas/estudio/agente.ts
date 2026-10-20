@@ -3,15 +3,18 @@ import { INDICE, PARES, PERFILES, type Perfil } from "../../content";
 import { agente, busquedaDe, fotosDe, todasLasPreguntas } from "../../catalogo";
 import { mezclar } from "../../lib/azar";
 import { vista } from "../../lib/errores";
-import { boton, miniatura, mk } from "../../lib/dom";
+import { boton, mk } from "../../lib/dom";
 import { sinTildes } from "../../lib/texto";
 import { conDatoCurioso } from "../../ui/cargando";
-import { abrirPanel, verFoto } from "../../ui/marco";
+import { abrirPanel } from "../../ui/marco";
+import { tiraDeFotos } from "../../ui/fotos";
+import { mostrarApunte } from "./apuntes";
 import { aItem, jugarPreguntas } from "../jugar/quiz";
 import { buscar } from "./buscador";
 import { mostrarEstudio } from "./hub";
 
-const SECCIONES: [keyof Perfil, string, string][] = [
+type CampoTexto = Exclude<keyof Perfil, "fotos" | "apunte" | "fichaMicroscopio">;
+const SECCIONES: [CampoTexto, string, string][] = [
   ["queEs", "Qué es", "q"], ["reconoce", "Cómo se reconoce", "r"], ["produce", "Qué produce", "p"],
   ["contagio", "Cómo se contagia", "c"], ["diagnostico", "Diagnóstico", "d"], ["tratamiento", "Tratamiento", "t"], ["datoExamen", "Dato de examen", "x"],
 ];
@@ -39,12 +42,11 @@ export const mostrarAgente = vista("la ficha del agente", (nombre: string, volve
   p.append(boton("← Volver", "ghost back", volver), mk("small", "ag-kicker", ubicacion), mk("h2", "ag-name", nombre));
 
   const ficha = pf.fichaMicroscopio ? agente(pf.fichaMicroscopio) : undefined;
-  const fotos = pf.fichaMicroscopio ? fotosDe(pf.fichaMicroscopio) : [];
-  if (fotos.length) {
-    const tira = mk("div", "strip");
-    fotos.forEach((f) => tira.append(miniatura(f.archivo, nombre, () => verFoto(f.archivo, nombre))));
-    p.append(tira, mk("p", "note", "Fotos reales del laboratorio del curso."));
-  }
+  const fotos = [
+    ...(pf.fotos ?? []).map((f) => ({ archivo: f.archivo, fuente: f.fuente, etiqueta: f.pie })),
+    ...(pf.fichaMicroscopio ? fotosDe(pf.fichaMicroscopio) : []).map((f) => ({ archivo: f.archivo, fuente: f.fuente, etiqueta: f.especie ?? nombre })),
+  ];
+  p.append(...tiraDeFotos(fotos));
 
   const cuerpo = mk("div", "ag-body");
   for (const [k, titulo, cls] of SECCIONES) {
@@ -65,6 +67,8 @@ export const mostrarAgente = vista("la ficha del agente", (nombre: string, volve
     pares.forEach((x) => s.append(mk("p", null, "Con " + (x.a === f ? x.b : x.a) + ": " + x.diferencia)));
     p.append(s);
   }
+
+  if (pf.apunte) p.append(boton("Leer el resumen completo de " + nombre, "ghost", () => mostrarApunte(pf.apunte!, () => mostrarAgente(nombre, volver))));
 
   const preg = preguntasDe(nombre);
   const fila = mk("div", "row");

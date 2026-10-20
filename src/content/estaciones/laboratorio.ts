@@ -1,5 +1,5 @@
 // Estación: Laboratorio
-// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas.
+// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso, preguntas revisadas y banco de teoría (TB, resistencia y micología).
 import type { Estacion } from "../types";
 
 export const laboratorio: Estacion = {
@@ -423,6 +423,58 @@ export const laboratorio: Estacion = {
         "Solo cuenta si supera 10⁵"
       ],
       "explicacion": "Práctica 4: menos de 10⁴ UFC/mL es probable contaminación, excepto en punción suprapúbica."
+    },
+    {
+      "id": "laboratorio-033",
+      "nivel": "f",
+      "pregunta": "Temperatura de incubación para ver la fase MOHO de los hongos en Sabouraud:",
+      "correcta": "25–30 °C",
+      "distractores": [
+        "4 °C",
+        "37 °C",
+        "42 °C"
+      ],
+      "pista": "La temperatura del ambiente, no la del cuerpo.",
+      "explicacion": "Los mohos y dermatofitos se incuban a 25–30 °C; a 37 °C los dimórficos pasan a levadura."
+    },
+    {
+      "id": "laboratorio-034",
+      "nivel": "m",
+      "pregunta": "En la tinción de Ziehl-Neelsen, el decolorante es ___ y los BAAR se ven ___:",
+      "correcta": "Alcohol-ácido / rojos sobre fondo azul",
+      "distractores": [
+        "Lugol / morados",
+        "Alcohol-acetona / azules",
+        "Agua / verdes"
+      ],
+      "pista": "Los micólicos retienen la fucsina; el contraste es de metileno.",
+      "explicacion": "Los ácidos micólicos retienen la fucsina y resisten el alcohol-ácido; el contraste es azul de metileno."
+    },
+    {
+      "id": "laboratorio-035",
+      "nivel": "f",
+      "pregunta": "Niño con gato y placa de alopecia descamativa en el cuero cabelludo. Agente y tratamiento:",
+      "correcta": "Microsporum canis, griseofulvina oral",
+      "distractores": [
+        "T. rubrum, terbinafina tópica",
+        "Candida, nistatina",
+        "Malassezia, ketoconazol"
+      ],
+      "pista": "Niño con gato: dermatofito zoófilo.",
+      "explicacion": "Tinea capitis zoofílica → griseofulvina oral."
+    },
+    {
+      "id": "laboratorio-036",
+      "nivel": "m",
+      "pregunta": "¿Qué tipo de medio es el agar sangre?",
+      "correcta": "Enriquecido, no selectivo y diferencial por la hemólisis",
+      "distractores": [
+        "Selectivo y diferencial por la fermentación de lactosa",
+        "Selectivo para hongos por su pH ácido y el cloranfenicol",
+        "Estandarizado y no diferencial, para el antibiograma"
+      ],
+      "pista": "Lleva 5 % de sangre de carnero y no tiene inhibidores.",
+      "explicacion": "Agar sangre: enriquecido (base + 5 % de sangre de carnero), no selectivo y diferencial por la hemólisis. Es rojo intenso y opaco. Hemólisis beta: halo transparente (S. aureus, S. pyogenes). Alfa: halo verdoso (S. pneumoniae, Streptococcus viridans). Gamma: sin cambio (Enterococcus). Proteus hace swarming. Se incuba a 35–37 °C por 18–24 h. Se usa en el urocultivo para Gram positivos."
     }
   ]
 };

@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  AGENTES_MICROSCOPIO, AHORCADO, AHORCADO_PUNTOS, AHORCADOS, CASOS, DATOS_CURIOSOS, ESTACIONES, FLUJOGRAMAS, FOTOS, INDICE, PARES, PERFILES, REINOS, TABLAS,
+  AGENTES_MICROSCOPIO, AHORCADO, AHORCADO_PUNTOS, AHORCADOS, APUNTES, CASOS, DATOS_CURIOSOS, ESTACIONES, FLUJOGRAMAS, FOTOS, INDICE, PARES, PERFILES, REINOS, TABLAS, TARJETAS, TEMAS_TARJETAS,
   type Estacion, type NivelAhorcado,
 } from "../src/content";
 import { raicesRespuesta, sinTildes } from "../src/lib/texto";
@@ -81,12 +81,35 @@ FOTOS.forEach((f) => {
 });
 if (new Set(FOTOS.map((f) => f.archivo)).size !== FOTOS.length) error("Hay fotos repetidas.");
 
+FOTOS.forEach((f) => { if (f.fuente !== "laboratorio" && f.fuente !== "atlas") error(`Foto ${f.numero}: falta la fuente (laboratorio o atlas).`); });
+if (new Set(FOTOS.map((f) => f.numero)).size !== FOTOS.length) error("Hay dos fotos con el mismo número.");
+const existe = (archivo: string) => fs.existsSync(path.join(raiz, "public", archivo));
+
+// ---- Apuntes y tarjetas de teoría ----
+const idsApuntes = new Set(APUNTES.map((a) => a.id));
+if (idsApuntes.size !== APUNTES.length) error("Hay dos apuntes con el mismo id.");
+APUNTES.forEach((a) => {
+  if (vacio(a.titulo) || !a.bloques.length) error(`Apunte ${a.id}: falta el título o el contenido.`);
+  a.bloques.forEach((b, i) => {
+    if (b.t === "tabla") b.filas.forEach((f, j) => { if (b.columnas.length && f.length !== b.columnas.length) error(`Apunte ${a.id}, tabla del bloque ${i + 1}, fila ${j + 1}: no coincide con las columnas.`); });
+    const texto = JSON.stringify(b);
+    if ((texto.match(/\*\*/g) ?? []).length % 2) aviso(`Apunte ${a.id}, bloque ${i + 1}: hay un ** sin cerrar.`);
+  });
+});
+if (new Set(TARJETAS.map((t) => t.id)).size !== TARJETAS.length) error("Hay dos tarjetas con el mismo id.");
+TARJETAS.forEach((t) => {
+  for (const k of ["tema", "pregunta", "respuesta"] as const) if (vacio(t[k])) error(`Tarjeta ${t.id}: falta "${k}".`);
+  if (!TEMAS_TARJETAS.includes(t.tema)) error(`Tarjeta ${t.id}: el tema "${t.tema}" no está en TEMAS_TARJETAS.`);
+});
+
 // ---- Fichas de agentes e índice ----
 const enIndice = new Set(INDICE.flatMap((s) => s.grupos.flatMap((g) => g.items.map((i) => i.nombre))));
 for (const [nombre, pf] of Object.entries(PERFILES)) {
   if (pf.fichaMicroscopio && !nombresAgentes.has(pf.fichaMicroscopio)) error(`Ficha ${nombre}: fichaMicroscopio "${pf.fichaMicroscopio}" no existe.`);
   if (!enIndice.has(nombre)) aviso(`Ficha ${nombre}: no aparece en el índice, así que nadie llega a ella.`);
   if (vacio(pf.queEs)) aviso(`Ficha ${nombre}: falta "queEs".`);
+  if (pf.apunte && !idsApuntes.has(pf.apunte)) error(`Ficha ${nombre}: el apunte "${pf.apunte}" no existe.`);
+  (pf.fotos ?? []).forEach((f) => { if (!existe(f.archivo)) error(`Ficha ${nombre}: no existe public/${f.archivo}.`); });
 }
 INDICE.forEach((s) => s.grupos.forEach((g) => g.items.forEach((it) => { if (vacio(it.busqueda)) error(`Índice ${it.nombre}: falta la búsqueda.`); })));
 REINOS.forEach((r) => {
@@ -95,6 +118,8 @@ REINOS.forEach((r) => {
 });
 
 // ---- Tablas ----
+if (new Set(TABLAS.map((t) => t.id)).size !== TABLAS.length) error("Hay dos tablas con el mismo id.");
+TABLAS.forEach((t) => (t.fotos ?? []).forEach((f) => { if (!existe(f.archivo)) error(`Tabla "${t.titulo}": no existe public/${f.archivo}.`); }));
 TABLAS.forEach((t) => t.filas.forEach((f, i) => {
   if (f.length !== t.columnas.length) error(`Tabla "${t.titulo}", fila ${i + 1}: tiene ${f.length} celdas y la tabla ${t.columnas.length} columnas.`);
 }));
@@ -155,7 +180,7 @@ for (const [tema, lista] of Object.entries(DATOS_CURIOSOS)) if (!lista.length ||
 
 // ---- Resultado ----
 const total = [...ESTACIONES, CASOS].reduce((n, s) => n + s.preguntas.length, 0);
-console.log(`Contenido: ${total} preguntas, ${AGENTES_MICROSCOPIO.length} estructuras, ${FOTOS.length} fotos, ${Object.keys(PERFILES).length} fichas, ${palabras.size} palabras.`);
+console.log(`Contenido: ${total} preguntas, ${AGENTES_MICROSCOPIO.length} estructuras, ${FOTOS.length} fotos, ${Object.keys(PERFILES).length} fichas, ${palabras.size} palabras, ${APUNTES.length} apuntes, ${TABLAS.length} tablas, ${TARJETAS.length} tarjetas de teoría.`);
 if (avisos.length) { console.log(`\n${avisos.length} aviso(s):`); avisos.forEach((a) => console.log("  · " + a)); }
 if (errores.length) {
   console.error(`\n${errores.length} ERROR(ES) — corrígelos antes de publicar:`);

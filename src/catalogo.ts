@@ -1,5 +1,6 @@
 /** Consultas sobre el contenido, compartidas por varias vistas. */
-import { AGENTES_MICROSCOPIO, CASOS, ESTACIONES, FOTOS, INDICE, PARES, TABLAS, type AgenteMicroscopio, type Estacion, type Foto, type Pregunta } from "./content";
+import { textoPlano } from "./lib/texto-rico";
+import { AGENTES_MICROSCOPIO, APUNTES, CASOS, ESTACIONES, FOTOS, INDICE, PARES, TABLAS, TARJETAS, type AgenteMicroscopio, type Estacion, type Foto, type Pregunta } from "./content";
 import { sinTildes } from "./lib/texto";
 
 /** Estaciones con banco de preguntas (las del tablero y Casos clínicos). */
@@ -24,7 +25,7 @@ export const TEXTO_DIAGNOSTICO = "¿Cuál es el diagnóstico más probable?";
 export const enunciado = (q: Pregunta): string => q.pregunta || TEXTO_DIAGNOSTICO;
 
 // ---- Índice de búsqueda ----
-export interface Entrada { tipo: string; titulo: string; texto: string }
+export interface Entrada { tipo: string; titulo: string; texto: string; /** Id del apunte donde está, para abrirlo. */ apunte?: string }
 
 let cache: Entrada[] | null = null;
 /** Todo el material buscable: resúmenes, fichas, tablas, pares y preguntas con su respuesta. */
@@ -33,7 +34,21 @@ export function indiceBusqueda(): Entrada[] {
   const idx: Entrada[] = [];
   CON_PREGUNTAS.forEach((st) => idx.push({ tipo: "Resumen", titulo: st.nombre, texto: st.resumen }));
   AGENTES_MICROSCOPIO.forEach((a) => idx.push({ tipo: "Ficha de microscopio", titulo: a.nombre, texto: "Criterio: " + a.criterio + "\nProduce: " + a.produce + "\nTratamiento: " + a.tratamiento }));
-  TABLAS.forEach((tb) => tb.filas.forEach((r) => idx.push({ tipo: tb.titulo, titulo: r[0], texto: r.slice(1).join(" · ") })));
+  TABLAS.forEach((tb) => tb.filas.forEach((r) => idx.push({ tipo: "Tabla · " + tb.titulo, titulo: textoPlano(r[0]), texto: textoPlano(r.slice(1).join(" · ")) })));
+  // Apuntes: un resultado por apartado (subtítulo), con su texto.
+  APUNTES.forEach((a) => {
+    let titulo = a.titulo;
+    let partes: string[] = [];
+    const cerrar = () => { if (partes.length) idx.push({ tipo: "Apunte · " + a.titulo, titulo, texto: partes.join("\n"), apunte: a.id }); partes = []; };
+    for (const b of a.bloques) {
+      if (b.t === "h") { cerrar(); titulo = textoPlano(b.texto).replace(/\s*⭐/g, ""); }
+      else if (b.t === "p") partes.push(textoPlano(b.texto));
+      else if (b.t === "lista") partes.push(...b.items.map((x) => "• " + textoPlano(x.trim())));
+      else partes.push(...b.filas.map((r) => textoPlano(r.join(" · "))));
+    }
+    cerrar();
+  });
+  TARJETAS.forEach((t) => idx.push({ tipo: "Tarjeta · " + t.tema, titulo: t.pregunta, texto: "Respuesta: " + t.respuesta + "\n" + t.detalle }));
   PARES.forEach((p) => idx.push({ tipo: "No confundir", titulo: p.a + " vs " + p.b, texto: p.diferencia }));
   todasLasPreguntas().forEach(({ est, q }) => idx.push({
     tipo: "Pregunta · " + est.nombre,

@@ -9,7 +9,7 @@ import { dominadasDe } from "../estado/progreso";
 import { sesion } from "../servicios/sesion";
 import { abrirPanel } from "../ui/marco";
 import { gruposConMaterial, listaDeAgentes } from "./estudio/indice";
-import { jugarTarjetas } from "./estudio/tarjetas";
+import { dePregunta, jugarTarjetas } from "./estudio/tarjetas";
 import { atajosCurso, elegirNivel, mostrarTablero } from "./jugar/tablero";
 import { introExamen, PREGUNTAS_EXAMEN } from "./jugar/examen";
 import { mostrarEntrenadorVirus } from "./jugar/entrenador-virus";
@@ -27,7 +27,7 @@ export const mostrarInicio = vista("Inicio", () => {
   const items = mk("div", "intro-items");
   const totalPreg = CON_PREGUNTAS.reduce((n, s) => n + s.preguntas.length, 0);
   items.append(
-    botonTarjeta("intro-item", "Jugar", totalPreg + " preguntas en 4 niveles, fotos reales de microscopio, ahorcado y casos clínicos.", null, mostrarTablero),
+    botonTarjeta("intro-item", "Jugar", totalPreg + " preguntas en 4 niveles, fotos de microscopio, ahorcado y casos clínicos.", null, mostrarTablero),
     botonTarjeta("intro-item", "Estudio", "Buscador, tarjetas de repaso, tus errores, tablas clave y una ficha de cada agente.", null, mostrarEstudio),
     botonTarjeta("intro-item", "Comentarios", "Dudas, avisos y sugerencias entre compañeros.", null, mostrarComentarios),
   );
@@ -68,7 +68,7 @@ export const mostrarReino = vista("el grupo", (nombre: string) => {
     const fila = mk("div", "row");
     fila.append(
       boton("Practicar " + nombre.toLowerCase(), "primary", () => elegirNivel(st.id)),
-      boton("Tarjetas de repaso", "ghost", () => jugarTarjetas(st.preguntas.map((q) => ({ est: st, q })), nombre, () => mostrarReino(nombre))),
+      boton("Tarjetas de repaso", "ghost", () => jugarTarjetas(st.preguntas.map((q) => dePregunta({ est: st, q })), nombre, () => mostrarReino(nombre))),
     );
     const volverAqui = () => mostrarReino(nombre);
     if (st.preguntas.length >= PREGUNTAS_EXAMEN) fila.append(boton("Modo examen", "ghost", () => introExamen(st.id, volverAqui)));
