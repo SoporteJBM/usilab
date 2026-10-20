@@ -7,7 +7,13 @@ import { acierto, estado, fallo, guardar } from "../../estado/progreso";
 import { APRUEBA_FLUJO, montarFotoFlujo, type FotoEnRonda } from "./flujo-foto";
 import { mostrarSolucionFlujo } from "../estudio/casos-flujo";
 import { armadoFlujo } from "../estudio/flujogramas";
-import { abrirPanel, pintarMarcador, type Seccion } from "../../ui/marco";
+import { abrirPanel, alSalirDeVista, modoEnfoque, pintarMarcador, type Seccion } from "../../ui/marco";
+import { esAncho } from "../../ui/ancho";
+import { icono } from "../../ui/secciones";
+import { mostrarApunte } from "../estudio/apuntes";
+
+/** Apunte de teoría que explica cada sección (para «Leer el apunte» después de responder). */
+const APUNTE_DE: Record<string, string> = { tuberculosis: "clase-tb", resistencia: "clase-resistencia", hongos: "clase-micologia" };
 import { ampliable } from "../../ui/visor";
 import { reportarError } from "../../ui/reportar";
 
@@ -104,13 +110,44 @@ export function jugarPreguntas(titulo: string, todos: ItemQuiz[], base: number, 
     p.append(fila);
   };
 
+  const resultados: ("ok" | "no" | null)[] = items.map(() => null);
+  const marcar = (bien: boolean) => { resultados[i] = bien ? "ok" : "no"; pintarSegmentos(); };
+  let segmentos: HTMLElement | null = null;
+  const pintarSegmentos = () => {
+    if (!segmentos) return;
+    segmentos.replaceChildren(...items.map((_, k) => mk("span", "seg" + (resultados[k] ? " " + resultados[k] : k === i ? " actual" : ""))));
+  };
+
+  /** Barra del modo enfoque (computadora): salir, título, avance por segmentos y número de pregunta. */
+  const barraEnfoque = (p: HTMLElement) => {
+    const barra = mk("div", "q-barra");
+    const salir = boton("Salir", "q-salir", o.alSalir);
+    salir.prepend(icono("cerrar", 16));
+    segmentos = mk("div", "q-segs");
+    segmentos.setAttribute("role", "progressbar");
+    segmentos.setAttribute("aria-label", "Pregunta " + (i + 1) + " de " + items.length);
+    segmentos.setAttribute("aria-valuemin", "1");
+    segmentos.setAttribute("aria-valuemax", String(items.length));
+    segmentos.setAttribute("aria-valuenow", String(i + 1));
+    barra.append(salir, mk("strong", "q-titulo", titulo), segmentos, mk("span", "q-cuenta", (i + 1) + " de " + items.length));
+    p.append(barra);
+    pintarSegmentos();
+  };
+
   const siguiente = () => {
     if (i >= items.length) return final();
     const it = items[i];
     const p = abrirPanel(seccion);
+    const ancho = esAncho();
     let usoPista = false;
     let respondida = false;
-    p.append(mk("h2", null, titulo), mk("p", "note", (i + 1) + " de " + items.length));
+    if (ancho) {
+      modoEnfoque(true);
+      p.classList.add("enfoque-panel");
+      alSalirDeVista(() => modoEnfoque(false));
+    }
+    barraEnfoque(p);
+    p.append(mk("h2", "q-h2", titulo), mk("p", "note q-num", (i + 1) + " de " + items.length));
     if (it.img) {
       const marco = mk("div", "photo");
       const im = mk("img");
@@ -122,13 +159,13 @@ export function jugarPreguntas(titulo: string, todos: ItemQuiz[], base: number, 
     if (it.flujo) { pintarFlujo(p, it.flujo); return; }
     if (it.fotoFlujo) {
       const f = it.fotoFlujo;
-      p.querySelector(".note")!.textContent = (i + 1) + " de " + items.length + " · flujograma en papel";
+      p.querySelector(".q-num")!.textContent = (i + 1) + " de " + items.length + " · flujograma en papel";
       montarFotoFlujo(p, f, {
         alTerminar: (nota) => {
           if (nota == null) return;
           const pts = Math.round((f.puntos * nota) / 20);
-          if (nota >= APRUEBA_FLUJO) { aciertos += 1; acierto(undefined, undefined, pts); }
-          else { fallo(undefined, undefined); estado.puntos += pts; guardar(); }
+          if (nota >= APRUEBA_FLUJO) { aciertos += 1; acierto(undefined, undefined, pts); marcar(true); }
+          else { fallo(undefined, undefined); estado.puntos += pts; guardar(); marcar(false); }
           pintarMarcador();
         },
         alSeguir: () => { i += 1; siguiente(); },
@@ -137,8 +174,14 @@ export function jugarPreguntas(titulo: string, todos: ItemQuiz[], base: number, 
       }, i === items.length - 1 ? "Ver resultado" : "Siguiente");
       return;
     }
-    if (it.caso) p.append(mk("p", "case", it.caso));
-    p.append(mk("p", null, it.pregunta));
+    // Pregunta a la izquierda y explicación a la derecha (en celular todo va en una columna, como antes).
+    const cuerpo = mk("div", "q-cuerpo");
+    const principal = mk("div", "q-main");
+    const lado = mk("aside", "q-lado");
+    lado.setAttribute("aria-label", "Explicación");
+    cuerpo.append(principal, lado);
+    if (it.caso) principal.append(mk("p", "case", it.caso));
+    principal.append(mk("p", null, it.pregunta));
 
     const textoPista = mk("p", "hint", it.pista ?? "");
     textoPista.hidden = true;
@@ -170,12 +213,14 @@ export function jugarPreguntas(titulo: string, todos: ItemQuiz[], base: number, 
           const pts = usoPista ? base / 2 : base;
           aciertos += 1;
           acierto(it.estacion, it.preguntaId, pts);
+          marcar(true);
           fb.className = "feedback ok";
           fb.textContent = "Correcto. +" + pts + " puntos";
         } else {
           b.classList.add("wrong");
           opciones.children[it.respuesta]?.classList.add("right");
           fallo(it.estacion, it.preguntaId);
+          marcar(false);
           fb.className = "feedback no";
           fb.textContent = "Era " + it.opciones[it.respuesta] + ".";
         }
@@ -185,6 +230,12 @@ export function jugarPreguntas(titulo: string, todos: ItemQuiz[], base: number, 
           ([["Qué es", it.ficha.nombre], ["Criterio", it.ficha.criterio], ["Produce", it.ficha.produce], ["Tratamiento", it.ficha.tratamiento]] as const)
             .forEach(([k2, v]) => dl.append(mk("dt", null, k2), mk("dd", null, v)));
           extra.append(dl);
+        }
+        const idApunte = it.estacion ? APUNTE_DE[it.estacion] : undefined;
+        if (idApunte) {
+          const leer = boton("Leer el apunte de esta clase", "q-apunte", () => mostrarApunte(idApunte, () => { i += 1; siguiente(); }));
+          leer.prepend(icono("libro", 18));
+          extra.append(leer);
         }
         extra.append(reportarError(() => ({
           tipo: "pregunta", estacion: it.estacion, id: it.preguntaId ?? (it.img ? "foto:" + it.img : undefined),
@@ -196,7 +247,28 @@ export function jugarPreguntas(titulo: string, todos: ItemQuiz[], base: number, 
       });
       opciones.append(b);
     });
-    p.append(textoPista, opciones, fb, extra, fila);
+    const ayuda = mk("p", "q-teclas", "Teclas 1 a " + it.opciones.length + " para elegir y Enter para seguir");
+    principal.append(textoPista, opciones, ayuda, fila);
+    lado.append(fb, extra);
+    p.append(cuerpo);
+
+    if (ancho) {
+      const teclas = (e: KeyboardEvent) => {
+        const t = e.target as HTMLElement | null;
+        if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+        if (e.altKey || e.ctrlKey || e.metaKey) return;
+        const n = Number(e.key);
+        if (!respondida && n >= 1 && n <= it.opciones.length) {
+          e.preventDefault();
+          (opciones.children[n - 1] as HTMLButtonElement | undefined)?.click();
+        } else if (e.key === "Enter" && respondida && !bSig.hidden && document.activeElement !== bSig) {
+          e.preventDefault();
+          bSig.click();
+        }
+      };
+      document.addEventListener("keydown", teclas);
+      alSalirDeVista(() => { modoEnfoque(false); document.removeEventListener("keydown", teclas); });
+    }
   };
 
   /** Pregunta de flujograma: se arma tocando los pasos; perfecto = correcta. */
@@ -212,8 +284,8 @@ export function jugarPreguntas(titulo: string, todos: ItemQuiz[], base: number, 
     fila.append(bSaltar, bSig, boton("Salir", "ghost", o.alSalir));
     p.append(armadoFlujo(fl.f, fl.intrusos, (r) => {
       bSaltar.hidden = true;
-      if (r.perfecto) { aciertos += 1; acierto(undefined, undefined, fl.puntos); }
-      else fallo(undefined, undefined);
+      if (r.perfecto) { aciertos += 1; acierto(undefined, undefined, fl.puntos); marcar(true); }
+      else { fallo(undefined, undefined); marcar(false); }
       bSig.hidden = false;
       pintarMarcador();
       fila.after(reportarError(() => ({ tipo: "flujograma", estacion: fl.f.tema.toLowerCase(), id: fl.f.id, texto: fl.f.consigna, correcta: fl.f.pasos.map((x) => x.texto).join(" → ") })));

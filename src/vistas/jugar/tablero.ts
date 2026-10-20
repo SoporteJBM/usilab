@@ -4,7 +4,9 @@ import { estacion } from "../../catalogo";
 import { mezclar } from "../../lib/azar";
 import { AppError, vista } from "../../lib/errores";
 import { boton, botonTarjeta, mk } from "../../lib/dom";
-import { dominadasDe, estado, rondaTerminada } from "../../estado/progreso";
+import { dominadasDe, estado, recordarUltima, rondaTerminada } from "../../estado/progreso";
+import { esAncho, vistaRepintable } from "../../ui/ancho";
+import { anillo, GRUPO_DE, GRUPOS, icono, type Grupo } from "../../ui/secciones";
 import { conDatoCurioso } from "../../ui/cargando";
 import { abrirPanel, abrirTablero, pintarMarcador } from "../../ui/marco";
 import { elegirModo } from "./niveles";
@@ -59,6 +61,7 @@ export const elegirNivel = vista("el nivel", (id: string) => {
 
 export const iniciarRonda = vista("la ronda", (id: string, k: Nivel) => {
   const st = estacionOError(id);
+  recordarUltima(id, k);
   const items = armarRonda(st, k).map((q) => aItem(q, st));
   jugarPreguntas(st.nombre + " · " + NOMBRE_NIVEL[k], items, PUNTOS[k] * (id === "casos" ? 2 : 1), {
     pista: PISTA[k],
@@ -100,8 +103,91 @@ export function atajosCurso(volver: () => void): HTMLElement {
   return caja;
 }
 
-export const mostrarTablero = vista("el tablero", () => {
+/** Filtro elegido en el tablero de computadora (se mantiene mientras la página esté abierta). */
+let filtro: Grupo | "todas" = "todas";
+
+/** JUGAR para computadora: cuadrícula de 4 columnas con filtros; cada sección con color, ícono y anillo de % dominado. */
+function tableroAncho(): void {
   const home = abrirTablero();
+  vistaRepintable(mostrarTablero);
+  home.className = "tablero-ancho";
+  const cab = mk("div", "ta-cab");
+  cab.append(mk("h2", null, "Jugar"));
+  const filtros = mk("div", "ta-filtros");
+  filtros.setAttribute("role", "group");
+  filtros.setAttribute("aria-label", "Filtrar secciones");
+  for (const g of GRUPOS) {
+    const b = boton(g.nombre, "ta-filtro" + (filtro === g.clave ? " on" : ""), () => { filtro = g.clave; tableroAncho(); });
+    b.setAttribute("aria-pressed", String(filtro === g.clave));
+    filtros.append(b);
+  }
+  cab.append(filtros);
+  home.append(cab, atajosCurso(mostrarTablero));
+
+  const grid = mk("section", "ta-grid");
+  grid.setAttribute("aria-label", "Secciones");
+  const conBanco = ESTACIONES.filter((st) => GRUPO_DE[st.id] && st.preguntas.length && (filtro === "todas" || GRUPO_DE[st.id] === filtro));
+  for (const st of conBanco) {
+    const total = st.preguntas.length;
+    const dom = dominadasDe(st.id);
+    const card = mk("article", "ta-card sec-" + st.id);
+    const arriba = mk("div", "ta-arriba");
+    const ic = mk("span", "sec-ico");
+    ic.append(icono(st.id, 24));
+    arriba.append(ic, anillo(dom / total, 56, 6, Math.round((100 * dom) / total) + "%", Math.round((100 * dom) / total) + " % dominado de " + st.nombre));
+    const jugar = boton(st.nombre, "ta-titulo", () => elegirNivel(st.id));
+    const fila = mk("div", "ta-acciones");
+    fila.append(boton("Resumen", "ghost", () => mostrarResumen(st.id)));
+    if (total >= PREGUNTAS_EXAMEN) fila.append(boton("Examen", "ghost", () => introExamen(st.id, mostrarTablero)));
+    card.append(arriba, jugar, mk("p", null, st.descripcion), mk("small", "ta-cuenta", total + " preguntas · " + dom + " dominadas"), fila);
+    grid.append(card);
+  }
+  if (!conBanco.length) grid.append(mk("p", "note", "No hay secciones en este grupo."));
+  home.append(grid);
+
+  // Otras formas de practicar
+  const otras = mk("section", "ta-otras");
+  otras.append(mk("h3", null, "Otras formas de practicar"));
+  const lista = mk("div", "ta-otras-lista");
+  const contagio = ESTACIONES.find((st) => st.id === "contagio");
+  const extra: [string, string, string, () => void][] = [
+    ["casos", CASOS.nombre, CASOS.descripcion, () => elegirNivel(CASOS.id)],
+    ["microscopio", MICROSCOPIO.nombre, MICROSCOPIO.descripcion, mostrarMicroscopio],
+  ];
+  if (contagio) extra.push(["contagio", contagio.nombre, contagio.descripcion, () => mostrarResumen(contagio.id)]);
+  extra.push(["entrenador-virus", "Entrenador de Virus", "Baltimore, VIH paso a paso, CD4 y más", () => mostrarEntrenadorVirus(mostrarTablero)]);
+  for (const [id, nombre, desc, fn] of extra) {
+    const b = mk("button", "ta-otra");
+    b.type = "button";
+    b.onclick = () => fn();
+    const t = mk("span");
+    t.append(mk("strong", null, nombre), mk("small", null, desc));
+    b.append(icono(id, 26), t);
+    lista.append(b);
+  }
+  otras.append(lista);
+  if (hayCorrector) {
+    const fe = mk("div", "ta-flujo");
+    const t = mk("span");
+    t.append(mk("strong", null, "Flujograma con foto"), mk("small", null, "Hazlo en papel, mándale la foto a Claude y te corrige según el nivel."));
+    const bs = mk("div", "row");
+    bs.append(
+      boton("Ver soluciones", "ghost", () => mostrarSolucionesFlujo(mostrarTablero)),
+      boton("Virus", "primary", () => elegirModoFotoFlujo("virus", mostrarTablero)),
+      boton("Hongos", "primary", () => elegirModoFotoFlujo("hongos", mostrarTablero)),
+    );
+    fe.append(icono("flujo-foto", 26), t, bs);
+    otras.append(fe);
+  }
+  home.append(otras);
+  pintarMarcador();
+}
+
+export const mostrarTablero = vista("el tablero", () => {
+  if (esAncho()) return tableroAncho();
+  const home = abrirTablero();
+  vistaRepintable(mostrarTablero);
+  home.className = "grid";
   home.append(atajosCurso(mostrarTablero));
   for (const t of tarjetas()) {
     const card = mk("article", "station");

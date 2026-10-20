@@ -93,7 +93,7 @@ const sinSupabase = {
   },
 };
 
-/** Arma el HTML del artefacto: sin <html>/<head>/<body> (claude.ai pone el esqueleto), con todo adentro. */
+/** Arma el HTML del artefacto: documento completo con todo adentro (CSS, JS y fotos). */
 async function construirArtefacto() {
   const r = await esbuild.build({
     ...opciones,
@@ -121,14 +121,26 @@ async function construirArtefacto() {
   const titulo = plantilla.match(/<title>.*<\/title>/)[0];
   const fuentes = plantilla.match(/<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>/)[0];
   const cuerpo = plantilla.split(/<body>/)[1].split(/<\/body>/)[0].replace(/<script[^>]*__JS__[^>]*><\/script>/, "").trim();
+  // Documento completo: los artefactos publicados en claude.ai ya no ponen el esqueleto.
   const html = [
+    "<!doctype html>",
+    '<html lang="es">',
+    "<head>",
+    '<meta charset="utf-8">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">',
+    '<meta name="theme-color" content="#2F7D6B">',
     titulo,
     '<meta name="description" content="Juego para estudiar Microbiología y Parasitología (ambiente de pruebas de MiUsiLab).">',
     '<link rel="preconnect" href="https://fonts.googleapis.com">',
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
     fuentes,
     "<style>\n" + css + "\n</style>",
+    "</head>",
+    "<body>",
     cuerpo,
     "<script>\n" + js.replace(/<\/script/gi, "<\\/script") + "\n</script>",
+    "</body>",
+    "</html>",
   ].join("\n");
   fs.writeFileSync(path.join(salida, "reto-microbiologia.html"), html);
   console.log("Artefacto: " + path.relative(raiz, path.join(salida, "reto-microbiologia.html")) + " (" + Math.round(html.length / 1024) + " KB)");

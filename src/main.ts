@@ -13,6 +13,9 @@ import { mostrarEstudio } from "./vistas/estudio/hub";
 import { mostrarInicio } from "./vistas/inicio";
 import { mostrarTablero } from "./vistas/jugar/tablero";
 import { ingresar, mostrarLogin } from "./vistas/login";
+import { menuTarjetas } from "./vistas/estudio/tarjetas";
+import { mostrarRanking } from "./vistas/ranking";
+import { icono } from "./ui/secciones";
 
 instalarManejadoresGlobales();
 definirRescate(() => (sesion.modo ? mostrarInicio() : mostrarLogin()));
@@ -24,8 +27,18 @@ async function arrancar(): Promise<void> {
     if (b && NAV[b.dataset.k ?? ""]) NAV[b.dataset.k!]();
   });
 
+  // Menú lateral (computadora): mismas secciones, más Flashcards y Ranking.
+  const LATERAL: Record<string, () => void> = { ...NAV, tarjetas: () => menuTarjetas(), ranking: () => mostrarRanking(mostrarInicio) };
+  const lateral = $("#lateral");
+  lateral.querySelectorAll<HTMLButtonElement>(".lat-nav button[data-k]").forEach((b) => b.prepend(icono(b.dataset.k ?? "", 20)));
+  lateral.querySelector(".lat-racha")?.prepend(icono("racha", 16));
+  lateral.addEventListener("click", (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-k]");
+    if (b && LATERAL[b.dataset.k ?? ""]) LATERAL[b.dataset.k!]();
+  });
+
   // La marca MiUsiLab lleva al inicio (si ya entró).
-  $("a.marca").addEventListener("click", (e) => { e.preventDefault(); if (sesion.modo) mostrarInicio(); });
+  document.querySelectorAll<HTMLAnchorElement>("a.marca, a.lat-marca").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); if (sesion.modo) mostrarInicio(); }));
 
   mostrarLogin();
   await iniciarAutenticacion((evento) => {

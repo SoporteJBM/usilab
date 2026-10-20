@@ -21,7 +21,7 @@ const deTarjeta = (t: Tarjeta): Carta => ({ kicker: "Teoría · " + t.tema, fren
 export const dePregunta = ({ est, q }: PreguntaUbicada): Carta => ({ kicker: est.nombre + " · " + NOMBRE_NIVEL[q.nivel], caso: q.caso, frente: enunciado(q), respuesta: q.correcta, detalle: q.explicacion });
 
 export const menuTarjetas = vista("las tarjetas", () => {
-  const p = abrirPanel("estudio");
+  const p = abrirPanel("estudio", "", "tarjetas");
   encabezado(p, "Tarjetas de repaso", "Elige un tema. Las tarjetas que marques como «Repasar» vuelven a salir más adelante.");
 
   p.append(mk("h3", "grp", "Teoría: Tuberculosis, resistencia y hongos"));
@@ -52,7 +52,7 @@ export const jugarTarjetas = vista("las tarjetas", (lista: Carta[], titulo: stri
   let repaso = 0;
 
   const siguiente = () => {
-    const p = abrirPanel("estudio");
+    const p = abrirPanel("estudio", "", "tarjetas");
     p.append(boton("← Tarjetas", "ghost back", volver));
     if (!cola.length) {
       p.append(mk("h2", null, total ? "¡Terminaste!" : titulo));

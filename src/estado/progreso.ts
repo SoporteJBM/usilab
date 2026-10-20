@@ -5,8 +5,8 @@
  * que descarta lo que no tenga la forma esperada o apunte a preguntas que ya no existen.
  * Así un dato viejo o manipulado nunca rompe la página.
  */
-import { pregunta } from "../catalogo";
-import type { Nivel } from "../content";
+import { estacion, pregunta } from "../catalogo";
+import { APUNTES, type Nivel } from "../content";
 
 export interface Estado {
   version: 4;
@@ -26,9 +26,15 @@ export interface Estado {
   examenes: Record<string, { mejor: number; ultima: number; intentos: number }>;
   /** Repaso inteligente: id de pregunta → caja (1 a 5) y fecha en que toca repasarla */
   repaso: Record<string, { caja: number; toca: string }>;
+  /** Preguntas respondidas hoy (para la meta del día). */
+  hoy: { fecha: string; n: number };
+  /** Última sección y nivel jugados (para «Continuar donde lo dejaste»). */
+  ultima: { est: string; nivel: Nivel } | null;
+  /** Apuntes marcados como leídos: id → true */
+  leidos: Record<string, true>;
 }
 
-export const vacio = (): Estado => ({ version: 4, puntos: 0, racha: 0, dominadas: {}, rondas: {}, ahorcadoVistas: {}, ultimoNivel: {}, errores: {}, examenes: {}, repaso: {} });
+export const vacio = (): Estado => ({ version: 4, puntos: 0, racha: 0, dominadas: {}, rondas: {}, ahorcadoVistas: {}, ultimoNivel: {}, errores: {}, examenes: {}, repaso: {}, hoy: { fecha: "", n: 0 }, ultima: null, leidos: {} });
 
 const NIVELES_OK = new Set(["f", "m", "d", "x"]);
 const NIVELES_AHORCADO = new Set(["facil", "medio", "dificil", "muydificil"]);
@@ -108,6 +114,13 @@ export function sanear(x: unknown): Estado {
       if (caja >= 1 && caja <= CAJAS && typeof v.toca === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v.toca)) e.repaso[id] = { caja, toca: v.toca };
     }
   }
+  if (esObjeto(x.hoy) && typeof x.hoy.fecha === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x.hoy.fecha)) {
+    e.hoy = { fecha: x.hoy.fecha, n: Math.min(10000, Math.floor(numero(x.hoy.n))) };
+  }
+  if (esObjeto(x.ultima) && typeof x.ultima.est === "string" && estacion(x.ultima.est) && typeof x.ultima.nivel === "string" && NIVELES_OK.has(x.ultima.nivel)) {
+    e.ultima = { est: x.ultima.est, nivel: x.ultima.nivel as Nivel };
+  }
+  if (esObjeto(x.leidos)) for (const [id, v] of Object.entries(x.leidos)) if (v === true && APUNTES.some((a) => a.id === id)) e.leidos[id] = true;
   if (esObjeto(x.ahorcadoVistas)) {
     for (const [k, v] of Object.entries(x.ahorcadoVistas)) {
       const nivel = k.includes(":") ? k.split(":")[1] : k;
@@ -177,8 +190,23 @@ export function proximoRepaso(): string | null {
 export const enRepaso = (): number => Object.keys(estado.repaso).length;
 
 // ---- Operaciones ----
+/** Meta del día: preguntas respondidas hoy. */
+export const META_DIARIA = 20;
+export const respondidasHoy = (): number => (estado.hoy.fecha === fecha(0) ? estado.hoy.n : 0);
+function contarHoy(): void {
+  const hoy = fecha(0);
+  estado.hoy = { fecha: hoy, n: (estado.hoy.fecha === hoy ? estado.hoy.n : 0) + 1 };
+}
+export function recordarUltima(est: string, nivel: Nivel): void { estado.ultima = { est, nivel }; guardar(); }
+export const estaLeido = (id: string): boolean => Boolean(estado.leidos[id]);
+export function marcarLeido(id: string, si: boolean): void {
+  if (si) estado.leidos[id] = true; else delete estado.leidos[id];
+  guardar();
+}
+
 export function acierto(est: string | undefined, id: string | undefined, puntos: number): void {
   estado.puntos += puntos;
+  contarHoy();
   estado.racha += 1;
   if (est && id && pregunta(id)) {
     (estado.dominadas[est] ??= {})[id] = true;
@@ -193,6 +221,7 @@ export function acierto(est: string | undefined, id: string | undefined, puntos:
 
 export function fallo(est: string | undefined, id: string | undefined): void {
   estado.racha = 0;
+  contarHoy();
   if (est && id && pregunta(id)) {
     programar(id, false);
     const m = (estado.errores[est] ??= {});

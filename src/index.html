@@ -12,6 +12,25 @@
 <link rel="stylesheet" href="__CSS__">
 </head>
 <body>
+<aside id="lateral" class="lateral" aria-label="Menú">
+  <a class="lat-marca" href="#" aria-label="MiUsiLab, ir al inicio"><span class="dot" aria-hidden="true"></span><span>MiUsi<b>Lab</b></span></a>
+  <nav class="lat-nav" aria-label="Secciones">
+    <button type="button" data-k="inicio">Inicio</button>
+    <button type="button" data-k="jugar">Jugar</button>
+    <button type="button" data-k="estudio">Estudio</button>
+    <button type="button" data-k="tarjetas">Flashcards</button>
+    <button type="button" data-k="comentarios">Comentarios<span class="badge" id="lat-badge"></span></button>
+  </nav>
+  <div class="lat-avance">
+    <span class="lat-etq">Tu avance</span>
+    <div class="lat-cifras">
+      <div><strong class="lat-racha"><span id="lat-racha">0</span></strong><small>aciertos seguidos</small></div>
+      <div><strong class="lat-puntos" id="lat-puntos">0</strong><small>puntos</small></div>
+    </div>
+    <button type="button" class="lat-link" id="lat-ranking" data-k="ranking" hidden>Ver ranking</button>
+  </div>
+  <div class="lat-cuenta" id="lat-cuenta"></div>
+</aside>
 <div class="wrap">
   <a class="marca" href="#" aria-label="MiUsiLab, ir al inicio"><span class="dot" aria-hidden="true"></span><span>MiUsi<b>Lab</b></span></a>
   <nav id="topnav" class="topnav" hidden aria-label="Secciones">

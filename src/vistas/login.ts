@@ -39,7 +39,35 @@ export async function ingresar(modo: "cuenta" | "invitado"): Promise<void> {
   }
 }
 
+/** Cuenta en el menú lateral (computadora): foto o inicial, nombre y botón para entrar o salir. */
+function pintarCuentaLateral(): void {
+  const caja = document.getElementById("lat-cuenta");
+  if (!caja) return;
+  caja.replaceChildren();
+  const cuenta = sesion.modo === "cuenta";
+  const nombre = cuenta ? (esArtefacto ? sesion.claude?.name || "Tu cuenta" : sesion.apodo) : "Invitado";
+  const foto = mk("span", "lat-foto");
+  foto.setAttribute("aria-hidden", "true");
+  if (esArtefacto && cuenta && sesion.claude?.avatarUrl) {
+    const img = mk("img");
+    img.src = sesion.claude.avatarUrl; img.alt = "";
+    img.onerror = () => { img.remove(); foto.textContent = (nombre || "?").trim().charAt(0).toUpperCase(); };
+    foto.append(img);
+  } else foto.textContent = (nombre || "?").trim().charAt(0).toUpperCase();
+  const textos = mk("span", "lat-quien");
+  textos.append(mk("strong", null, nombre), mk("small", null, cuenta ? (esArtefacto ? "Cuenta de Claude" : "Tu cuenta") : "Avance en este dispositivo"));
+  caja.append(foto, textos, boton(cuenta ? "Salir" : "Entrar", "lat-salir", async () => {
+    await salir();
+    pestana = "entrar";
+    pintarMarcador();
+    mostrarLogin();
+  }));
+  const r = document.getElementById("lat-ranking");
+  if (r) r.hidden = !(esArtefacto && cuenta);
+}
+
 export function pintarCabecera(): void {
+  pintarCuentaLateral();
   const w = $("#who");
   w.replaceChildren();
   w.hidden = false;
