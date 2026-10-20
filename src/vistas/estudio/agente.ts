@@ -43,7 +43,7 @@ export const mostrarAgente = vista("la ficha del agente", (nombre: string, volve
   if (fotos.length) {
     const tira = mk("div", "strip");
     fotos.forEach((f) => tira.append(miniatura(f.archivo, nombre, () => verFoto(f.archivo, nombre))));
-    p.append(tira, mk("p", "note", "Fotos del laboratorio de Mafer."));
+    p.append(tira, mk("p", "note", "Fotos reales del laboratorio del curso."));
   }
 
   const cuerpo = mk("div", "ag-body");

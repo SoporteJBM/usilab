@@ -1,5 +1,5 @@
 // Ahorcado
-// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas por Mafer.
+// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas.
 import type { NivelAhorcado, PalabraAhorcado } from "./types";
 
 export const AHORCADO_RESUMEN = "Adivina el nombre del agente con su pista. Tienes 6 errores.";

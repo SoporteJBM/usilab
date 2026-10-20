@@ -23,7 +23,7 @@ export const mostrarInicio = vista("Inicio", () => {
   const p = abrirPanel("inicio", "inicio");
   p.append(mk("h2", null, sesion.modo === "cuenta" && sesion.apodo ? "Hola, " + sesion.apodo : "Inicio"));
   const intro = mk("section", "intro");
-  intro.append(mk("p", "intro-lead", "Una forma de estudiar Microbiología y Parasitología jugando. Todo sale de lo visto en clase: las prácticas, el banco de laboratorio y preguntas revisadas por Mafer. La meta no es memorizar, sino entender el porqué, para poder responder aunque el profesor pregunte de otra forma."));
+  intro.append(mk("p", "intro-lead", "Una forma de estudiar Microbiología y Parasitología jugando. Todo sale de lo visto en clase: las prácticas, el banco de laboratorio y preguntas revisadas una por una. La meta no es memorizar, sino entender el porqué, para poder responder aunque el profesor pregunte de otra forma."));
   const items = mk("div", "intro-items");
   const totalPreg = CON_PREGUNTAS.reduce((n, s) => n + s.preguntas.length, 0);
   items.append(

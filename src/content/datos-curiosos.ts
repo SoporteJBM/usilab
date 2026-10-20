@@ -1,5 +1,5 @@
 // "¿Sabías que...?" que aparece al cargar, por tema
-// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas por Mafer.
+// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas.
 export const DATOS_CURIOSOS: Record<string, string[]> = {
   "hongos": [
     "Entre las Candida comunes, solo C. albicans forma clamidoconidias.",

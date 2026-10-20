@@ -151,6 +151,8 @@ ol.rank .pts small { display: block; color: var(--muted); font-size: 12px; font-
 .fj-revela { margin: 0; font-family: var(--display); font-weight: 600; color: var(--accent); }
 button.fj-modo { text-align: left; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px; border: 2px solid var(--xhard); background: color-mix(in srgb, var(--xhard) 8%, var(--surface)); }
 button.fj-modo strong { font-size: 18px; color: var(--xhard); }
+button.fj-mixto { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); margin-top: 8px; }
+button.fj-mixto strong { color: var(--accent); }
 button.fj-modo span { font-family: var(--body); font-size: 14px; color: var(--muted); line-height: 1.35; }
 .fj-cuerpo, .fj-extra, .fj-huecos { display: flex; flex-direction: column; gap: 10px; }
 .fj-hueco { display: flex; flex-direction: column; gap: 6px; }
@@ -925,20 +927,45 @@ function pickLevel(id) {
   }, (k) => go(() => startRound(id, k), id), showHome, id);
   if ((id === "virus" || id === "hongos") && typeof elegirModoFlujo === "function") {
     const p = $("#panel");
-    const nota = mk("p", "note", "Cada ronda de " + st.name + " incluye un flujograma en papel (con foto) que se corrige según el nivel. Para practicar solo flujogramas:");
+    const nota = mk("p", "note", "Además de las rondas de preguntas, cada nivel (Fácil, Medio, Difícil y Muy difícil) tiene estos modos:");
     const b = mk("button", "fj-modo", ""); b.type = "button";
     b.append(mk("strong", null, "Modo flujogramas"), mk("span", null, "Siempre en papel con foto; Claude corrige. Fácil: 4 criterios · Medio: 6 · Difícil: 8 · Muy difícil: 8 con nivel de examen final"));
     b.onclick = () => elegirModoFlujo(null, undefined, id);
+    const mix = mk("button", "fj-modo fj-mixto", ""); mix.type = "button";
+    mix.append(mk("strong", null, "Modo mixto"), mk("span", null, "Todo " + st.name + " junto: 6 preguntas + 2 flujogramas con foto, mezclados y del nivel que elijas"));
+    mix.onclick = () => elegirModoMixto(id);
     const fila = p.querySelector(".row");
-    p.insertBefore(nota, fila); p.insertBefore(b, fila);
+    p.insertBefore(nota, fila); p.insertBefore(b, fila); p.insertBefore(mix, fila);
   }
+}
+
+// MODO MIXTO: preguntas de la estación y flujogramas del mismo tema, mezclados, según el nivel.
+const MIXTO_PREGUNTAS = 6, MIXTO_FLUJOS = 2;
+function elegirModoMixto(id) {
+  const st = getStation(id);
+  const nCasos = FLUJO_CASOS.filter((c) => c.area === id && FLUJO_GRAFICOS[c.id]).length;
+  showLevelPicker("Modo mixto · " + st.name, (k) => {
+    const n = Math.min(MIXTO_PREGUNTAS, st.bank.filter((q) => q.n === k).length);
+    return n + " preguntas + " + Math.min(MIXTO_FLUJOS, nCasos) + " flujogramas (" + FLUJO_NIVEL[k].desc + ")";
+  }, (k) => go(() => rondaMixta(id, k), id), () => pickLevel(id), "mixto-" + id);
+}
+function rondaMixta(id, k) {
+  const st = getStation(id);
+  const m = state.mastered[id] || {};
+  const idx = st.bank.map((_, i) => i).filter((i) => st.bank[i].n === k);
+  const elegidas = [...shuffle(idx.filter((i) => !m[i])), ...shuffle(idx.filter((i) => m[i]))].slice(0, MIXTO_PREGUNTAS);
+  const preguntas = elegidas.map((i) => toItem(st.bank[i], i));
+  const casos = shuffle(FLUJO_CASOS.filter((c) => c.area === id && FLUJO_GRAFICOS[c.id])).slice(0, MIXTO_FLUJOS);
+  const items = shuffle([...preguntas, ...casos.map((c) => itemFlujo(k, c.id, id))]);
+  runQuiz("Mixto · " + st.name + " · " + NOMBRE_NIVEL[k], items, PTS[k], {
+    station: id, hint: HINT[k], onExit: () => pickLevel(id), onAgain: () => elegirModoMixto(id),
+    onEnd: () => { state.rounds[id] = (state.rounds[id] || 0) + 1; saveState(); }
+  });
 }
 
 function startRound(id, k) {
   const st = getStation(id);
   const items = pickRound(st, k).map((i) => toItem(st.bank[i], i));
-  // Virus: una de las preguntas de cada ronda es de flujograma, evaluada según el nivel.
-  if ((id === "virus" || id === "hongos") && items.length >= 2 && typeof itemFlujo === "function") items.splice(Math.floor(Math.random() * items.length), 1, itemFlujo(k, null, id));
   runQuiz(st.name + " · " + NOMBRE_NIVEL[k], items, PTS[k] * (id === "casos" ? 2 : 1), {
     station: id,
     hint: HINT[k],
@@ -1290,7 +1317,7 @@ AHORCADO.niveles = {
   ]
 };
 
-// Temas de teoría confirmados por Mafer en la revisión de preguntas.
+// Temas de teoría confirmados en la revisión de preguntas.
 FACTS.virus = [
   "El VIH usa el receptor CD4 y un correceptor (CCR5 o CXCR4) para entrar a la célula.",
   "Fiebre con vesículas en boca, palmas y plantas en un lactante sugiere Coxsackie: enfermedad mano-pie-boca.",
@@ -1560,7 +1587,7 @@ function mk(tag, cls, text) { const e = document.createElement(tag); if (cls) e.
 function showMicroMenu() {
   const p = openPanel();
   p.append(mk("h2", null, "Microscopio"));
-  p.append(mk("p", "note", "Fotos del laboratorio de Mafer, revisadas por ella."));
+  p.append(mk("p", "note", "Fotos reales del laboratorio del curso."));
   const menu = mk("div", "menu");
   const conFoto = new Set(FOTOS.map((f) => f.a)).size;
   [
@@ -2107,7 +2134,7 @@ function verFoto(src, alt) {
 function fotosDe(nombre) { return FOTOS.filter((f) => f.a === nombre); }
 function showFichas() {
   const p = openPanel(); setCrumb("Estudiar");
-  studyHeader(p, "Fichas de microscopio", "Las fotos son del laboratorio de Mafer. Toca una foto para verla en grande.");
+  studyHeader(p, "Fichas de microscopio", "Las fotos son reales, del laboratorio del curso. Toca una foto para verla en grande.");
   let grupo = "";
   AGENTES.forEach((ag) => {
     if (ag.g !== grupo) { grupo = ag.g; p.append(mk("h3", "grp", grupo)); }
@@ -2269,7 +2296,7 @@ function showInicio() {
   p.classList.add("inicio");
   p.append(mk("h2", null, session.mode === "cuenta" ? "Hola, " + miNombre() : "Inicio"));
   const intro = mk("section", "intro");
-  intro.append(mk("p", "intro-lead", "Una forma de estudiar Microbiología y Parasitología jugando. Todo sale de lo visto en clase: las prácticas, el banco de laboratorio y preguntas revisadas por Mafer. La meta no es memorizar, sino entender el porqué, para poder responder aunque el profesor pregunte de otra forma."));
+  intro.append(mk("p", "intro-lead", "Una forma de estudiar Microbiología y Parasitología jugando. Todo sale de lo visto en clase: las prácticas, el banco de laboratorio y preguntas revisadas una por una. La meta no es memorizar, sino entender el porqué, para poder responder aunque el profesor pregunte de otra forma."));
   const totalPreg = [...STATIONS, CASOS].reduce((n, s) => n + s.bank.length, 0);
   const items = mk("div", "intro-items");
   [["Jugar", totalPreg + " preguntas en 4 niveles, fotos reales de microscopio, ahorcado y casos clínicos.", showHome],
@@ -2432,7 +2459,7 @@ function showAgente(nombre, volver) {
   if (fotos.length) {
     const strip = mk("div", "strip");
     fotos.forEach((f) => { const b = mk("button", "thumb"); b.setAttribute("aria-label", "Ver foto"); const im = mk("img"); im.src = f.img; im.alt = ""; im.loading = "lazy"; b.append(im); b.onclick = () => verFoto(f.img, nombre); strip.append(b); });
-    p.append(strip, mk("p", "note", "Fotos del laboratorio de Mafer."));
+    p.append(strip, mk("p", "note", "Fotos reales del laboratorio del curso."));
   }
   const body = mk("div", "ag-body");
   SECCIONES_PERFIL.forEach(([k, t]) => {
@@ -2998,7 +3025,7 @@ function flujoModeloTexto(id) {
 }
 
 // FLUJOGRAMAS DE HONGOS: casos, clave por criterio y flujograma gráfico.
-// Fuente: material de la estación Hongos (prácticas 4, 5 y 6, banco de laboratorio y fichas revisadas por Mafer).
+// Fuente: material de la estación Hongos (prácticas 4, 5 y 6, banco de laboratorio y fichas revisadas).
 const FLUJO_CASOS_HONGOS = [
   {
     id: "muguet", tema: "Levaduras", area: "hongos",

@@ -1,5 +1,5 @@
 // Flujogramas de Hongos (los mismos 11 casos del artefacto beta).
-// Fuente: material de la estación Hongos (prácticas 4, 5 y 6, banco de laboratorio y fichas revisadas por Mafer).
+// Fuente: material de la estación Hongos (prácticas 4, 5 y 6, banco de laboratorio y fichas revisadas).
 import type { Flujograma } from "./flujogramas";
 
 export const FLUJOGRAMAS_HONGOS: Flujograma[] = [

@@ -1,5 +1,5 @@
 // Estación: Laboratorio
-// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas por Mafer.
+// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas.
 import type { Estacion } from "../types";
 
 export const laboratorio: Estacion = {

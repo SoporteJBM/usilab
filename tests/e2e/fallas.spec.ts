@@ -34,7 +34,7 @@ test("sin localStorage (modo privado) se puede jugar igual", async ({ page }) =>
 
 test("sin internet: el ingreso avisa en español y el modo invitado sigue disponible", async ({ page }) => {
   await abrir(page, { __mock_falla: "red" });
-  await page.locator("#email").fill("mafer@ejemplo.com");
+  await page.locator("#email").fill("ana@ejemplo.com");
   await page.locator("#pw").fill("contrasena123");
   await page.locator("form.auth").getByRole("button", { name: "Entrar" }).click();
   await expect(page.locator(".msg")).toHaveText("Sin conexión. Revisa tu internet e inténtalo otra vez.");

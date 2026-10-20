@@ -1,5 +1,5 @@
 // Microscopio: estructuras, pares que se confunden y fotos
-// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas por Mafer.
+// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas.
 import type { AgenteMicroscopio, Foto, Par, TemaLectura } from "./types";
 
 export const MICROSCOPIO: TemaLectura = {
@@ -223,7 +223,7 @@ export const PARES: Par[] = [
   }
 ];
 
-/** Fotos del laboratorio de Mafer (carpeta public/img). */
+/** Fotos reales del laboratorio (carpeta public/img). */
 export const FOTOS: Foto[] = [
   {
     "agente": "Cladosporium",

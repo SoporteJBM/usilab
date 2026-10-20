@@ -1,5 +1,5 @@
 // Tablas clave de la zona de estudio
-// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas por Mafer.
+// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas.
 import type { Tabla } from "./types";
 
 export const TABLAS: Tabla[] = [

@@ -8,7 +8,7 @@ import { encabezado } from "./comun";
 
 export const mostrarFichas = vista("las fichas", () => {
   const p = abrirPanel("estudio");
-  encabezado(p, "Fichas de microscopio", "Las fotos son del laboratorio de Mafer. Toca una foto para verla en grande.");
+  encabezado(p, "Fichas de microscopio", "Las fotos son reales, del laboratorio del curso. Toca una foto para verla en grande.");
   let grupo = "";
   for (const ag of AGENTES_MICROSCOPIO) {
     if (ag.grupo !== grupo) { grupo = ag.grupo; p.append(mk("h3", "grp", grupo)); }

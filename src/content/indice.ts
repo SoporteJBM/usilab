@@ -1,5 +1,5 @@
 // Índice del curso y grupos de Inicio
-// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas por Mafer.
+// Fuentes: Prácticas 4, 5 y 6, banco de laboratorio del curso y preguntas revisadas.
 import type { Reino, SeccionIndice } from "./types";
 
 export const INDICE: SeccionIndice[] = [

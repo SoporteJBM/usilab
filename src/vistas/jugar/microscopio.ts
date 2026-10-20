@@ -78,7 +78,7 @@ function jugar(nombre: string, generar: (k: Nivel) => ItemQuiz[]): void {
 
 export const mostrarMicroscopio = vista("el microscopio", () => {
   const p = abrirPanel("jugar");
-  p.append(mk("h2", null, "Microscopio"), mk("p", "note", "Fotos del laboratorio de Mafer, revisadas por ella."));
+  p.append(mk("h2", null, "Microscopio"), mk("p", "note", "Fotos reales del laboratorio del curso."));
   const menu = mk("div", "menu");
   const conFoto = new Set(FOTOS.map((f) => f.agente)).size;
   const opcionesMenu: [string, string, () => void][] = [

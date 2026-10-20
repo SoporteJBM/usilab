@@ -28,7 +28,7 @@ La primera vez que corras las pruebas, instala el navegador: `npx playwright ins
 
 ```
 src/
-  content/            ← CONTENIDO (lo que se edita con Mafer)
+  content/            ← CONTENIDO (lo que se edita)
     estaciones/       una estación por archivo: hongos.ts, bacterias.ts, casos.ts…
     microscopio.ts    estructuras, pares "No confundir" y fotos
     perfiles.ts       página de cada agente (Escherichia coli, Candida…)
