@@ -58,7 +58,8 @@ export const jugarAhorcado = vista("el ahorcado", (nivel: NivelAhorcado) => {
   const completa = () => palabra.split("").every((ch) => !/[A-Z]/.test(ch) || adivinadas.has(ch));
   const refrescar = () => {
     estadoTxt.textContent = "Errores: " + errores + " de " + maxErrores;
-    palabraEl.textContent = palabra.split("").map((ch) => (!/[A-Z]/.test(ch) || adivinadas.has(ch) ? ch : "_")).join(" ");
+    // Cada palabra va en su bloque para que el espacio entre palabras se note (p. ej. PAPILOMA HUMANO).
+    palabraEl.replaceChildren(...palabra.split(" ").map((parte) => mk("span", "w-parte", parte.split("").map((ch) => (!/[A-Z]/.test(ch) || adivinadas.has(ch) ? ch : "_")).join(" "))));
   };
   const terminar = (gano: boolean) => {
     terminado = true;

@@ -172,8 +172,8 @@ export const AHORCADO: Record<NivelAhorcado, PalabraAhorcado[]> = {
       "pista": "Género al que pertenece el VIH."
     },
     {
-      "palabra": "PAPILOMAVIRUS",
-      "pista": "Virus de ADN que causa verrugas y cáncer de cuello uterino."
+      "palabra": "PAPILOMA HUMANO",
+      "pista": "Virus del ___ ___: virus de ADN que causa verrugas y cáncer de cuello uterino."
     },
     {
       "palabra": "TRANSCRIPTASA",
