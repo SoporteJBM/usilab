@@ -152,6 +152,12 @@ ol.rank .pts small { display: block; color: var(--muted); font-size: 12px; font-
 .fj-revela { margin: 0; font-family: var(--display); font-weight: 600; color: var(--accent); }
 button.fj-modo { text-align: left; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px; border: 2px solid var(--xhard); background: color-mix(in srgb, var(--xhard) 8%, var(--surface)); }
 button.fj-modo strong { font-size: 18px; color: var(--xhard); }
+button.fj-ahorcado { border-color: var(--hint); background: color-mix(in srgb, var(--hint) 8%, var(--surface)); margin-top: 8px; }
+button.fj-ahorcado strong { color: var(--hint); }
+.hang-img { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.hang-img svg, .hang-img img { width: min(100%, 260px); height: auto; border-radius: 8px; }
+.hang-img img { max-height: 260px; object-fit: cover; }
+.hang-img small { font-size: 12px; color: var(--muted); }
 button.fj-mixto { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); margin-top: 8px; }
 button.fj-mixto strong { color: var(--accent); }
 button.fj-modo span { font-family: var(--body); font-size: 14px; color: var(--muted); line-height: 1.35; }
@@ -319,9 +325,17 @@ table.kt th.rowh { font-family: var(--display); font-weight: 600; color: var(--f
 .strip { display: flex; gap: 6px; overflow-x: auto; }
 .thumb { padding: 0; border-radius: 8px; overflow: hidden; width: 84px; height: 112px; flex: none; background: #000; border: 1px solid var(--line); min-height: 0; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.lightbox { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.9); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; cursor: zoom-out; }
-.lightbox img { max-width: 100%; max-height: 82vh; object-fit: contain; border-radius: 8px; }
-.lightbox p { color: #fff; margin: 0; font-family: var(--display); font-size: 14px; }
+.lightbox { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.98); display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 12px; }
+.lb-stage { flex: 1; min-height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; touch-action: none; cursor: zoom-in; user-select: none; }
+.lb-stage.zoom { cursor: grab; }
+.lb-stage img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; transform-origin: center; will-change: transform; pointer-events: none; }
+.lb-bar { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.lb-bar button { min-width: 48px; min-height: 44px; border-radius: 22px; border: 1px solid #ffffff55; background: #ffffff1a; color: #fff; font-size: 18px; font-family: var(--display); padding: 0 14px; }
+.lb-bar .lb-cerrar { font-size: 15px; }
+.lightbox p { color: #ddd; margin: 0; font-family: var(--display); font-size: 13px; text-align: center; }
+img.ampliable { cursor: zoom-in; }
+.photo { position: relative; }
+.photo .lupa { position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,.6); color: #fff; font-size: 12px; padding: 4px 8px; border-radius: 12px; pointer-events: none; font-family: var(--display); }
 .par { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
 .par-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .par-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -927,17 +941,26 @@ function pickLevel(id) {
     const ids = st.bank.map((q, i) => (q.n === k ? i : -1)).filter((i) => i >= 0);
     return ids.length + " preguntas · " + ids.filter((i) => m[i]).length + " dominadas · rondas de " + roundSize(st, k);
   }, (k) => go(() => startRound(id, k), id), showHome, id);
+  const modos = [];
   if ((id === "virus" || id === "hongos") && typeof elegirModoFlujo === "function") {
+    modos.push(["fj-modo", "Modo flujogramas", "Siempre en papel con foto; Claude corrige. Fácil: 4 criterios · Medio: 6 · Difícil: 8 · Muy difícil: 8 con nivel de examen final", () => elegirModoFlujo(null, undefined, id)]);
+    modos.push(["fj-modo fj-mixto", "Modo mixto", "Todo " + st.name + " junto: 6 preguntas + 2 flujogramas con foto, mezclados y del nivel que elijas", () => elegirModoMixto(id)]);
+  }
+  const nAhorcado = typeof AHORCADOS !== "undefined" && AHORCADOS[id] ? totalAhorcado(AHORCADOS[id]) : 0;
+  if (nAhorcado > 0) {
+    const A = AHORCADOS[id];
+    modos.push(["fj-modo fj-ahorcado", "Ahorcado", (A.imagen ? "Mira la foto real y adivina qué es · " + nAhorcado + " fotos" : "Adivina el nombre con su pista · " + nAhorcado + " palabras") + " en 4 niveles", () => elegirAhorcado(id)]);
+  }
+  if (modos.length) {
     const p = $("#panel");
-    const nota = mk("p", "note", "Además de las rondas de preguntas, cada nivel (Fácil, Medio, Difícil y Muy difícil) tiene estos modos:");
-    const b = mk("button", "fj-modo", ""); b.type = "button";
-    b.append(mk("strong", null, "Modo flujogramas"), mk("span", null, "Siempre en papel con foto; Claude corrige. Fácil: 4 criterios · Medio: 6 · Difícil: 8 · Muy difícil: 8 con nivel de examen final"));
-    b.onclick = () => elegirModoFlujo(null, undefined, id);
-    const mix = mk("button", "fj-modo fj-mixto", ""); mix.type = "button";
-    mix.append(mk("strong", null, "Modo mixto"), mk("span", null, "Todo " + st.name + " junto: 6 preguntas + 2 flujogramas con foto, mezclados y del nivel que elijas"));
-    mix.onclick = () => elegirModoMixto(id);
     const fila = p.querySelector(".row");
-    p.insertBefore(nota, fila); p.insertBefore(b, fila); p.insertBefore(mix, fila);
+    p.insertBefore(mk("p", "note", "Además de las rondas de preguntas, cada nivel (Fácil, Medio, Difícil y Muy difícil) tiene estos modos:"), fila);
+    modos.forEach(([cls, t, d, fn]) => {
+      const b = mk("button", cls, ""); b.type = "button";
+      b.append(mk("strong", null, t), mk("span", null, d));
+      b.onclick = fn;
+      p.insertBefore(b, fila);
+    });
   }
 }
 
@@ -1414,6 +1437,7 @@ function renderHome() {
   const home = $("#home");
   home.innerHTML = "";
   ALL().forEach((st) => {
+    if (st.game) return; // El ahorcado ahora vive dentro de cada estación.
     const total = st.bank.length;
     const done = doneCount(st);
     const unlocked = isUnlocked(st);
@@ -1501,14 +1525,23 @@ function showHangmanMenu() {
     (k) => go(() => showHangman(LV[k]), "ahorcado"), showHome, "ahorcado");
 }
 
-function showHangman(level = "medio") {
-  const lista = AHORCADO.niveles[level];
-  let vistas = state.hangSeen[level] || [];
+function showHangman(level = "medio", area = null, volver = null) {
+  const A = area ? AHORCADOS[area] : AHORCADO;
+  const lista = area ? itemsAhorcado(A, level) : A.niveles[level];
+  if (!lista.length) {
+    const p0 = openPanel();
+    p0.append(mk("h2", null, "Ahorcado · " + A.nombre), mk("p", "note", "Este nivel todavía no tiene fotos."));
+    const v0 = mk("button", "ghost", "Volver"); v0.onclick = volver || showHome; p0.append(v0);
+    return;
+  }
+  const idDe = (x) => x.id || x.w;
+  const clave = area ? area + ":" + level : level;
+  let vistas = state.hangSeen[clave] || [];
   if (vistas.length >= lista.length) vistas = [];
-  const libres = lista.filter((x) => !vistas.includes(x.w));
+  const libres = lista.filter((x) => !vistas.includes(idDe(x)));
   const item = libres[Math.floor(Math.random() * libres.length)];
-  state.hangSeen[level] = [...vistas, item.w]; saveState();
-  const pts = AHORCADO.puntos[level];
+  state.hangSeen[clave] = [...vistas, idDe(item)]; saveState();
+  const pts = AHORCADO_PUNTOS[level];
   const guessed = new Set();
   const revelar = { facil: 3, medio: 1, dificil: 0, muydificil: 0 }[level];
   const maxErr = level === "muydificil" ? 5 : 6;
@@ -1518,17 +1551,18 @@ function showHangman(level = "medio") {
   const p = $("#panel");
   p.hidden = false; $("#home").hidden = true; p.innerHTML = "";
 
-  const h = document.createElement("h2"); h.textContent = "Ahorcado";
-  const clue = document.createElement("p"); clue.className = "case"; clue.textContent = "Pista: " + item.c;
+  const h = document.createElement("h2"); h.textContent = area ? "Ahorcado · " + A.nombre : "Ahorcado";
+  const imagen = typeof imagenAhorcado === "function" ? imagenAhorcado(item) : null;
+  const clue = document.createElement("p"); clue.className = "case"; clue.textContent = (imagen ? (A.pregunta || "¿Qué es?") + " Pista: " : "Pista: ") + ocultarRespuesta(item.c, item.w);
   const status = document.createElement("p"); status.className = "note";
   const word = document.createElement("p"); word.className = "word";
   const kb = document.createElement("div"); kb.className = "kb";
   const msg = document.createElement("p"); msg.className = "feedback";
   const row = document.createElement("div"); row.className = "row";
   const again = document.createElement("button"); again.className = "primary"; again.textContent = "Otra palabra"; again.hidden = true;
-  again.onclick = () => go(() => showHangman(level), "ahorcado");
-  const exit = document.createElement("button"); exit.className = "ghost"; exit.textContent = "Volver al tablero";
-  exit.onclick = showHome;
+  again.onclick = () => go(() => showHangman(level, area, volver), area ? AHORCADO_TEMA_DATO[area] : "ahorcado");
+  const exit = document.createElement("button"); exit.className = "ghost"; exit.textContent = volver ? "Volver" : "Volver al tablero";
+  exit.onclick = volver || showHome;
   row.append(again, exit);
 
   function refresh() {
@@ -1574,7 +1608,9 @@ function showHangman(level = "medio") {
   });
 
   refresh();
-  p.append(h, clue, status, word, kb, msg, row);
+  p.append(h);
+  if (imagen) p.append(imagen);
+  p.append(clue, status, word, kb, msg, row);
 }
 
 function openPanel() {
@@ -1596,6 +1632,7 @@ function showMicroMenu() {
     ["Identificar fotos", "Ronda de 10 fotos reales al azar, " + FOTOS.length + " en total", () => microPick("Identificar fotos", fotoItems)],
     ["Por criterio", "Te describo lo que se ve; tú dices qué es (" + AGENTES.length + " estructuras)", () => microPick("Por criterio", criterioItems)],
     ["Pares que se confunden", PARES.length + " pares donde más se pierden puntos", () => microPick("Pares que se confunden", paresItems)],
+    ["Ahorcado con fotos", "Mira la foto real y adivina qué es, letra por letra (4 niveles)", () => elegirAhorcado("microscopio", showMicroMenu)],
     ["Mapa de cobertura", "Qué tenemos de cada estructura: foto " + conFoto + " de " + AGENTES.length, () => showCobertura()]
   ].forEach(([t, s, fn]) => {
     const b = mk("button"); b.append(mk("span", null, t), mk("small", null, s)); b.onclick = fn; menu.append(b);
@@ -1673,7 +1710,7 @@ function runQuiz(title, items, base, opt = {}) {
     p.append(mk("h2", null, title));
     p.append(mk("p", "note", (idx + 1) + " de " + items.length));
     if (it.img) {
-      const ph = mk("div", "photo"); const im = mk("img"); im.src = it.img; im.alt = "Foto de microscopio"; ph.append(im); p.append(ph);
+      const ph = mk("div", "photo"); const im = mk("img"); im.src = it.img; im.alt = "Foto de microscopio"; ph.append(ampliable(im, "Foto para identificar"), mk("span", "lupa", "🔍 Toca para ampliar")); p.append(ph);
     }
     if (it.caso) p.append(mk("p", "case", it.caso));
     p.append(mk("p", null, it.q));
@@ -2129,9 +2166,92 @@ function showTablas() {
 }
 
 // --- Fichas de microscopio con fotos ---
+// Visor de fotos: pantalla completa con zoom (pellizcar, rueda del mouse, doble toque o botones) y arrastre.
 function verFoto(src, alt) {
-  const v = document.getElementById("lightbox") || (() => { const d = mk("div", "lightbox"); d.id = "lightbox"; d.hidden = true; d.onclick = () => { d.hidden = true; }; document.body.append(d); return d; })();
-  v.innerHTML = ""; const im = mk("img"); im.src = src; im.alt = alt; v.append(im, mk("p", null, alt + " · toca para cerrar")); v.hidden = false;
+  const viejo = document.getElementById("lightbox"); if (viejo) viejo.remove();
+  const v = mk("div", "lightbox"); v.id = "lightbox";
+  v.setAttribute("role", "dialog"); v.setAttribute("aria-modal", "true"); v.setAttribute("aria-label", alt || "Foto");
+  const escena = mk("div", "lb-stage");
+  const im = mk("img"); im.src = src; im.alt = alt || ""; im.draggable = false;
+  escena.append(im);
+  const barra = mk("div", "lb-bar");
+  const menos = mk("button", null, "−"), mas = mk("button", null, "+"), reset = mk("button", null, "Ajustar"), cerrar = mk("button", "lb-cerrar", "Cerrar ✕");
+  menos.setAttribute("aria-label", "Alejar"); mas.setAttribute("aria-label", "Acercar");
+  barra.append(menos, mas, reset, cerrar);
+  const pie = mk("p", null, (alt ? alt + " · " : "") + "Pellizca, usa la rueda o toca dos veces para acercar");
+  v.append(escena, barra, pie);
+  document.body.append(v);
+
+  let z = 1, x = 0, y = 0;
+  const MAX = 6;
+  const limitar = () => {
+    const r = escena.getBoundingClientRect();
+    const mx = Math.max(0, (im.offsetWidth * z - r.width) / 2), my = Math.max(0, (im.offsetHeight * z - r.height) / 2);
+    x = Math.min(mx, Math.max(-mx, x)); y = Math.min(my, Math.max(-my, y));
+  };
+  const pintar = () => { limitar(); im.style.transform = "translate(" + x + "px," + y + "px) scale(" + z + ")"; escena.classList.toggle("zoom", z > 1); };
+  // Acercar manteniendo fijo el punto (px, py) relativo al centro de la escena.
+  const zoomEn = (nz, px = 0, py = 0) => {
+    nz = Math.min(MAX, Math.max(1, nz));
+    x = px - (px - x) * (nz / z); y = py - (py - y) * (nz / z); z = nz;
+    if (z === 1) { x = 0; y = 0; }
+    pintar();
+  };
+  const centro = (cx, cy) => { const r = escena.getBoundingClientRect(); return [cx - r.left - r.width / 2, cy - r.top - r.height / 2]; };
+  menos.onclick = () => zoomEn(z / 1.6); mas.onclick = () => zoomEn(z * 1.6); reset.onclick = () => zoomEn(1);
+  const salir = () => { v.remove(); document.removeEventListener("keydown", teclas); };
+  const teclas = (e) => { if (e.key === "Escape") salir(); else if (e.key === "+" || e.key === "=") zoomEn(z * 1.6); else if (e.key === "-") zoomEn(z / 1.6); };
+  document.addEventListener("keydown", teclas);
+  cerrar.onclick = salir;
+  escena.addEventListener("wheel", (e) => { e.preventDefault(); const [px, py] = centro(e.clientX, e.clientY); zoomEn(z * (e.deltaY < 0 ? 1.25 : 0.8), px, py); }, { passive: false });
+  // Arrastre y pellizco con pointer events.
+  const punteros = new Map();
+  let inicio = null, movido = false;
+  escena.addEventListener("pointerdown", (e) => {
+    escena.setPointerCapture(e.pointerId); punteros.set(e.pointerId, [e.clientX, e.clientY]); movido = false;
+    if (punteros.size === 2) { const [a, b] = [...punteros.values()]; inicio = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), z, c: centro((a[0] + b[0]) / 2, (a[1] + b[1]) / 2) }; }
+  });
+  escena.addEventListener("pointermove", (e) => {
+    if (!punteros.has(e.pointerId)) return;
+    const [ax, ay] = punteros.get(e.pointerId);
+    punteros.set(e.pointerId, [e.clientX, e.clientY]);
+    if (punteros.size === 2 && inicio) {
+      const [a, b] = [...punteros.values()];
+      const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      zoomEn(inicio.z * d / inicio.d, inicio.c[0], inicio.c[1]); movido = true;
+    } else if (punteros.size === 1 && z > 1) {
+      x += e.clientX - ax; y += e.clientY - ay; pintar();
+      if (Math.abs(e.clientX - ax) + Math.abs(e.clientY - ay) > 2) movido = true;
+    }
+  });
+  // Doble toque (o doble clic) acerca o vuelve al tamaño normal; un toque fuera de la foto cierra.
+  let ultimoToque = 0, cierre = null;
+  const sobreFoto = (cx, cy) => { const r = im.getBoundingClientRect(); return cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom; };
+  const soltar = (e) => {
+    const eraUnico = punteros.size === 1;
+    punteros.delete(e.pointerId); if (punteros.size < 2) inicio = null;
+    if (e.type !== "pointerup" || !eraUnico || movido) return;
+    const ahora = Date.now();
+    if (ahora - ultimoToque < 320) {
+      clearTimeout(cierre); ultimoToque = 0;
+      const [px, py] = centro(e.clientX, e.clientY); zoomEn(z > 1 ? 1 : 2.5, px, py);
+    } else {
+      ultimoToque = ahora;
+      if (z === 1 && !sobreFoto(e.clientX, e.clientY)) cierre = setTimeout(salir, 330);
+    }
+  };
+  escena.addEventListener("pointerup", soltar); escena.addEventListener("pointercancel", soltar);
+  cerrar.focus({ preventScroll: true });
+}
+// Hace que una imagen se pueda abrir en el visor.
+function ampliable(img, titulo) {
+  img.classList.add("ampliable");
+  img.tabIndex = 0; img.setAttribute("role", "button");
+  img.setAttribute("aria-label", "Ver la foto en detalle");
+  img.title = "Toca para ver en detalle";
+  img.onclick = () => verFoto(img.src, titulo || "");
+  img.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); verFoto(img.src, titulo || ""); } };
+  return img;
 }
 function fotosDe(nombre) { return FOTOS.filter((f) => f.a === nombre); }
 function showFichas() {
@@ -3454,7 +3574,7 @@ function jugarItemFlujo(p, titulo, i, total, it, base, alResponder, alSeguir, al
     const inp = document.createElement("input");
     inp.type = "file"; inp.accept = "image/*";
     if (capturar) inp.setAttribute("capture", "environment");
-    inp.onchange = () => { const f = inp.files && inp.files[0]; if (!f) return; archivo = f; prev.replaceChildren(); const im = mk("img"); im.alt = "Tu flujograma"; im.src = URL.createObjectURL(f); prev.append(im); prev.hidden = false; enviar.disabled = false; msg.textContent = ""; msg.className = "msg"; };
+    inp.onchange = () => { const f = inp.files && inp.files[0]; if (!f) return; archivo = f; prev.replaceChildren(); const im = mk("img"); im.alt = "Tu flujograma"; im.src = URL.createObjectURL(f); prev.append(ampliable(im, "Tu flujograma")); prev.hidden = false; enviar.disabled = false; msg.textContent = ""; msg.className = "msg"; };
     inp.click();
   };
   const foto = mk("button", "primary", "📷 Tomar foto"); foto.type = "button"; foto.onclick = () => elegir(true);
@@ -3678,6 +3798,172 @@ const VIRUS_EXTRA = [{"nivel": "f", "caso": "Niño de 4 años con fiebre leve y 
     if (!ya.has((item.c || "") + "|" + item.q)) st.bank.push(item);
   });
 })();
+
+// AHORCADO POR TEMA: cada estación tiene su propio ahorcado con 4 niveles.
+// Microscopio usa las fotos reales del laboratorio: se adivina qué hongo es (el nombre registrado de la foto).
+const AHORCADOS = {
+  hongos: { nombre: "Hongos", niveles: {
+    facil: [
+      { w: "CANDIDA", c: "Pseudohifas con clamidoconidias; muguet y candidemia por catéter." },
+      { w: "FUSARIUM", c: "Macroconidias en canoa; queratitis por trauma vegetal." },
+      { w: "ASPERGILLUS", c: "Vesícula con fiálides en la punta del conidióforo; signo del halo." },
+      { w: "RHIZOPUS", c: "Hifas anchas sin tabiques y esporangios; escara negra en el paladar." },
+      { w: "SABOURAUD", c: "Medio de cultivo para hongos: dextrosa al 4 % y pH ácido." }
+    ],
+    medio: [
+      { w: "PENICILLIUM", c: "Conidióforo en pincel, sin vesícula; contaminante ambiental." },
+      { w: "MICROSPORUM", c: "Macroconidios en huso; tinea capitis en niños con gatos." },
+      { w: "RHODOTORULA", c: "Levadura rosada en hemocultivo de un paciente con catéter." },
+      { w: "CRYPTOCOCCUS", c: "Levadura capsulada; meningitis en inmunosuprimidos." }
+    ],
+    dificil: [
+      { w: "TRICHOPHYTON", c: "Dermatofito de la onicomicosis; una especie da reverso rojo vinoso." },
+      { w: "HISTOPLASMA", c: "Cuevas con murciélagos; macroconidias tuberculadas con espinas." },
+      { w: "SPOROTHRIX", c: "Pinchazo con rosal y nódulos en cadena; conidios en margarita." },
+      { w: "CLADOSPORIUM", c: "Dematiáceo con conidios pequeños en cadenas ramificadas." }
+    ],
+    muydificil: [
+      { w: "PARACOCCIDIOIDES", c: "Levadura en rueda de timón; agricultor con úlceras orales moriformes." },
+      { w: "EPIDERMOPHYTON", c: "Macroconidios en mazo, lisos, sin microconidios; nunca afecta el pelo." },
+      { w: "ALTERNARIA", c: "Dematiáceo con conidios grandes muriformes en forma de maza." },
+      { w: "GEOTRICHUM", c: "Hongo hialino septado de la lista de géneros ambientales." }
+    ]
+  } },
+  bacterias: { nombre: "Bacterias", niveles: {
+    facil: [
+      { w: "PROTEUS", c: "Swarming en agar sangre y cristales de estruvita en orina alcalina." },
+      { w: "KLEBSIELLA", c: "Colonias rosadas muy mucoides en MacConkey por su cápsula." },
+      { w: "SALMONELLA", c: "Roja con centro negro en XLD; la especie Typhi deja portadores crónicos." },
+      { w: "SHIGELLA", c: "Roja sin centro negro en XLD; en Perú, sobre todo la especie flexneri." },
+      { w: "VIBRIO", c: "Bacilo curvo que causa diarrea en agua de arroz." }
+    ],
+    medio: [
+      { w: "ESCHERICHIA", c: "Colonia rosada, plana y seca en MacConkey; causa más común de cistitis." },
+      { w: "PSEUDOMONAS", c: "Puede teñir la orina de verde en pacientes con sonda." },
+      { w: "MYCOBACTERIUM", c: "Bacilos rojos en Ziehl-Neelsen; colonias en coliflor en Löwenstein-Jensen." },
+      { w: "STAPHYLOCOCCUS", c: "Si es resistente a oxacilina, se trata con vancomicina." }
+    ],
+    dificil: [
+      { w: "CAMPYLOBACTER", c: "Coprocultivo en microaerofilia, con lectura hasta 72 horas." },
+      { w: "STREPTOCOCCUS", c: "Algunas especies dan hemólisis beta en agar sangre; otras, alfa." },
+      { w: "ENTEROCOCCUS", c: "En agar sangre no produce hemólisis (gamma)." },
+      { w: "MORGANELLA", c: "H₂S negativo e indol positivo: lo contrario de Proteus." }
+    ],
+    muydificil: [
+      { w: "BARTONELLA", c: "Fiebre de la Oroya: bacilos dentro de los hematíes; la transmite la titira." },
+      { w: "MYCOPLASMA", c: "Bacteria sin pared celular: no responde a los β-lactámicos." },
+      { w: "CARBAPENEMASA", c: "Enzima de la KPC: sin halo ni con imipenem ni con meropenem." },
+      { w: "BETALACTAMASA", c: "Enzima que rompe el anillo de la penicilina; la BLEE es una de ellas." }
+    ]
+  } },
+  virus: { nombre: "Virus", niveles: {
+    facil: [
+      { w: "CAPSIDE", c: "Cubierta de proteínas que protege el genoma del virus." },
+      { w: "ROTAVIRUS", c: "Virus de ARN doble cadena: diarrea infantil." },
+      { w: "SARAMPION", c: "Virus con manchas de Koplik." },
+      { w: "HERPES", c: "Vesículas agrupadas; se trata con aciclovir." },
+      { w: "DENGUE", c: "Flavivirus que transmite un mosquito; la segunda infección suele ser más grave." }
+    ],
+    medio: [
+      { w: "RETROVIRUS", c: "Familia del VIH y del HTLV: pasan de ARN a ADN." },
+      { w: "INTEGRASA", c: "Enzima que inserta el ADN del VIH en el genoma de la célula." },
+      { w: "KOPLIK", c: "Apellido de las manchas orales del sarampión." },
+      { w: "INFLUENZA", c: "Genoma segmentado: puede hacer shift; oseltamivir en las primeras 48 horas." }
+    ],
+    dificil: [
+      { w: "LENTIVIRUS", c: "Género al que pertenece el VIH." },
+      { w: "PAPILOMAVIRUS", c: "Virus de ADN que causa verrugas y cáncer de cuello uterino." },
+      { w: "TRANSCRIPTASA", c: "La ___ inversa copia ARN a ADN." },
+      { w: "COXSACKIE", c: "Enterovirus de la enfermedad mano-pie-boca." }
+    ],
+    muydificil: [
+      { w: "COILOCITO", c: "Célula con halo perinuclear claro: efecto del VPH." },
+      { w: "DOLUTEGRAVIR", c: "Inhibidor de integrasa preferido por el MINSA." },
+      { w: "DELTARETROVIRUS", c: "Género del HTLV." },
+      { w: "CITOMEGALOVIRUS", c: "Herpesvirus congénito: sordera, coriorretinitis y calcificaciones periventriculares." }
+    ]
+  } },
+  parasitos: { nombre: "Parásitos", niveles: {
+    facil: [
+      { w: "GIARDIA", c: "Protozoo intestinal: diarrea grasosa; trofozoítos binucleados en heces." },
+      { w: "PLASMODIUM", c: "Fiebre cíclica y anemia; lo transmite la hembra de Anopheles." },
+      { w: "LEISHMANIA", c: "Úlcera cutánea tras viajar a la selva; parásito dentro de macrófagos." },
+      { w: "TOXOPLASMA", c: "Lesiones cerebrales en anillo en VIH avanzado; el gato es su hospedador definitivo." }
+    ],
+    medio: [
+      { w: "TRICHOMONAS", c: "Pera con flagelos en el sedimento urinario; flujo espumoso." },
+      { w: "ENTAMOEBA", c: "Ameba que invade el intestino; sus trofozoítos pierden movilidad si la muestra tarda." },
+      { w: "FASCIOLA", c: "Berros crudos, dolor en hipocondrio derecho y eosinofilia." },
+      { w: "ENTEROBIUS", c: "Prurito anal nocturno; se diagnostica con el test de Graham." },
+      { w: "ASCARIS", c: "Huevos mamelonados en heces; sus larvas pasan por el pulmón (síndrome de Löffler)." }
+    ],
+    dificil: [
+      { w: "STRONGYLOIDES", c: "Larvas rabditiformes en heces; hiperinfección con corticoides." },
+      { w: "CYCLOSPORA", c: "Su ooquiste aparece en el coprológico directo de la práctica." },
+      { w: "LOXOSCELES", c: "Araña del rincón: placa necrótica y hemólisis." },
+      { w: "LATRODECTUS", c: "Viuda negra: agitación, espasmos y rigidez abdominal." }
+    ],
+    muydificil: [
+      { w: "TRYPANOSOMA", c: "Chagas: años después, miocardiopatía y megacolon." },
+      { w: "ECHINOCOCCUS", c: "Quiste hidatídico: nunca se punza sin protección." },
+      { w: "CISTICERCOSIS", c: "Se adquiere al ingerir huevos de T. solium, no por comer cerdo." },
+      { w: "HIPNOZOITO", c: "Forma de P. vivax que duerme en el hígado: por eso se agrega primaquina." }
+    ]
+  } },
+  laboratorio: { nombre: "Laboratorio", imagen: true, niveles: { facil: [], medio: [], dificil: [], muydificil: [] } },
+  microscopio: { nombre: "Microscopio", imagen: true, pregunta: "¿Qué hongo es?", niveles: { facil: [], medio: [], dificil: [], muydificil: [] } }
+};
+const AHORCADO_PUNTOS = { facil: 10, medio: 15, dificil: 20, muydificil: 30 };
+const AHORCADO_TEMA_DATO = { hongos: "hongos", bacterias: "bacterias", virus: "virus", parasitos: "parasitos", laboratorio: "laboratorio", microscopio: "hongos" };
+
+// Microscopio: las fotos reales. Fácil y medio: el género; difícil: Trichophyton; muy difícil: la especie.
+(function armarAhorcadoMicroscopio() {
+  const NIVEL_GENERO = { "Candida albicans": "facil", "Fusarium": "facil", "Aspergillus": "medio", "Cladosporium": "medio" };
+  const niv = AHORCADOS.microscopio.niveles;
+  FOTOS.forEach((f, i) => {
+    const ag = AGENTES.find((x) => x.a === f.a);
+    const criterio = ag ? ag.c : "";
+    const genero = f.a.split(" ")[0].toUpperCase();
+    if (NIVEL_GENERO[f.a]) niv[NIVEL_GENERO[f.a]].push({ id: "foto" + i, w: genero, c: criterio, foto: i });
+    else if (genero === "TRICHOPHYTON") {
+      niv.dificil.push({ id: "foto" + i, w: genero, c: "Dermatofito. " + criterio, foto: i });
+      niv.muydificil.push({ id: "foto-sp" + i, w: f.a.split(" ")[1].toUpperCase(), c: "Trichophyton ___ · " + criterio, foto: i });
+    }
+  });
+})();
+
+// Regla de los ahorcados con imagen: cada pregunta tiene que tener su foto real y la respuesta es
+// el nombre con el que se registró esa foto. Si no hay foto, la pregunta no se pone.
+// Laboratorio todavía no tiene fotos propias (placas, Gram, sedimento...), por eso su ahorcado no aparece.
+function itemsAhorcado(A, level) {
+  const lista = A.niveles[level] || [];
+  return A.imagen ? lista.filter((x) => x.foto != null && FOTOS[x.foto] && FOTOS[x.foto].img) : lista;
+}
+// La pista nunca debe decir la respuesta: se tapa cualquier palabra que contenga su raíz (p. ej. «aspergilar»).
+function ocultarRespuesta(texto, palabra) {
+  const sinTilde = (t) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const raiz = sinTilde(palabra).toUpperCase().slice(0, 6);
+  return texto.replace(/[\p{L}]+/gu, (w) => (sinTilde(w).toUpperCase().includes(raiz) ? "___" : w));
+}
+function totalAhorcado(A) { return ["facil", "medio", "dificil", "muydificil"].reduce((t, k) => t + itemsAhorcado(A, k).length, 0); }
+
+function elegirAhorcado(area, volver) {
+  const A = AHORCADOS[area];
+  const LV = { f: "facil", m: "medio", d: "dificil", x: "muydificil" };
+  const REV = { f: "3 letras reveladas", m: "1 letra revelada", d: "Sin letras reveladas", x: "Sin letras · solo 5 errores" };
+  const back = volver || (() => pickLevel(area));
+  showLevelPicker("Ahorcado · " + A.nombre, (k) => { const n = itemsAhorcado(A, LV[k]).length; return n ? n + (A.imagen ? (n === 1 ? " foto" : " fotos") : " palabras") + " · " + REV[k] + " · " + AHORCADO_PUNTOS[LV[k]] + " pts" : "Sin fotos todavía"; },
+    (k) => go(() => showHangman(LV[k], area, back), AHORCADO_TEMA_DATO[area]), back, "ahorcado-" + area);
+}
+
+function imagenAhorcado(item) {
+  const box = mk("div", "hang-img");
+  if (item.foto != null && FOTOS[item.foto]) {
+    const img = mk("img"); img.src = FOTOS[item.foto].img; img.alt = "Foto de microscopio para adivinar"; box.append(ampliable(img, "Foto para adivinar"));
+    box.append(mk("small", null, "Foto real del laboratorio · toca la foto para verla en detalle"));
+  } else return null;
+  return box;
+}
 
 boot();
 </script>
