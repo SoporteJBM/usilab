@@ -52,8 +52,40 @@ function porPregunta<T>(x: unknown, valor: (v: unknown) => T | null): Record<str
   return out;
 }
 
+/**
+ * El artefacto antiguo guardaba el avance con otro formato: { score, streak, mastered: {estación: {índice: true}},
+ * errores: {estación: {índice: veces}}, rounds }. El índice i de una estación es la pregunta «estación-00(i+1)».
+ */
+export function esFormatoAntiguo(x: unknown): boolean {
+  return esObjeto(x) && x.version !== 4 && ("mastered" in x || "score" in x);
+}
+function migrarAntiguo(x: Record<string, unknown>): Record<string, unknown> {
+  const id = (est: string, i: string) => est + "-" + String(Number(i) + 1).padStart(3, "0");
+  const porIndice = <T>(m: unknown, valor: (v: unknown) => T | null) => {
+    const out: Record<string, Record<string, T>> = {};
+    if (!esObjeto(m)) return out;
+    for (const [est, mapa] of Object.entries(m)) {
+      if (!esObjeto(mapa)) continue;
+      for (const [i, v] of Object.entries(mapa)) {
+        const val = valor(v);
+        if (/^\d+$/.test(i) && val !== null) (out[est] ??= {})[id(est, i)] = val;
+      }
+    }
+    return out;
+  };
+  return {
+    version: 4,
+    puntos: x.score,
+    racha: x.streak,
+    dominadas: porIndice(x.mastered, (v) => (v ? true : null)),
+    errores: porIndice(x.errores, (v) => (typeof v === "number" && v > 0 ? v : null)),
+    rondas: x.rounds,
+  };
+}
+
 export function sanear(x: unknown): Estado {
   const e = vacio();
+  if (esFormatoAntiguo(x)) x = migrarAntiguo(x as Record<string, unknown>);
   if (!esObjeto(x)) return e;
   e.puntos = numero(x.puntos);
   e.racha = Math.floor(numero(x.racha));

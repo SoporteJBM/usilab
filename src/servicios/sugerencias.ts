@@ -6,6 +6,9 @@
  * solo el dueño puede leer) y reemplazar el cuerpo marcado con TODO por un insert con `intentar()`.
  */
 import type { Resultado } from "./supabase";
+import { esArtefacto } from "../config";
+import { dbClaude, errorClaude, perfiles } from "./claude";
+import { sesion } from "./sesion";
 
 export const MAX_TEXTO = 600;
 
@@ -38,9 +41,63 @@ export function validar(s: Sugerencia): string | null {
 export async function enviarSugerencia(s: Sugerencia): Promise<Resultado<null>> {
   const error = validar(s);
   if (error) return { ok: false, error };
+  if (esArtefacto) {
+    // Artefacto: cada persona guarda sus envíos en sugerencias/<su id>; solo el dueño los lee todos.
+    const id = sesion.claude?.id;
+    if (!id) return { ok: false, error: "Abre la página con tu cuenta de Claude para poder enviar sugerencias." };
+    try {
+      const d = await dbClaude();
+      if (!d) return { ok: false, error: "No se pudo enviar. Inténtalo otra vez." };
+      const ref = d.doc("sugerencias/" + id);
+      const doc = await ref.get();
+      const previos = Array.isArray(doc.data()?.envios) ? (doc.data()!.envios as unknown[]) : [];
+      await ref.set({ envios: [...previos, { ...s, t: Date.now() }].slice(-20) });
+      return { ok: true, data: null };
+    } catch (e) {
+      return { ok: false, error: errorClaude(e) };
+    }
+  }
   // TODO(base de datos): reemplazar por
   //   return intentar((c) => c.from("sugerencias").insert({ ...s }));
   console.info("[reto] sugerencia (aún sin base de datos)", s);
   await new Promise((r) => setTimeout(r, 300));
   return { ok: true, data: null };
+}
+
+/** Sugerencia tal como llega a la bandeja del dueño (incluye el formato antiguo del artefacto). */
+export interface SugerenciaRecibida { autor: string; t: number; utilidad: number | null; partes: [string, string][] }
+
+/** Solo el dueño del artefacto: todas las sugerencias, las más nuevas primero. */
+export async function sugerenciasRecibidas(): Promise<Resultado<SugerenciaRecibida[]>> {
+  if (!esArtefacto) return { ok: false, error: "Disponible cuando se configure la base de datos." };
+  try {
+    const d = await dbClaude();
+    if (!d) return { ok: false, error: "No se pudieron cargar." };
+    const snap = await d.collection("sugerencias").get();
+    const out: (SugerenciaRecibida & { uid: string })[] = [];
+    for (const doc of snap.docs) {
+      const envios = (doc.data()?.envios ?? []) as Record<string, unknown>[];
+      if (!Array.isArray(envios)) continue;
+      for (const e of envios) {
+        if (!e || typeof e !== "object") continue;
+        const txt = (v: unknown) => (typeof v === "string" ? v.trim() : Array.isArray(v) ? v.join(", ") : "");
+        const partes: [string, string][] = ([
+          ["Sección que más usa", txt(e.seccionFavorita)],
+          ["Mejorar", txt(e.mejorar ?? e.temas)],
+          ["Tema nuevo", txt(e.temaNuevo)],
+          ["Cambiaría o agregaría", txt(e.cambios ?? e.mejora)],
+          ["No funcionó o fue confuso", txt(e.problemas ?? e.falla)],
+          ["¿La recomendaría?", txt(e.recomendaria)],
+          ["Nombre", txt(e.nombre)],
+        ] as [string, string][]).filter(([, v]) => v);
+        const utilidad = Number(e.utilidad ?? e.nota) || null;
+        out.push({ uid: doc.id, autor: "", t: Number(e.t) || Date.parse(String(e.enviado)) || 0, utilidad, partes });
+      }
+    }
+    const ps = await perfiles([...new Set(out.map((x) => x.uid))]);
+    out.forEach((x) => { x.autor = ps[x.uid]?.name || "Alumno"; });
+    return { ok: true, data: out.sort((a, b) => b.t - a.t) };
+  } catch (e) {
+    return { ok: false, error: errorClaude(e) };
+  }
 }

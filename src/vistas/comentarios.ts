@@ -5,7 +5,8 @@
 import { vista } from "../lib/errores";
 import { boton, mk } from "../lib/dom";
 import { hace } from "../lib/texto";
-import { MAX, borrar, contar, publicar, puedePublicar, recientes, type Comentario } from "../servicios/comentarios";
+import { MAX, borrar, contar, porQueNo, publicar, puedeLeer, puedePublicar, recientes, type Comentario } from "../servicios/comentarios";
+import { bandejasDelDueno } from "./bandejas";
 import { abrirPanel, alSalirDeVista, pintarInsignia } from "../ui/marco";
 import { formularioSugerencias } from "./sugerencias";
 
@@ -18,9 +19,11 @@ export const mostrarComentarios = vista("Comentarios", () => {
   const p = abrirPanel("comentarios");
   p.append(mk("h2", null, "Comentarios"));
   formularioSugerencias(p);
-  // El muro de comentarios solo existe con cuenta; sin cuenta, la sección es solo el formulario.
-  if (!puedePublicar()) return;
+  void bandejasDelDueno(p);
+  // El muro de comentarios necesita cuentas; sin ellas, la sección es solo el formulario.
+  if (!puedeLeer()) return;
   p.append(mk("h3", "sug-sep", "Muro de comentarios"));
+  if (!puedePublicar()) p.append(mk("p", "note", porQueNo()));
   const lista = mk("ol", "comments");
   let activo = true;
   let cargando = false;
@@ -36,7 +39,7 @@ export const mostrarComentarios = vista("Comentarios", () => {
       const cab = mk("div", "c-head");
       cab.append(mk("strong", null, it.autor + (it.mio ? " (tú)" : "")), mk("small", null, hace(it.t)));
       li.append(cab, mk("p", "c-text", it.texto));
-      if (it.mio) {
+      if (it.puedeBorrar) {
         let armado = false;
         const del = boton("Borrar", "c-del", async () => {
           if (!armado) {
@@ -46,7 +49,7 @@ export const mostrarComentarios = vista("Comentarios", () => {
             return;
           }
           del.disabled = true;
-          const r = await borrar(it.id);
+          const r = await borrar(it);
           if (!r.ok) { del.disabled = false; del.textContent = "No se pudo borrar: " + r.error; return; }
           await cargar();
         });
@@ -115,7 +118,8 @@ export const mostrarComentarios = vista("Comentarios", () => {
   }
   p.append(lista);
 
-  if (puedePublicar()) {
+  if (puedeLeer()) {
+    if (!puedePublicar()) lista.append(mk("li", "empty", "Cargando…"));
     void cargar();
     const iv = setInterval(() => void cargar(), 30000);
     alSalirDeVista(() => { activo = false; clearInterval(iv); });

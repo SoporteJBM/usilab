@@ -9,6 +9,8 @@ import type { User } from "@supabase/supabase-js";
 import { escribir, leer } from "../lib/almacen";
 import { alCambiar, estado, reemplazar, sanear, totalDominadas, vacio } from "../estado/progreso";
 import { db, intentar, type Resultado } from "./supabase";
+import { esArtefacto } from "../config";
+import { dbClaude, errorClaude, usuarioClaude, type PerfilClaude } from "./claude";
 
 export const CLAVE = "reto-micro-v4";
 
@@ -20,9 +22,19 @@ export const sesion = {
   lista: false,
   /** true si se llegó desde el enlace de "olvidé mi contraseña" */
   recuperando: false,
+  /** En el artefacto: la cuenta de Claude de quien mira (aunque juegue como invitado). */
+  claude: null as PerfilClaude | null,
 };
 
-const claveLocal = () => (sesion.modo === "cuenta" && sesion.usuario ? CLAVE + ":" + sesion.usuario.id : CLAVE);
+/** Id de la cuenta con la que se entró (Supabase o Claude), o null si es invitado. */
+export function idCuenta(): string | null {
+  if (sesion.modo !== "cuenta") return null;
+  return esArtefacto ? sesion.claude?.id ?? null : sesion.usuario?.id ?? null;
+}
+/** Clave antigua del artefacto (avance guardado antes de igualarlo con la página). */
+const CLAVE_ANTIGUA = "reto-micro-v3";
+
+const claveLocal = () => { const id = idCuenta(); return id ? CLAVE + ":" + id : CLAVE; };
 const urlRegreso = () => location.origin + location.pathname;
 
 // ---- Indicador "Guardando…" ----
@@ -47,6 +59,7 @@ alCambiar(() => {
 
 /** Sube el avance a la cuenta. Si ya hay una subida en curso, encola otra al terminar. */
 export async function sincronizar(): Promise<boolean> {
+  if (esArtefacto) return sincronizarArtefacto();
   if (sesion.modo !== "cuenta" || !sesion.usuario) return false;
   if (sincronizando) { pendiente = true; return false; }
   sincronizando = true;
@@ -65,6 +78,29 @@ export async function sincronizar(): Promise<boolean> {
   return r.ok;
 }
 
+/** Artefacto: el avance va a data/users/<id>/progreso y el puntaje al ranking. */
+async function sincronizarArtefacto(): Promise<boolean> {
+  const id = idCuenta();
+  if (!id) return false;
+  if (sincronizando) { pendiente = true; return false; }
+  sincronizando = true;
+  mostrarSync("Guardando…");
+  let ok = false;
+  try {
+    const d = await dbClaude();
+    if (!d) throw { code: "sin_db" };
+    await d.doc("data/users/" + id + "/progreso").set(JSON.parse(JSON.stringify(estado)));
+    await d.doc("ranking/" + id).set({ score: Math.round(estado.puntos), dominadas: totalDominadas(), t: Date.now() });
+    ok = true;
+    mostrarSync("Guardado en tu cuenta");
+  } catch (e) {
+    mostrarSync(errorClaude(e).startsWith("Tu acceso") ? "Tu acceso no permite guardar en línea: se guarda en este dispositivo" : "Sin conexión: se guarda en este dispositivo");
+  }
+  sincronizando = false;
+  if (pendiente) { pendiente = false; return sincronizarArtefacto(); }
+  return ok;
+}
+
 if (typeof window !== "undefined") {
   window.addEventListener("online", () => { if (sesion.modo === "cuenta") void sincronizar(); });
   // Al cerrar o cambiar de pestaña, guarda lo pendiente.
@@ -79,7 +115,28 @@ export async function entrar(modo: "cuenta" | "invitado"): Promise<string | null
   sesion.modo = modo;
   let aviso: string | null = null;
   let datos = leer(claveLocal());
-  if (modo === "cuenta" && sesion.usuario) {
+  if (esArtefacto) {
+    // Avance guardado por el artefacto antiguo en este dispositivo.
+    if (datos == null) datos = leer(modo === "cuenta" && sesion.claude ? CLAVE_ANTIGUA + ":" + sesion.claude.id : CLAVE_ANTIGUA);
+    if (modo === "cuenta" && sesion.claude) {
+      sesion.apodo = sesion.claude.name || "";
+      try {
+        const d = await dbClaude();
+        const doc = d ? await d.doc("data/users/" + sesion.claude.id + "/progreso").get() : null;
+        if (doc?.exists) {
+          const remoto = sanear(doc.data());
+          const local = datos == null ? null : sanear(datos);
+          if (!local || remoto.puntos >= local.puntos) datos = remoto;
+        }
+      } catch (e) {
+        aviso = "No se pudo traer tu avance de la cuenta (" + errorClaude(e) + "). Usamos el de este dispositivo.";
+      }
+      if (datos == null || sanear(datos).puntos === 0) {
+        const invitado = leer(CLAVE) ?? leer(CLAVE_ANTIGUA);
+        if (invitado != null && sanear(invitado).puntos > 0) datos = invitado;
+      }
+    }
+  } else if (modo === "cuenta" && sesion.usuario) {
     const id = sesion.usuario.id;
     const [prog, perfil] = await Promise.all([
       intentar((c) => c.from("progreso").select("estado").eq("user_id", id).maybeSingle()),
@@ -110,10 +167,10 @@ export async function salir(): Promise<void> {
   clearTimeout(reloj);
   if (sesion.modo === "cuenta") {
     await sincronizar();
-    await intentar((c) => c.auth.signOut());
+    if (!esArtefacto) await intentar((c) => c.auth.signOut());
   }
   sesion.modo = null;
-  sesion.usuario = null;
+  if (!esArtefacto) sesion.usuario = null;
   sesion.apodo = "";
   reemplazar(vacio());
 }
@@ -123,6 +180,15 @@ type Evento = "entro" | "recuperar" | "salio";
 
 /** Revisa si hay sesión guardada y escucha los cambios (confirmación de correo, Google, recuperación). */
 export async function iniciarAutenticacion(alEvento: (e: Evento) => void): Promise<void> {
+  if (esArtefacto) {
+    // En el artefacto la cuenta es la de Claude con la que se abrió la página: no hay contraseña.
+    const u = await usuarioClaude();
+    if (u) {
+      try { sesion.claude = await u.me(); } catch { sesion.claude = null; }
+    }
+    sesion.lista = true;
+    return;
+  }
   const c = db();
   if (c) {
     try {

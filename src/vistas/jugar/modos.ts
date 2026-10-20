@@ -15,7 +15,10 @@ import { estado, rondaTerminada } from "../../estado/progreso";
 import { conDatoCurioso } from "../../ui/cargando";
 import { menuAhorcado, totalAhorcado } from "./ahorcado";
 import { elegirModo } from "./niveles";
-import { aItem, itemFlujo, jugarPreguntas, type FlujoEnRonda } from "./quiz";
+import { aItem, itemFlujo, itemFotoFlujo, jugarPreguntas, type FlujoEnRonda } from "./quiz";
+import { NIVELES_FLUJO } from "../../content";
+import { hayCorrector } from "../../servicios/corrector";
+import { casoFlujo, casosDeArea, historialFlujo, nombreEnfermedad } from "./flujo-foto";
 
 const TEMA_FLUJO: Record<string, string> = { virus: "Virus", hongos: "Hongos" };
 export const PREGUNTAS_MIXTO = 6;
@@ -97,6 +100,34 @@ export const rondaMixta = vista("el modo mixto", (id: string, k: Nivel, volver: 
   });
 });
 
+// ---- Flujograma con foto (corrige Claude) ----
+const FOTOS_RONDA = 3;
+
+export const elegirModoFotoFlujo = vista("el flujograma con foto", (area: string, volver: () => void, casoId?: string) => {
+  const caso = casoId ? casoFlujo(casoId) : undefined;
+  const st = estacion(area);
+  const h = historialFlujo();
+  elegirModo({
+    titulo: caso ? "Flujograma · " + nombreEnfermedad(caso) : "Flujograma con foto · " + (st?.nombre ?? area),
+    memoria: "foto-" + area,
+    detalle: (k) => NIVELES_FLUJO[k].desc + (casoId && h[casoId + ":" + k] ? " · tu mejor nota: " + h[casoId + ":" + k].mejor + "/20" : ""),
+    alConfirmar: (k) => conDatoCurioso(() => rondaFotoFlujo(area, k, volver, casoId), area),
+    alVolver: volver,
+  });
+});
+
+export const rondaFotoFlujo = vista("el flujograma con foto", (area: string, k: Nivel, volver: () => void, casoId?: string) => {
+  const unico = casoId ? casoFlujo(casoId) : undefined;
+  const casos = unico ? [unico] : mezclar(casosDeArea(area)).slice(0, FOTOS_RONDA);
+  if (!casos.length) throw new AppError("No hay casos para este tema.", "datos", area);
+  const nombre = estacion(area)?.nombre ?? area;
+  jugarPreguntas("Flujograma con foto · " + nombre + " · " + NOMBRE_NIVEL[k], casos.map((c) => itemFotoFlujo({ caso: c, nivel: k, puntos: PUNTOS[k] * 2 })), PUNTOS[k], {
+    alSalir: volver,
+    otraVez: () => elegirModoFotoFlujo(area, volver, casoId),
+    textoVolver: "Volver",
+  });
+});
+
 /** Botones de los modos extra para ponerlos bajo los niveles de una estación. */
 export function modosExtra(id: string, volver: () => void): HTMLElement[] {
   const st = estacion(id);
@@ -105,6 +136,9 @@ export function modosExtra(id: string, volver: () => void): HTMLElement[] {
   if (flujogramasDe(id).length) {
     out.push(botonTarjeta("modo-extra modo-flujo", "Modo flujogramas", "Arma flujogramas en orden; el nivel decide cuántos pasos falsos hay", flujogramasDe(id).length + " flujogramas", () => elegirModoFlujo(id, volver)));
     out.push(botonTarjeta("modo-extra modo-mixto", "Modo mixto", "Todo " + st.nombre + " junto: " + PREGUNTAS_MIXTO + " preguntas + " + FLUJOS_MIXTO + " flujogramas, mezclados", null, () => elegirModoMixto(id, volver)));
+  }
+  if (hayCorrector && casosDeArea(id).length) {
+    out.push(botonTarjeta("modo-extra modo-foto", "Flujograma con foto", "Hazlo en papel, mándale la foto a Claude y te corrige según el nivel", casosDeArea(id).length + " casos · nota sobre 20", () => elegirModoFotoFlujo(id, volver)));
   }
   const n = totalAhorcado(id);
   if (n) out.push(botonTarjeta("modo-extra modo-ahorcado", "Ahorcado", "Adivina el nombre con su pista", n + " palabras en 4 niveles", () => menuAhorcado(id, volver)));

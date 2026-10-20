@@ -137,3 +137,5 @@ ol.exam-rev p { margin: 0; }
 .repaso-hoy { margin: 0; font-family: var(--display); }
 .repaso-hoy.ok { color: var(--accent); }
 .repaso-vacio { margin: 0; padding: 12px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); }
+.modo-foto { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 7%, var(--surface)); }
+.modo-foto strong { color: var(--bad); }

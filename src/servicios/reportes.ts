@@ -8,6 +8,9 @@
  */
 import { escribir, leer } from "../lib/almacen";
 import type { Resultado } from "./supabase";
+import { esArtefacto } from "../config";
+import { dbClaude, errorClaude, perfiles } from "./claude";
+import { sesion } from "./sesion";
 
 export const MAX_COMENTARIO = 400;
 export const MOTIVOS = [
@@ -54,6 +57,21 @@ export function reportesGuardados(): Reporte[] {
 export async function enviarReporte(r: Reporte): Promise<Resultado<null>> {
   const error = validarReporte(r);
   if (error) return { ok: false, error };
+  if (esArtefacto && sesion.claude) {
+    // Artefacto: cada persona guarda sus reportes en reportes/<su id>; solo el dueño los lee todos.
+    try {
+      const d = await dbClaude();
+      if (d) {
+        const ref = d.doc("reportes/" + sesion.claude.id);
+        const doc = await ref.get();
+        const previos = Array.isArray(doc.data()?.lista) ? (doc.data()!.lista as unknown[]) : [];
+        await ref.set({ lista: [...previos, r].slice(-MAXIMO_GUARDADOS) });
+        return { ok: true, data: null };
+      }
+    } catch (e) {
+      return { ok: false, error: errorClaude(e) };
+    }
+  }
   // TODO(base de datos): reemplazar por
   //   return intentar((c) => c.from("reportes").insert({ ...r }));
   const lista = [...reportesGuardados(), r].slice(-MAXIMO_GUARDADOS);
@@ -61,4 +79,27 @@ export async function enviarReporte(r: Reporte): Promise<Resultado<null>> {
   console.info("[reto] reporte de error (aún sin base de datos)", r);
   await new Promise((res) => setTimeout(res, 200));
   return { ok: true, data: null };
+}
+
+export interface ReporteRecibido extends Reporte { autor: string }
+
+/** Solo el dueño del artefacto: todos los reportes, los más nuevos primero. */
+export async function reportesRecibidos(): Promise<Resultado<ReporteRecibido[]>> {
+  if (!esArtefacto) return { ok: false, error: "Disponible cuando se configure la base de datos." };
+  try {
+    const d = await dbClaude();
+    if (!d) return { ok: false, error: "No se pudieron cargar." };
+    const snap = await d.collection("reportes").get();
+    const out: (ReporteRecibido & { uid: string })[] = [];
+    for (const doc of snap.docs) {
+      const lista = doc.data()?.lista;
+      if (!Array.isArray(lista)) continue;
+      for (const r of lista as Reporte[]) if (r && typeof r.texto === "string") out.push({ ...r, uid: doc.id, autor: "" });
+    }
+    const ps = await perfiles([...new Set(out.map((x) => x.uid))]);
+    out.forEach((x) => { x.autor = ps[x.uid]?.name || "Alumno"; });
+    return { ok: true, data: out.sort((a, b) => (a.enviado < b.enviado ? 1 : -1)) };
+  } catch (e) {
+    return { ok: false, error: errorClaude(e) };
+  }
 }

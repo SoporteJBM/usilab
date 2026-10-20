@@ -2,6 +2,8 @@
 //   node build.mjs            → producción (minificado, nombres con hash)
 //   node build.mjs --dev      → servidor local con recarga en http://localhost:5173
 //   node build.mjs --mock     → usa una base de datos falsa en memoria (para pruebas)
+//   node build.mjs --artefacto → un solo HTML para el artefacto de claude.ai (dist-artefacto/), con el CSS,
+//                                el JS y las fotos adentro; cuentas, datos y corrección con las capacidades de Claude.
 // La configuración se lee de .env o de variables de entorno: SUPABASE_URL, SUPABASE_ANON_KEY, GOOGLE=1.
 import * as esbuild from "esbuild";
 import fs from "node:fs";
@@ -12,7 +14,8 @@ const raiz = path.dirname(fileURLToPath(import.meta.url));
 const args = new Set(process.argv.slice(2));
 const dev = args.has("--dev");
 const mock = args.has("--mock");
-const salida = path.join(raiz, process.env.OUT_DIR || "dist");
+const artefacto = args.has("--artefacto");
+const salida = path.join(raiz, process.env.OUT_DIR || (artefacto ? "dist-artefacto" : "dist"));
 
 function leerEnv() {
   const env = { ...process.env };
@@ -27,14 +30,16 @@ function leerEnv() {
 }
 
 const env = leerEnv();
-const config = mock
+const config = artefacto
+  ? { supabaseUrl: "", supabaseAnonKey: "", google: false, plataforma: "artefacto" }
+  : mock
   ? { supabaseUrl: "https://mock.supabase.co", supabaseAnonKey: "mock", google: false }
   : { supabaseUrl: env.SUPABASE_URL || "", supabaseAnonKey: env.SUPABASE_ANON_KEY || "", google: env.GOOGLE === "1" };
 
 if (!mock && config.supabaseUrl && !/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(config.supabaseUrl)) {
   console.warn("Aviso: SUPABASE_URL no parece una URL de Supabase:", config.supabaseUrl);
 }
-if (!mock && !config.supabaseUrl) console.warn("Aviso: sin SUPABASE_URL. La página funcionará solo en modo invitado.");
+if (!mock && !artefacto && !config.supabaseUrl) console.warn("Aviso: sin SUPABASE_URL. La página funcionará solo en modo invitado.");
 
 // En pruebas, @supabase/supabase-js se reemplaza por un simulador.
 const simulador = {
@@ -80,6 +85,55 @@ const opciones = {
   logLevel: "info",
 };
 
+// Artefacto: sin Supabase (se usan las capacidades de claude.ai).
+const sinSupabase = {
+  name: "sin-supabase",
+  setup(b) {
+    b.onResolve({ filter: /^@supabase\/supabase-js$/ }, () => ({ path: path.join(raiz, "src/servicios/sin-supabase.ts") }));
+  },
+};
+
+/** Arma el HTML del artefacto: sin <html>/<head>/<body> (claude.ai pone el esqueleto), con todo adentro. */
+async function construirArtefacto() {
+  const r = await esbuild.build({
+    ...opciones,
+    format: "iife",
+    entryNames: "[name]",
+    sourcemap: false,
+    write: false,
+    plugins: [sinSupabase],
+  });
+  const texto = (re) => {
+    const f = r.outputFiles.find((o) => re.test(o.path));
+    if (!f) throw new Error("No se generó " + re);
+    return f.text;
+  };
+  let js = texto(/main\.js$/);
+  const css = texto(/main\.css$/);
+  // Fotos: van como data: URI (el artefacto no puede cargar archivos sueltos).
+  const dirImg = path.join(raiz, "public/img");
+  for (const f of fs.readdirSync(dirImg)) {
+    const uri = "data:image/jpeg;base64," + fs.readFileSync(path.join(dirImg, f)).toString("base64");
+    js = js.split('"img/' + f + '"').join(JSON.stringify(uri));
+  }
+  if (/"img\/[^"]+\.jpg"/.test(js)) throw new Error("Quedó una foto sin incrustar");
+  const plantilla = fs.readFileSync(path.join(raiz, "src/index.html"), "utf8");
+  const titulo = plantilla.match(/<title>.*<\/title>/)[0];
+  const fuentes = plantilla.match(/<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>/)[0];
+  const cuerpo = plantilla.split(/<body>/)[1].split(/<\/body>/)[0].replace(/<script[^>]*__JS__[^>]*><\/script>/, "").trim();
+  const html = [
+    titulo,
+    '<meta name="description" content="Juego para estudiar Microbiología y Parasitología (ambiente de pruebas de MiUsiLab).">',
+    '<link rel="preconnect" href="https://fonts.googleapis.com">',
+    fuentes,
+    "<style>\n" + css + "\n</style>",
+    cuerpo,
+    "<script>\n" + js.replace(/<\/script/gi, "<\\/script") + "\n</script>",
+  ].join("\n");
+  fs.writeFileSync(path.join(salida, "reto-microbiologia.html"), html);
+  console.log("Artefacto: " + path.relative(raiz, path.join(salida, "reto-microbiologia.html")) + " (" + Math.round(html.length / 1024) + " KB)");
+}
+
 fs.rmSync(salida, { recursive: true, force: true });
 fs.mkdirSync(salida, { recursive: true });
 
@@ -88,6 +142,8 @@ if (dev) {
   await ctx.watch();
   const { port } = await ctx.serve({ servedir: salida, port: Number(env.PORT) || 5173 });
   console.log(`\n  Abre http://localhost:${port}\n`);
+} else if (artefacto) {
+  await construirArtefacto();
 } else {
   await esbuild.build(opciones);
 }

@@ -1,0 +1,72 @@
+/* Flujograma con foto: flujograma modelo (gráfico), corrección y soluciones. Traído del artefacto. */
+.fj-revela { margin: 0; font-family: var(--display); font-weight: 600; color: var(--accent); }
+figure.fg { margin: 0; display: flex; flex-direction: column; align-items: stretch; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg); }
+.fg-leyenda { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.fg-ley { font-family: var(--display); font-size: 11px; padding: 2px 8px; border-radius: 999px; border-left: 6px solid var(--c); background: var(--surface); }
+.fg-patogenia { --c: #B4532A; } .fg-zona { --c: #3A6EA5; } .fg-sintomas { --c: #A8433A; } .fg-enfermedad { --c: #B07A12; }
+.fg-diagnostico { --c: #2F7D6B; } .fg-tratamiento { --c: #6B3FA0; } .fg-prevencion { --c: #4D6B2E; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fg-patogenia { --c: #E08A5F; } :root:not([data-theme="light"]) .fg-zona { --c: #7FA9D8; } :root:not([data-theme="light"]) .fg-sintomas { --c: #E07A6E; } :root:not([data-theme="light"]) .fg-enfermedad { --c: #E7B25A; } :root:not([data-theme="light"]) .fg-diagnostico { --c: #5FC2A8; } :root:not([data-theme="light"]) .fg-tratamiento { --c: #B99BE6; } :root:not([data-theme="light"]) .fg-prevencion { --c: #9CC46B; } }
+.fg-fila { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.fg-nodo { width: 100%; max-width: 420px; text-align: center; padding: 10px 14px; background: color-mix(in srgb, var(--c, var(--accent)) 10%, var(--surface)); border: 2px solid var(--c, var(--accent)); display: flex; flex-direction: column; gap: 2px; font-size: 14.5px; line-height: 1.35; }
+.fg-nodo small { font-family: var(--display); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--c, var(--accent)); }
+.fg-pro { border-radius: 6px; }
+.fg-ini, .fg-fin { border-radius: 999px; padding-inline: 22px; }
+.fg-fin { border-width: 3px; }
+.fg-dec { border: 0; padding: 16px 34px; background: var(--c, var(--hint)); clip-path: polygon(22px 0, calc(100% - 22px) 0, 100% 50%, calc(100% - 22px) 100%, 22px 100%, 0 50%); color: #fff; font-family: var(--display); font-weight: 600; }
+.fg-dec small { color: rgba(255,255,255,.85); }
+.fg-flecha { position: relative; height: 26px; display: flex; justify-content: center; }
+.fg-flecha::before { content: ""; width: 2px; background: var(--muted); height: 18px; }
+.fg-flecha::after { content: ""; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top: 7px solid var(--muted); border-bottom: 0; }
+.fg-flecha b { position: absolute; left: calc(50% + 10px); top: 3px; font-family: var(--display); font-size: 12px; color: var(--accent); }
+.fg-rama { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 420px; padding-left: 18px; }
+.fg-rama b { font-family: var(--display); font-size: 12px; color: var(--bad); flex: none; }
+.fg-rama b::after { content: " ↳"; color: var(--muted); }
+.fg-rama-caja { flex: 1; min-width: 0; font-size: 13.5px; line-height: 1.35; padding: 8px 10px; border: 1.5px dashed var(--bad); border-radius: 6px; background: var(--surface); }
+.fg-muestra { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.fg-muestra .fg-nodo { width: auto; padding: 6px 14px; font-size: 13px; --c: var(--muted); }
+.fg-muestra .fg-dec { padding: 8px 24px; clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%); }
+details.fe-modelo > summary, details.fs-exp > summary { font-family: var(--display); }
+details.fe-modelo[open] figure.fg { margin-bottom: 4px; }
+h3.fs-area { font-family: var(--display); font-size: 19px; margin: 12px 0 0; scroll-margin-top: 80px; }
+ol.fs-flujo { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 24px; }
+ol.fs-flujo li { position: relative; border: 1.5px solid var(--accent); border-radius: 12px; padding: 12px 14px; background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+ol.fs-flujo li:not(:last-child)::after { content: "↓"; position: absolute; left: 50%; bottom: -24px; transform: translateX(-50%); line-height: 24px; color: var(--muted); font-family: var(--display); }
+ol.fs-flujo li strong { display: block; font-family: var(--display); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+ol.fs-flujo li p { margin: 0; font-size: 15px; line-height: 1.45; }
+ol.fs-flujo li.fs-enfermedad { border-color: var(--hint); background: color-mix(in srgb, var(--hint) 10%, var(--surface)); }
+ol.fs-flujo li.fs-enfermedad strong { color: var(--hint); }
+ol.fs-flujo li.fs-tratamiento { border-color: var(--xhard); background: color-mix(in srgb, var(--xhard) 7%, var(--surface)); }
+ol.fs-flujo li.fs-tratamiento strong { color: var(--xhard); }
+.fe-station { border-color: color-mix(in srgb, var(--xhard) 45%, var(--line)); }
+.fe-criterios { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.fe-chip { font-family: var(--display); font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); }
+button.fe-caso { text-align: left; cursor: pointer; font: inherit; color: inherit; background: var(--surface); }
+button.fe-caso:hover { border-color: var(--accent); }
+ol.fe-pasos { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+.fe-subir { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.fe-preview { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; max-width: 100%; background: #000; }
+.fe-preview img { display: block; max-width: 100%; max-height: 60vh; object-fit: contain; }
+.fe-resultado { display: flex; flex-direction: column; gap: 10px; }
+.fe-resumen { margin: 0; font-size: 17px; }
+details.fe-crit { border: 1px solid var(--line); border-left-width: 4px; border-radius: 10px; padding: 0 12px; }
+details.fe-crit[open] { padding-bottom: 12px; }
+details.fe-crit.ok { border-left-color: var(--accent); }
+details.fe-crit.medio { border-left-color: var(--hint); }
+details.fe-crit.mal { border-left-color: var(--bad); }
+details.fe-crit.ileg { border-left-color: var(--bad); border-left-style: dashed; }
+details.fe-crit.ileg > summary b { color: var(--bad); }
+.fe-ilegible { border: 1.5px dashed var(--bad); border-radius: 10px; padding: 10px 14px; background: color-mix(in srgb, var(--bad) 7%, var(--surface)); }
+.fe-ilegible h3 { margin: 0 0 4px; font-family: var(--display); font-size: 15px; color: var(--bad); }
+.fe-ilegible p { margin: 0 0 6px; font-size: 14px; }
+.fe-ilegible ul { margin: 0; padding-left: 20px; font-size: 14px; }
+details.fe-crit > summary { cursor: pointer; display: flex; justify-content: space-between; gap: 10px; padding: 12px 0; font-family: var(--display); font-weight: 600; list-style: none; }
+details.fe-crit > summary::-webkit-details-marker { display: none; }
+details.fe-crit > summary b { font-variant-numeric: tabular-nums; white-space: nowrap; flex: none; }
+details.fe-crit.ok > summary b { color: var(--accent); } details.fe-crit.medio > summary b { color: var(--hint); } details.fe-crit.mal > summary b { color: var(--bad); }
+.fe-estado { font-family: var(--display); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.fe-crit p { margin: 6px 0 0; font-size: 15px; line-height: 1.45; }
+.fe-tuyo { color: var(--muted); font-style: italic; }
+.fe-fallo { color: var(--bad); }
+.fe-corr { color: var(--accent); }
+details.fe-ref { margin-top: 8px; font-size: 14px; }
+details.fe-ref summary { cursor: pointer; color: var(--muted); font-family: var(--display); font-size: 13px; }

@@ -1,5 +1,5 @@
 /** Ingreso: entrar, crear cuenta, recuperar contraseña o jugar como invitado. */
-import { CONFIG } from "../config";
+import { CONFIG, esArtefacto } from "../config";
 import { avisar, protegido, vista } from "../lib/errores";
 import { $, boton, mk } from "../lib/dom";
 import { crearCuenta, entrar, entrarConCorreo, entrarConGoogle, nuevaContrasena, olvideContrasena, salir, sesion, sincronizar } from "../servicios/sesion";
@@ -7,6 +7,7 @@ import { db } from "../servicios/supabase";
 import { abrirLogin, pintarMarcador } from "../ui/marco";
 import { actualizarInsignia } from "./comentarios";
 import { mostrarInicio } from "./inicio";
+import { mostrarRanking } from "./ranking";
 
 let pestana: "entrar" | "crear" = "entrar";
 let entrando = false;
@@ -42,10 +43,16 @@ export function pintarCabecera(): void {
   const w = $("#who");
   w.replaceChildren();
   w.hidden = false;
-  w.append(mk("strong", null, sesion.modo === "cuenta" ? sesion.apodo : "Invitado"));
+  if (esArtefacto && sesion.modo === "cuenta" && sesion.claude?.avatarUrl) {
+    const img = mk("img");
+    img.src = sesion.claude.avatarUrl; img.alt = "";
+    w.append(img);
+  }
+  w.append(mk("strong", null, sesion.modo === "cuenta" ? (esArtefacto ? sesion.claude?.name || "Tu cuenta" : sesion.apodo) : "Invitado"));
   const s = mk("span", "sync", sesion.modo === "cuenta" ? "" : "Avance solo en este dispositivo");
   s.id = "sync";
   w.append(s);
+  if (esArtefacto && sesion.modo === "cuenta") w.append(boton("Ranking", "ghost", () => mostrarRanking()));
   w.append(boton(sesion.modo === "cuenta" ? "Cerrar sesión" : "Entrar con cuenta", "ghost", async () => {
     await salir();
     pestana = "entrar";
@@ -60,7 +67,22 @@ export const mostrarLogin = vista("el ingreso", () => {
   msg.setAttribute("role", "status");
   const decir = (t: string, ok = false) => { msg.textContent = t; msg.className = "msg " + (ok ? "ok" : "no"); };
 
-  if (!db()) {
+  if (esArtefacto) {
+    caja.append(mk("h2", null, "Entra para guardar tu avance"));
+    if (!sesion.lista) {
+      caja.append(mk("p", "note", "Comprobando tu cuenta de Claude…"));
+    } else if (sesion.claude) {
+      const cuenta = mk("div", "acct");
+      if (sesion.claude.avatarUrl) { const img = mk("img"); img.src = sesion.claude.avatarUrl; img.alt = ""; cuenta.append(img); }
+      const txt = mk("div");
+      txt.append(mk("strong", null, sesion.claude.name || "Tu cuenta"), mk("small", null, "Cuenta de Claude"));
+      cuenta.append(txt);
+      caja.append(cuenta, boton("Entrar", "primary", () => ingresar("cuenta")),
+        mk("p", "note", "No hay contraseña: entras con la cuenta de Claude con la que abriste esta página. Tu avance queda guardado en tu cuenta, lo ves en cualquier dispositivo y apareces en el ranking."));
+    } else {
+      caja.append(mk("p", "note", "No encontramos una cuenta con acceso a esta página. Puedes jugar como invitado: tu avance se guarda solo en este dispositivo."));
+    }
+  } else if (!db()) {
     caja.append(mk("h2", null, "Bienvenido"), mk("p", "note", "El ingreso con cuenta todavía no está configurado. Puedes jugar como invitado: tu avance se guarda en este dispositivo."));
   } else if (sesion.recuperando) {
     caja.append(mk("h2", null, "Crea una contraseña nueva"));

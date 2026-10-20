@@ -3,7 +3,9 @@ import type { AgenteMicroscopio, Estacion, Flujograma, Pregunta } from "../../co
 import { enunciado } from "../../catalogo";
 import { mezclar } from "../../lib/azar";
 import { boton, mk } from "../../lib/dom";
-import { acierto, fallo } from "../../estado/progreso";
+import { acierto, estado, fallo, guardar } from "../../estado/progreso";
+import { APRUEBA_FLUJO, montarFotoFlujo, type FotoEnRonda } from "./flujo-foto";
+import { mostrarSolucionFlujo } from "../estudio/casos-flujo";
 import { armadoFlujo } from "../estudio/flujogramas";
 import { abrirPanel, pintarMarcador, type Seccion } from "../../ui/marco";
 import { ampliable } from "../../ui/visor";
@@ -23,6 +25,12 @@ export interface ItemQuiz {
   ficha?: AgenteMicroscopio;
   /** Pregunta de flujograma: se arma en orden en lugar de elegir una opción. */
   flujo?: FlujoEnRonda;
+  /** Flujograma en papel con foto, corregido por Claude. */
+  fotoFlujo?: FotoEnRonda;
+}
+
+export function itemFotoFlujo(f: FotoEnRonda): ItemQuiz {
+  return { pregunta: f.caso.caso, opciones: [], respuesta: -1, fotoFlujo: f };
 }
 
 export interface FlujoEnRonda {
@@ -69,6 +77,7 @@ export function aItem(q: Pregunta, est: Estacion | string): ItemQuiz {
 /** Descarta ítems mal formados en lugar de mostrar una pregunta imposible. */
 function valido(it: ItemQuiz): boolean {
   if (it.flujo) return it.flujo.f.pasos.length >= 2;
+  if (it.fotoFlujo) return !!it.fotoFlujo.caso;
   const ok = Array.isArray(it.opciones) && it.opciones.length >= 2 && it.respuesta >= 0 && it.respuesta < it.opciones.length && new Set(it.opciones).size === it.opciones.length;
   if (!ok) console.warn("[reto] pregunta descartada por mal formada", it);
   return ok;
@@ -111,6 +120,23 @@ export function jugarPreguntas(titulo: string, todos: ItemQuiz[], base: number, 
       p.append(marco);
     }
     if (it.flujo) { pintarFlujo(p, it.flujo); return; }
+    if (it.fotoFlujo) {
+      const f = it.fotoFlujo;
+      p.querySelector(".note")!.textContent = (i + 1) + " de " + items.length + " · flujograma en papel";
+      montarFotoFlujo(p, f, {
+        alTerminar: (nota) => {
+          if (nota == null) return;
+          const pts = Math.round((f.puntos * nota) / 20);
+          if (nota >= APRUEBA_FLUJO) { aciertos += 1; acierto(undefined, undefined, pts); }
+          else { fallo(undefined, undefined); estado.puntos += pts; guardar(); }
+          pintarMarcador();
+        },
+        alSeguir: () => { i += 1; siguiente(); },
+        alSalir: o.alSalir,
+        verSolucion: (id) => mostrarSolucionFlujo(id, () => { i += 1; siguiente(); }),
+      }, i === items.length - 1 ? "Ver resultado" : "Siguiente");
+      return;
+    }
     if (it.caso) p.append(mk("p", "case", it.caso));
     p.append(mk("p", null, it.pregunta));
 

@@ -10,7 +10,10 @@ import { abrirPanel, abrirTablero, pintarMarcador } from "../../ui/marco";
 import { elegirModo } from "./niveles";
 import { aItem, jugarPreguntas } from "./quiz";
 import { mostrarMicroscopio } from "./microscopio";
-import { modosExtra } from "./modos";
+import { elegirModoFotoFlujo, modosExtra } from "./modos";
+import { hayCorrector } from "../../servicios/corrector";
+import { CASOS_FLUJO } from "../../content";
+import { mostrarSolucionesFlujo } from "../estudio/casos-flujo";
 import { EXAMEN_CURSO, introExamen, PREGUNTAS_EXAMEN, PREGUNTAS_EXAMEN_CURSO } from "./examen";
 import { mostrarRepaso, resumenRepaso } from "./repaso";
 import { mostrarEntrenadorVirus } from "./entrenador-virus";
@@ -115,6 +118,20 @@ export const mostrarTablero = vista("el tablero", () => {
     fila.append(boton("Estudiar", "ghost", () => mostrarResumen(t.id)));
     if (t.examen) fila.append(boton("Examen", "ghost", t.examen));
     if (t.jugar) fila.append(boton(t.textoJugar ?? "Jugar", "primary", t.jugar));
+    card.append(fila);
+    home.append(card);
+  }
+  if (hayCorrector) {
+    // Flujograma con foto: se juega aquí; la solución está en Estudio.
+    const card = mk("article", "station fe-station");
+    card.append(mk("h2", null, "Flujograma con foto"), mk("p", null, "Haz el flujograma de un caso en papel, mándale la foto a Claude y te corrige según el nivel."));
+    card.append(mk("p", "note", CASOS_FLUJO.filter((c) => c.area === "virus").length + " casos de Virus · " + CASOS_FLUJO.filter((c) => c.area === "hongos").length + " de Hongos · nota sobre 20"));
+    const fila = mk("div", "row");
+    fila.append(
+      boton("Ver soluciones", "ghost", () => mostrarSolucionesFlujo(mostrarTablero)),
+      boton("Virus", "primary", () => elegirModoFotoFlujo("virus", mostrarTablero)),
+      boton("Hongos", "primary", () => elegirModoFotoFlujo("hongos", mostrarTablero)),
+    );
     card.append(fila);
     home.append(card);
   }

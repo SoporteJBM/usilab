@@ -32,3 +32,14 @@ h3.sug-sep { margin-top: 8px; }
 .sug-input { min-height: 46px; }
 .sug textarea:focus-visible, .sug-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .sug-pie { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+
+/* Ranking */
+ol.rank { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+ol.rank li { display: grid; grid-template-columns: 26px 32px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
+ol.rank li.empty { display: block; color: var(--muted); }
+ol.rank li.me { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+ol.rank .pos { font-family: var(--display); font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
+ol.rank img { width: 32px; height: 32px; border-radius: 50%; }
+ol.rank .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+ol.rank .pts { font-family: var(--display); text-align: right; font-variant-numeric: tabular-nums; }
+ol.rank .pts small { display: block; color: var(--muted); font-size: 12px; font-family: var(--body); }

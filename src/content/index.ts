@@ -10,3 +10,4 @@ export { INDICE, REINOS } from "./indice";
 export { TABLAS } from "./tablas";
 export { NIVELES, PUNTOS, PISTA, NOMBRE_NIVEL } from "./niveles";
 export { FLUJOGRAMAS, type Flujograma, type PasoFlujo } from "./flujogramas";
+export { AREAS_FLUJO, CASOS_FLUJO, CRITERIOS_FLUJO, LOGICA_FLUJO, NIVELES_FLUJO, ORDEN_FLUJO, type CasoFlujo, type CriterioFlujo, type NivelFlujo, type NodoFlujo } from "./flujo-foto";
