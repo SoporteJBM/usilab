@@ -13,6 +13,8 @@ export interface OpcionesNivel {
   /** Clave para recordar el último nivel elegido en este juego. */
   memoria: string;
   seccion?: Seccion;
+  /** Elementos que van bajo los niveles (p. ej. botones de otros modos). */
+  extras?: HTMLElement[];
 }
 
 export function elegirModo(o: OpcionesNivel): void {
@@ -48,6 +50,6 @@ export function elegirModo(o: OpcionesNivel): void {
   }
   const fila = mk("div", "row");
   fila.append(confirmar, boton("Volver", "ghost", o.alVolver));
-  p.append(caja, fila);
+  p.append(caja, ...(o.extras ?? []), fila);
   pintar();
 }

@@ -81,3 +81,59 @@ ol.exam-rev li.mal { border-left-color: var(--bad); }
 ol.exam-rev small { font-family: var(--display); font-size: 12px; color: var(--muted); }
 ol.exam-rev p { margin: 0; }
 .exam-tuya { color: var(--bad); }
+
+/* Modos extra bajo los niveles (flujogramas, mixto, ahorcado) */
+.modos-nota { margin-top: 4px; }
+.modo-extra { text-align: left; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px; border: 2px solid var(--line); background: var(--surface); width: 100%; }
+.modo-extra strong { font-size: 18px; font-family: var(--display); }
+.modo-extra span { font-family: var(--body); font-size: 14px; color: var(--muted); line-height: 1.35; }
+.modo-extra small { font-size: 12px; color: var(--muted); }
+.modo-flujo { border-color: var(--xhard); background: color-mix(in srgb, var(--xhard) 8%, var(--surface)); }
+.modo-flujo strong { color: var(--xhard); }
+.modo-mixto { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.modo-mixto strong { color: var(--accent); }
+.modo-ahorcado { border-color: var(--hint); background: color-mix(in srgb, var(--hint) 8%, var(--surface)); }
+.modo-ahorcado strong { color: var(--hint); }
+/* Ahorcado con foto */
+.hang-img { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.hang-img img { width: min(100%, 260px); max-height: 300px; object-fit: cover; border-radius: 8px; background: #000; }
+.hang-img small { font-size: 12px; color: var(--muted); text-align: center; }
+/* Flujograma dentro de una ronda */
+.flujo-etq { margin: 0; font-family: var(--display); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--xhard); }
+.flujo-tit { margin: 0; font-family: var(--display); }
+/* Reportar error */
+.reporte { margin-top: 6px; }
+.reporte-btn { background: none; border: none; padding: 4px 0; min-height: 0; color: var(--muted); font-size: 13px; font-family: var(--display); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.reporte-btn:hover { color: var(--text, inherit); }
+.reporte-form { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px dashed var(--line); border-radius: 10px; margin-top: 6px; }
+.reporte-form textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: inherit; resize: vertical; }
+.reporte-msg { margin: 0; font-size: 14px; color: var(--muted); }
+.reporte-msg.ok { color: var(--accent); }
+.reporte-msg.no { color: var(--bad); }
+/* Examen del curso: resultado por sección */
+.exam-secciones { display: flex; flex-direction: column; gap: 6px; }
+.exam-secciones h3 { margin: 6px 0 2px; font-family: var(--display); font-size: 16px; }
+.exam-sec { display: grid; grid-template-columns: minmax(90px, 1fr) 2fr auto; align-items: center; gap: 10px; font-size: 14px; }
+.exam-sec-barra { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.exam-sec-barra span { display: block; height: 100%; background: var(--accent); }
+/* Atajos de todo el curso: repaso de hoy y examen completo */
+.atajos { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 520px) { .atajos { grid-template-columns: 1fr 1fr; } }
+.atajo { text-align: left; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px; border: 2px solid var(--line); background: var(--surface); width: 100%; }
+.atajo strong { font-family: var(--display); font-size: 18px; }
+.atajo span { font-size: 14px; color: var(--muted); line-height: 1.35; }
+.atajo small { font-size: 13px; font-family: var(--display); }
+.atajo-repaso { border-color: var(--accent); }
+.atajo-repaso strong, .atajo-repaso small { color: var(--accent); }
+.atajo-examen { border-color: var(--xhard); }
+.atajo-examen strong, .atajo-examen small { color: var(--xhard); }
+/* Repaso inteligente */
+.repaso-cajas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.repaso-caja { border: 1px solid var(--line); border-radius: 10px; padding: 8px 4px; text-align: center; display: flex; flex-direction: column; gap: 2px; }
+.repaso-caja strong { font-family: var(--display); font-size: 20px; }
+.repaso-caja small { font-size: 11px; color: var(--muted); line-height: 1.2; }
+.repaso-caja.c1 { border-color: var(--bad); }
+.repaso-caja.c5 { border-color: var(--accent); }
+.repaso-hoy { margin: 0; font-family: var(--display); }
+.repaso-hoy.ok { color: var(--accent); }
+.repaso-vacio { margin: 0; padding: 12px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); }

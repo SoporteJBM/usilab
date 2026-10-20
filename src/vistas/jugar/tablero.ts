@@ -1,17 +1,18 @@
 /** JUGAR: tablero de estaciones, elegir nivel y rondas de preguntas. */
-import { AGENTES_MICROSCOPIO, AHORCADO, AHORCADO_RESUMEN, CASOS, ESTACIONES, FOTOS, MICROSCOPIO, NOMBRE_NIVEL, PISTA, PUNTOS, type Estacion, type Nivel } from "../../content";
+import { AGENTES_MICROSCOPIO, CASOS, ESTACIONES, FOTOS, MICROSCOPIO, NOMBRE_NIVEL, PISTA, PUNTOS, type Estacion, type Nivel } from "../../content";
 import { estacion } from "../../catalogo";
 import { mezclar } from "../../lib/azar";
 import { AppError, vista } from "../../lib/errores";
-import { boton, mk } from "../../lib/dom";
+import { boton, botonTarjeta, mk } from "../../lib/dom";
 import { dominadasDe, estado, rondaTerminada } from "../../estado/progreso";
 import { conDatoCurioso } from "../../ui/cargando";
 import { abrirPanel, abrirTablero, pintarMarcador } from "../../ui/marco";
 import { elegirModo } from "./niveles";
 import { aItem, jugarPreguntas } from "./quiz";
 import { mostrarMicroscopio } from "./microscopio";
-import { menuAhorcado } from "./ahorcado";
-import { introExamen, PREGUNTAS_EXAMEN } from "./examen";
+import { modosExtra } from "./modos";
+import { EXAMEN_CURSO, introExamen, PREGUNTAS_EXAMEN, PREGUNTAS_EXAMEN_CURSO } from "./examen";
+import { mostrarRepaso, resumenRepaso } from "./repaso";
 import { mostrarEntrenadorVirus } from "./entrenador-virus";
 
 const TAMANO_RONDA: Record<string, number> = { casos: 4 };
@@ -49,6 +50,7 @@ export const elegirNivel = vista("el nivel", (id: string) => {
     },
     alConfirmar: (k) => conDatoCurioso(() => iniciarRonda(id, k), id),
     alVolver: mostrarTablero,
+    extras: modosExtra(id, () => elegirNivel(id)),
   });
 });
 
@@ -74,7 +76,6 @@ function tarjetas(): Tarjeta[] {
     jugar: st.preguntas.length ? () => elegirNivel(st.id) : undefined,
     examen: st.preguntas.length >= PREGUNTAS_EXAMEN ? () => introExamen(st.id, mostrarTablero) : undefined,
   });
-  const palabras = Object.values(AHORCADO).reduce((n, l) => n + l.length, 0);
   return [
     ...ESTACIONES.flatMap((st) => st.id !== "virus" ? [deEstacion(st)] : [deEstacion(st), {
       id: "entrenador-virus", nombre: "Entrenador de Virus", descripcion: "Baltimore, VIH paso a paso, CD4, esquemas, co-test y proteínas",
@@ -82,13 +83,23 @@ function tarjetas(): Tarjeta[] {
       nota: "6 ejercicios", jugar: () => mostrarEntrenadorVirus(mostrarTablero), textoJugar: "Entrenar",
     }]),
     { ...MICROSCOPIO, total: 0, hechas: 0, nota: FOTOS.length + " fotos reales · " + AGENTES_MICROSCOPIO.length + " estructuras", jugar: mostrarMicroscopio, textoJugar: "Entrar" },
-    { id: "ahorcado", nombre: "Ahorcado", descripcion: "Adivina el agente con su pista", resumen: AHORCADO_RESUMEN, total: 0, hechas: 0, nota: palabras + " palabras en 4 niveles", jugar: menuAhorcado },
     deEstacion(CASOS),
   ];
 }
 
+/** Atajos que valen para todo el curso: repaso de hoy y examen completo. */
+export function atajosCurso(volver: () => void): HTMLElement {
+  const caja = mk("div", "atajos");
+  caja.append(
+    botonTarjeta("atajo atajo-repaso", "Repaso de hoy", "Las preguntas que estás por olvidar, de todas las secciones.", resumenRepaso(), () => mostrarRepaso(volver)),
+    botonTarjeta("atajo atajo-examen", "Examen del curso", PREGUNTAS_EXAMEN_CURSO + " preguntas de todas las secciones, con tiempo y nota sobre 20.", estado.examenes[EXAMEN_CURSO] ? "Tu mejor nota: " + estado.examenes[EXAMEN_CURSO].mejor + "/20" : "Simula el examen final", () => introExamen(EXAMEN_CURSO, volver)),
+  );
+  return caja;
+}
+
 export const mostrarTablero = vista("el tablero", () => {
   const home = abrirTablero();
+  home.append(atajosCurso(mostrarTablero));
   for (const t of tarjetas()) {
     const card = mk("article", "station");
     card.append(mk("h2", null, t.nombre), mk("p", null, t.descripcion));

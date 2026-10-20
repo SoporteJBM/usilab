@@ -3,6 +3,7 @@ export * from "./types";
 export { ESTACIONES, CASOS } from "./estaciones";
 export { MICROSCOPIO, AGENTES_MICROSCOPIO, PARES, FOTOS } from "./microscopio";
 export { AHORCADO, AHORCADO_PUNTOS, AHORCADO_RESUMEN } from "./ahorcado";
+export { AHORCADOS, type AhorcadoEstacion } from "./ahorcados";
 export { DATOS_CURIOSOS } from "./datos-curiosos";
 export { PERFILES } from "./perfiles";
 export { INDICE, REINOS } from "./indice";

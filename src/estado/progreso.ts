@@ -6,7 +6,7 @@
  * Así un dato viejo o manipulado nunca rompe la página.
  */
 import { pregunta } from "../catalogo";
-import type { Nivel, NivelAhorcado } from "../content";
+import type { Nivel } from "../content";
 
 export interface Estado {
   version: 4;
@@ -16,17 +16,19 @@ export interface Estado {
   dominadas: Record<string, Record<string, true>>;
   /** estación → rondas jugadas */
   rondas: Record<string, number>;
-  /** palabras del ahorcado ya vistas por nivel (para no repetir) */
-  ahorcadoVistas: Partial<Record<NivelAhorcado, string[]>>;
+  /** palabras del ahorcado ya vistas por nivel (para no repetir); clave «nivel» o «estación:nivel» */
+  ahorcadoVistas: Record<string, string[]>;
   /** último nivel elegido en cada juego */
   ultimoNivel: Record<string, Nivel>;
   /** estación → id de pregunta → veces fallada */
   errores: Record<string, Record<string, number>>;
   /** estación → resultados del modo examen (nota sobre 20) */
   examenes: Record<string, { mejor: number; ultima: number; intentos: number }>;
+  /** Repaso inteligente: id de pregunta → caja (1 a 5) y fecha en que toca repasarla */
+  repaso: Record<string, { caja: number; toca: string }>;
 }
 
-export const vacio = (): Estado => ({ version: 4, puntos: 0, racha: 0, dominadas: {}, rondas: {}, ahorcadoVistas: {}, ultimoNivel: {}, errores: {}, examenes: {} });
+export const vacio = (): Estado => ({ version: 4, puntos: 0, racha: 0, dominadas: {}, rondas: {}, ahorcadoVistas: {}, ultimoNivel: {}, errores: {}, examenes: {}, repaso: {} });
 
 const NIVELES_OK = new Set(["f", "m", "d", "x"]);
 const NIVELES_AHORCADO = new Set(["facil", "medio", "dificil", "muydificil"]);
@@ -67,9 +69,18 @@ export function sanear(x: unknown): Estado {
       if (intentos > 0) e.examenes[k] = { mejor: nota(v.mejor), ultima: nota(v.ultima), intentos };
     }
   }
+  if (esObjeto(x.repaso)) {
+    for (const [id, v] of Object.entries(x.repaso)) {
+      if (!pregunta(id) || !esObjeto(v)) continue;
+      const caja = Math.floor(numero(v.caja));
+      if (caja >= 1 && caja <= CAJAS && typeof v.toca === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v.toca)) e.repaso[id] = { caja, toca: v.toca };
+    }
+  }
   if (esObjeto(x.ahorcadoVistas)) {
     for (const [k, v] of Object.entries(x.ahorcadoVistas)) {
-      if (NIVELES_AHORCADO.has(k) && Array.isArray(v)) e.ahorcadoVistas[k as NivelAhorcado] = v.filter((w): w is string => typeof w === "string").slice(0, 500);
+      const nivel = k.includes(":") ? k.split(":")[1] : k;
+      const valida = /^([a-z-]{1,30}:)?[a-z]+$/.test(k) && NIVELES_AHORCADO.has(nivel);
+      if (valida && Array.isArray(v)) e.ahorcadoVistas[k] = v.filter((w): w is string => typeof w === "string").slice(0, 500);
     }
   }
   return e;
@@ -94,12 +105,52 @@ export function guardar(): void {
   }
 }
 
+// ---- Repaso inteligente (repetición espaciada, cajas de Leitner) ----
+/** Días hasta el siguiente repaso según la caja: si aciertas sube de caja y se espacia más. */
+export const DIAS_POR_CAJA = [0, 1, 3, 7, 16, 35];
+export const CAJAS = 5;
+
+/** Fecha local en formato AAAA-MM-DD, con `dias` de diferencia. */
+export function fecha(dias = 0, desde = new Date()): string {
+  const d = new Date(desde.getFullYear(), desde.getMonth(), desde.getDate() + dias);
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+
+function programar(id: string, bien: boolean): void {
+  const previo = estado.repaso[id];
+  if (bien) {
+    const caja = Math.min(CAJAS, (previo?.caja ?? 0) + 1);
+    estado.repaso[id] = { caja, toca: fecha(DIAS_POR_CAJA[caja]) };
+  } else {
+    // Fallada: vuelve a la caja 1 y toca repasarla hoy mismo.
+    estado.repaso[id] = { caja: 1, toca: fecha(0) };
+  }
+}
+
+export interface PendienteRepaso { est: string; id: string; caja: number; toca: string }
+/** Preguntas que tocan hoy (o antes): las más atrasadas y de caja más baja primero. */
+export function pendientesDeRepaso(hoy = fecha(0)): PendienteRepaso[] {
+  const out: PendienteRepaso[] = [];
+  for (const [id, r] of Object.entries(estado.repaso)) {
+    const p = pregunta(id);
+    if (p && r.toca <= hoy) out.push({ est: p.est.id, id, caja: r.caja, toca: r.toca });
+  }
+  return out.sort((a, b) => (a.toca < b.toca ? -1 : a.toca > b.toca ? 1 : a.caja - b.caja));
+}
+/** Próxima fecha con repaso pendiente, o null si no hay ninguna programada. */
+export function proximoRepaso(): string | null {
+  const fechas = Object.values(estado.repaso).map((r) => r.toca).sort();
+  return fechas[0] ?? null;
+}
+export const enRepaso = (): number => Object.keys(estado.repaso).length;
+
 // ---- Operaciones ----
 export function acierto(est: string | undefined, id: string | undefined, puntos: number): void {
   estado.puntos += puntos;
   estado.racha += 1;
   if (est && id && pregunta(id)) {
     (estado.dominadas[est] ??= {})[id] = true;
+    programar(id, true);
     if (estado.errores[est]) {
       delete estado.errores[est][id];
       if (!Object.keys(estado.errores[est]).length) delete estado.errores[est];
@@ -111,6 +162,7 @@ export function acierto(est: string | undefined, id: string | undefined, puntos:
 export function fallo(est: string | undefined, id: string | undefined): void {
   estado.racha = 0;
   if (est && id && pregunta(id)) {
+    programar(id, false);
     const m = (estado.errores[est] ??= {});
     m[id] = (m[id] || 0) + 1;
   }

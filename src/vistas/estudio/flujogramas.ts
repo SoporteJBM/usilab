@@ -117,14 +117,16 @@ export const responderFlujo = vista("el flujograma", (id: string, volver: () => 
   p.append(ta, ver, resultado);
 });
 
-export const armarFlujo = vista("el flujograma", (id: string, volver: () => void, seccion: Seccion = "estudio") => {
-  const f = buscar(id);
-  const p = abrirPanel(seccion);
-  p.append(boton("← Flujogramas", "ghost back", volver), mk("h2", null, f.titulo));
-  p.append(mk("p", "note", "Toca los pasos en el orden correcto. Ojo: hay " + f.intrusos.length + " pasos que no van. Toca un paso de tu lista para quitarlo."));
+export interface ResultadoArmado { perfecto: boolean; enSuSitio: number; total: number; intrusos: number }
 
+/**
+ * Componente «armar en orden»: se tocan los pasos en orden; hay pasos falsos mezclados.
+ * Lo usan Estudio, el Modo flujogramas y el Modo mixto. `alRevisar` se llama una sola vez.
+ */
+export function armadoFlujo(f: Flujograma, intrusos: string[], alRevisar: (r: ResultadoArmado) => void, opciones: { mostrarModelo?: boolean; puntos?: number } = {}): HTMLElement {
+  const caja = mk("div", "flujo-armar");
   const correctos = f.pasos.map((x) => x.texto);
-  const fichas = mezclar([...correctos, ...f.intrusos]);
+  const fichas = mezclar([...correctos, ...intrusos]);
   const elegidos: string[] = [];
   let revisado = false;
 
@@ -134,6 +136,7 @@ export const armarFlujo = vista("el flujograma", (id: string, volver: () => void
   const msg = mk("p", "feedback");
   msg.setAttribute("role", "status");
   const revisar = boton("Revisar", "primary", () => corregir());
+  const reiniciar = boton("Empezar de nuevo", "ghost", () => { if (!revisado) { elegidos.length = 0; pintar(); } });
   const fila = mk("div", "row");
   const modelo = mk("div", "flujo-modelo");
 
@@ -144,10 +147,7 @@ export const armarFlujo = vista("el flujograma", (id: string, volver: () => void
       const li = mk("li");
       const b = boton(t, "flujo-elegido", () => { if (revisado) return; elegidos.splice(i, 1); pintar(); });
       b.setAttribute("aria-label", "Paso " + (i + 1) + ": " + t + ". Toca para quitarlo.");
-      if (revisado) {
-        const ok = correctos[i] === t;
-        li.className = ok ? "bien" : f.intrusos.includes(t) ? "intruso" : "mal";
-      }
+      if (revisado) li.className = correctos[i] === t ? "bien" : intrusos.includes(t) ? "intruso" : "mal";
       li.append(b);
       tuyo.append(li);
     });
@@ -162,24 +162,37 @@ export const armarFlujo = vista("el flujograma", (id: string, volver: () => void
   };
 
   const corregir = () => {
+    if (revisado) return;
     revisado = true;
     const enSuSitio = elegidos.filter((t, i) => correctos[i] === t).length;
-    const intrusos = elegidos.filter((t) => f.intrusos.includes(t)).length;
+    const nIntrusos = elegidos.filter((t) => intrusos.includes(t)).length;
     const perfecto = enSuSitio === correctos.length && elegidos.length === correctos.length;
     msg.className = "feedback " + (perfecto ? "ok" : "no");
-    msg.textContent = perfecto
-      ? "¡Perfecto! +" + PUNTOS_PERFECTO + " puntos"
-      : enSuSitio + " de " + correctos.length + " pasos en su lugar" + (intrusos ? " · " + intrusos + (intrusos === 1 ? " paso falso" : " pasos falsos") : "") + ".";
-    if (perfecto) { sumarPuntos(PUNTOS_PERFECTO); pintarMarcador(); }
+    msg.textContent = perfecto ? "¡Perfecto!" + (opciones.puntos ? " +" + opciones.puntos + " puntos" : "") : enSuSitio + " de " + correctos.length + " pasos en su lugar" + (nIntrusos ? " · " + nIntrusos + (nIntrusos === 1 ? " paso falso" : " pasos falsos") : "") + ".";
+    revisar.hidden = true;
+    reiniciar.hidden = true;
     pintar();
-    modelo.replaceChildren(mk("h3", null, "Flujograma modelo"), dibujarFlujo(f));
-    fila.replaceChildren(
+    if (opciones.mostrarModelo !== false) modelo.replaceChildren(mk("h3", null, "Flujograma modelo"), dibujarFlujo(f));
+    alRevisar({ perfecto, enSuSitio, total: correctos.length, intrusos: nIntrusos });
+  };
+
+  fila.append(revisar, reiniciar);
+  caja.append(tuyo, mk("h3", "flujo-sub", "Pasos disponibles"), banco, msg, fila, modelo);
+  pintar();
+  return caja;
+}
+
+export const armarFlujo = vista("el flujograma", (id: string, volver: () => void, seccion: Seccion = "estudio") => {
+  const f = buscar(id);
+  const p = abrirPanel(seccion);
+  p.append(boton("← Flujogramas", "ghost back", volver), mk("h2", null, f.titulo));
+  p.append(mk("p", "note", "Toca los pasos en el orden correcto. Ojo: hay " + f.intrusos.length + " pasos que no van. Toca un paso de tu lista para quitarlo."));
+  const despues = mk("div", "row");
+  p.append(armadoFlujo(f, f.intrusos, (r) => {
+    if (r.perfecto) { sumarPuntos(PUNTOS_PERFECTO); pintarMarcador(); }
+    despues.append(
       boton("Otra vez", "primary", () => armarFlujo(id, volver, seccion)),
       boton("Responder como pregunta abierta", "ghost", () => responderFlujo(id, volver, seccion)),
     );
-  };
-
-  fila.append(revisar, boton("Empezar de nuevo", "ghost", () => { if (!revisado) { elegidos.length = 0; pintar(); } }));
-  p.append(tuyo, mk("h3", "flujo-sub", "Pasos disponibles"), banco, msg, fila, modelo);
-  pintar();
+  }, { puntos: PUNTOS_PERFECTO }), despues);
 });

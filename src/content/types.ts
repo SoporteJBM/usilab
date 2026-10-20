@@ -94,6 +94,10 @@ export interface Reino {
 export interface PalabraAhorcado {
   palabra: string;
   pista: string;
+  /** Foto real que hay que reconocer (solo en los ahorcados con imagen). */
+  foto?: string;
+  /** Identificador si la misma palabra se repite con fotos distintas. */
+  id?: string;
 }
 
 export type NivelAhorcado = "facil" | "medio" | "dificil" | "muydificil";

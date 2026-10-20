@@ -10,7 +10,7 @@ import { sesion } from "../servicios/sesion";
 import { abrirPanel } from "../ui/marco";
 import { gruposConMaterial, listaDeAgentes } from "./estudio/indice";
 import { jugarTarjetas } from "./estudio/tarjetas";
-import { elegirNivel, mostrarTablero } from "./jugar/tablero";
+import { atajosCurso, elegirNivel, mostrarTablero } from "./jugar/tablero";
 import { introExamen, PREGUNTAS_EXAMEN } from "./jugar/examen";
 import { mostrarEntrenadorVirus } from "./jugar/entrenador-virus";
 
@@ -32,7 +32,7 @@ export const mostrarInicio = vista("Inicio", () => {
     botonTarjeta("intro-item", "Comentarios", "Dudas, avisos y sugerencias entre compañeros.", null, mostrarComentarios),
   );
   intro.append(items);
-  p.append(intro);
+  p.append(intro, atajosCurso(mostrarInicio));
   p.append(mk("p", "note", "El curso se divide en cuatro grandes grupos. Elige uno para ver qué agentes se estudian y practicarlos."));
   const grid = mk("div", "reinos");
   for (const r of REINOS) {

@@ -6,9 +6,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  AGENTES_MICROSCOPIO, AHORCADO, AHORCADO_PUNTOS, CASOS, DATOS_CURIOSOS, ESTACIONES, FLUJOGRAMAS, FOTOS, INDICE, PARES, PERFILES, REINOS, TABLAS,
+  AGENTES_MICROSCOPIO, AHORCADO, AHORCADO_PUNTOS, AHORCADOS, CASOS, DATOS_CURIOSOS, ESTACIONES, FLUJOGRAMAS, FOTOS, INDICE, PARES, PERFILES, REINOS, TABLAS,
   type Estacion, type NivelAhorcado,
 } from "../src/content";
+import { raicesRespuesta, sinTildes } from "../src/lib/texto";
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const errores: string[] = [];
@@ -112,6 +113,28 @@ NIVELES_A.forEach((k) => {
     palabras.set(w.palabra, k);
   });
 });
+
+// ---- Ahorcado de cada estación ----
+for (const [area, A] of Object.entries(AHORCADOS)) {
+  NIVELES_A.forEach((k) => {
+    const lista = A.niveles[k];
+    if (!lista?.length) { error(`Ahorcado ${A.nombre}: el nivel ${k} no tiene palabras.`); return; }
+    if (lista.length < 8) aviso(`Ahorcado ${A.nombre} (${k}): solo ${lista.length} palabras; conviene tener 8 o más.`);
+    const vistas = new Set<string>();
+    lista.forEach((w) => {
+      const donde = `Ahorcado ${A.nombre} (${k}) "${w.palabra}"`;
+      if (!/^[A-Z][A-Z ]*[A-Z]$/.test(w.palabra)) error(`${donde}: solo mayúsculas A-Z y espacios, sin tildes ni Ñ.`);
+      if (vacio(w.pista)) error(`${donde}: falta la pista.`);
+      if (vistas.has(w.palabra)) error(`${donde}: está repetida en el mismo nivel.`);
+      vistas.add(w.palabra);
+      // La pista no puede decir la respuesta (ni un pedazo, como «aspergilar» para ASPERGILLUS).
+      const pista = sinTildes(w.pista).toUpperCase();
+      const delata = raicesRespuesta(w.palabra).filter((r) => pista.split(/[^A-Z]+/).some((x) => x.includes(r)));
+      if (delata.length) error(`${donde}: la pista revela la respuesta (${delata.join(", ")}).`);
+    });
+  });
+  if (area !== area.toLowerCase()) error(`Ahorcado: el id «${area}» debe ir en minúsculas.`);
+}
 
 // ---- Flujogramas ----
 const idsFlujo = new Set<string>();

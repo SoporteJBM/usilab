@@ -9,6 +9,7 @@ import { abrirPanel, type Seccion } from "../../ui/marco";
 import { elegirModo } from "./niveles";
 import { jugarPreguntas, type ItemQuiz } from "./quiz";
 import { mostrarTablero } from "./tablero";
+import { menuAhorcado, totalAhorcado } from "./ahorcado";
 
 const N_OPCIONES: Record<Nivel, number> = { f: 3, m: 4, d: 4, x: 4 };
 const DESCRIPCION: Record<Nivel, string> = {
@@ -85,6 +86,7 @@ export const mostrarMicroscopio = vista("el microscopio", () => {
     ["Identificar fotos", "Ronda de 10 fotos reales al azar, " + FOTOS.length + " en total", () => jugar("Identificar fotos", itemsFoto)],
     ["Por criterio", "Te describo lo que se ve; tú dices qué es (" + AGENTES_MICROSCOPIO.length + " estructuras)", () => jugar("Por criterio", itemsCriterio)],
     ["Pares que se confunden", PARES.length + " pares donde más se pierden puntos", () => jugar("Pares que se confunden", itemsPares)],
+    ["Ahorcado con fotos", "Mira la foto real y adivina qué hongo es, letra por letra (" + totalAhorcado("microscopio") + " rondas en 4 niveles)", () => menuAhorcado("microscopio", mostrarMicroscopio)],
     ["Mapa de cobertura", "Qué tenemos de cada estructura: foto " + conFoto + " de " + AGENTES_MICROSCOPIO.length, () => mostrarCobertura(mostrarMicroscopio, "jugar")],
   ];
   for (const [t, s, fn] of opcionesMenu) {

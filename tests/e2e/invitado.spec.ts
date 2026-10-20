@@ -10,7 +10,8 @@ test("invitado: inicio, menú y una ronda completa que guarda el avance", async 
   // Menú superior
   const nav = page.locator("#topnav");
   await nav.getByRole("button", { name: "Jugar" }).click();
-  await expect(page.locator("#home .station")).toHaveCount(11);
+  await expect(page.locator("#home .station")).toHaveCount(10);
+  await expect(page.locator("#home .atajo")).toHaveCount(2);
   await nav.getByRole("button", { name: "Estudio" }).click();
   await expect(page.getByRole("heading", { name: "Estudio" })).toBeVisible();
   await nav.getByRole("button", { name: "Comentarios" }).click();
@@ -53,13 +54,14 @@ test("ahorcado y microscopio abren y se juegan", async ({ page }) => {
   await abrir(page);
   await comoInvitado(page);
   await page.locator("#topnav").getByRole("button", { name: "Jugar" }).click();
-  await page.locator(".station", { hasText: "Ahorcado" }).getByRole("button", { name: "Jugar" }).click();
+  await page.locator(".station", { hasText: "Hongos" }).getByRole("button", { name: "Jugar" }).click();
+  await page.locator(".modo-ahorcado").click();
   await elegirNivel(page, "Fácil");
   await expect(page.locator(".word")).toBeVisible();
   await page.locator(".kb button:not([disabled])").first().click();
   await expect(page.locator(".note", { hasText: /Errores: \d de 6/ })).toBeVisible();
 
-  await page.getByRole("button", { name: "Volver al tablero" }).click();
+  await page.locator("#topnav").getByRole("button", { name: "Jugar" }).click();
   await page.locator(".station", { hasText: "Microscopio" }).getByRole("button", { name: "Entrar" }).click();
   await page.getByRole("button", { name: /Identificar fotos/ }).click();
   await elegirNivel(page, "Medio");

@@ -4,14 +4,15 @@
  * hasta el final. Se puede volver atrás y cambiar respuestas. Al terminar: nota sobre 20,
  * revisión con explicaciones, y lo fallado pasa a «Mis errores».
  */
-import { NOMBRE_NIVEL, type Nivel, type Pregunta } from "../../content";
-import { enunciado, estacion } from "../../catalogo";
+import { NOMBRE_NIVEL, type Estacion, type Nivel, type Pregunta } from "../../content";
+import { CON_PREGUNTAS, enunciado, estacion, todasLasPreguntas } from "../../catalogo";
 import { mezclar } from "../../lib/azar";
 import { AppError, vista } from "../../lib/errores";
 import { boton, mk } from "../../lib/dom";
 import { acierto, estado, fallo, registrarExamen } from "../../estado/progreso";
 import { abrirPanel, alSalirDeVista, pintarMarcador } from "../../ui/marco";
 import { aItem, type ItemQuiz } from "./quiz";
+import { reportarError } from "../../ui/reportar";
 
 export const PREGUNTAS_EXAMEN = 20;
 export const SEGUNDOS_POR_PREGUNTA = 90;
@@ -20,7 +21,49 @@ export const NOTA_APROBATORIA = 11;
 const REPARTO: Record<Nivel, number> = { f: 4, m: 6, d: 6, x: 4 };
 const PUNTOS: Record<Nivel, number> = { f: 5, m: 10, d: 20, x: 40 };
 
-interface Reactivo { q: Pregunta; item: ItemQuiz; elegida: number | null }
+interface Reactivo { q: Pregunta; est: Estacion; item: ItemQuiz; elegida: number | null }
+
+/** Id especial del examen de todo el curso. */
+export const EXAMEN_CURSO = "curso";
+export const PREGUNTAS_EXAMEN_CURSO = 30;
+const REPARTO_CURSO: Record<Nivel, number> = { f: 6, m: 9, d: 9, x: 6 };
+
+interface FuenteExamen { id: string; nombre: string; total: number; armar: () => { q: Pregunta; est: Estacion }[] }
+
+/**
+ * Examen de todo el curso: respeta el reparto por nivel y, dentro de cada nivel,
+ * va tomando preguntas de cada sección por turnos para que todas aparezcan.
+ */
+export function armarExamenCurso(total = PREGUNTAS_EXAMEN_CURSO): { q: Pregunta; est: Estacion }[] {
+  const todas = todasLasPreguntas();
+  const elegidas: { q: Pregunta; est: Estacion }[] = [];
+  const escala = total / PREGUNTAS_EXAMEN_CURSO;
+  for (const k of Object.keys(REPARTO_CURSO) as Nivel[]) {
+    const cuota = Math.round(REPARTO_CURSO[k] * escala);
+    const porSeccion = mezclar(CON_PREGUNTAS.map((est) => mezclar(todas.filter((x) => x.est.id === est.id && x.q.nivel === k)))).filter((l) => l.length);
+    let tomadas = 0;
+    while (tomadas < cuota && porSeccion.some((l) => l.length)) {
+      for (const l of porSeccion) {
+        if (tomadas >= cuota) break;
+        const x = l.shift();
+        if (x) { elegidas.push(x); tomadas += 1; }
+      }
+    }
+  }
+  const resto = mezclar(todas.filter((x) => !elegidas.includes(x)));
+  while (elegidas.length < total && resto.length) elegidas.push(resto.shift()!);
+  return mezclar(elegidas.slice(0, total));
+}
+
+function fuenteExamen(estId: string): FuenteExamen {
+  if (estId === EXAMEN_CURSO) {
+    const n = Math.min(PREGUNTAS_EXAMEN_CURSO, todasLasPreguntas().length);
+    return { id: EXAMEN_CURSO, nombre: "Todo el curso", total: n, armar: () => armarExamenCurso(n) };
+  }
+  const st = estacion(estId);
+  if (!st) throw new AppError("Ese tema no existe.", "datos", estId);
+  return { id: st.id, nombre: st.nombre, total: Math.min(PREGUNTAS_EXAMEN, st.preguntas.length), armar: () => armarExamen(st.preguntas).map((q) => ({ q, est: st })) };
+}
 
 /** Elige las preguntas respetando el reparto; si un nivel no alcanza, completa con otros. */
 export function armarExamen(preguntas: Pregunta[], total = PREGUNTAS_EXAMEN): Pregunta[] {
@@ -35,15 +78,14 @@ export const notaSobre20 = (aciertos: number, total: number): number => (total ?
 const mmss = (s: number) => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
 
 export const introExamen = vista("el modo examen", (estId: string, volver: () => void) => {
-  const st = estacion(estId);
-  if (!st) throw new AppError("Ese tema no existe.", "datos", estId);
+  const st = fuenteExamen(estId);
   const p = abrirPanel("jugar", "examen");
-  const total = Math.min(PREGUNTAS_EXAMEN, st.preguntas.length);
+  const total = st.total;
   const minutos = Math.round((total * SEGUNDOS_POR_PREGUNTA) / 60);
   p.append(mk("h2", null, "Modo examen · " + st.nombre));
   const reglas = mk("ul", "exam-reglas");
   [
-    total + " preguntas de los 4 niveles, mezcladas",
+    total + " preguntas de los 4 niveles, mezcladas" + (st.id === EXAMEN_CURSO ? ", de todas las secciones del curso" : ""),
     minutos + " minutos; al acabarse el tiempo se entrega solo",
     "Sin pistas y sin ver si acertaste hasta el final",
     "Puedes volver atrás y cambiar respuestas",
@@ -58,9 +100,8 @@ export const introExamen = vista("el modo examen", (estId: string, volver: () =>
 });
 
 export const rendirExamen = vista("el examen", (estId: string, volver: () => void) => {
-  const st = estacion(estId);
-  if (!st) throw new AppError("Ese tema no existe.", "datos", estId);
-  const reactivos: Reactivo[] = armarExamen(st.preguntas).map((q) => ({ q, item: aItem(q, st), elegida: null }));
+  const st = fuenteExamen(estId);
+  const reactivos: Reactivo[] = st.armar().map(({ q, est }) => ({ q, est, item: aItem(q, est), elegida: null }));
   if (!reactivos.length) throw new AppError("Este tema todavía no tiene preguntas.", "datos", estId);
 
   const p = abrirPanel("jugar", "examen");
@@ -106,7 +147,7 @@ export const rendirExamen = vista("el examen", (estId: string, volver: () => voi
   const pintar = () => {
     const r = reactivos[actual];
     cuerpo.replaceChildren();
-    cuerpo.append(mk("p", "note", "Pregunta " + (actual + 1) + " de " + reactivos.length));
+    cuerpo.append(mk("p", "note", "Pregunta " + (actual + 1) + " de " + reactivos.length + (st.id === EXAMEN_CURSO ? " · " + r.est.nombre : "")));
     if (r.item.caso) cuerpo.append(mk("p", "case", r.item.caso));
     cuerpo.append(mk("p", "exam-preg", r.item.pregunta));
     const opts = mk("div", "opts");
@@ -152,8 +193,8 @@ export const rendirExamen = vista("el examen", (estId: string, volver: () => voi
     for (const r of reactivos) {
       const bien = r.elegida === r.item.respuesta;
       porNivel[r.q.nivel][1] += 1;
-      if (bien) { aciertos += 1; porNivel[r.q.nivel][0] += 1; acierto(st.id, r.q.id, PUNTOS[r.q.nivel]); }
-      else fallo(st.id, r.q.id);
+      if (bien) { aciertos += 1; porNivel[r.q.nivel][0] += 1; acierto(r.est.id, r.q.id, PUNTOS[r.q.nivel]); }
+      else fallo(r.est.id, r.q.id);
     }
     const nota = notaSobre20(aciertos, reactivos.length);
     registrarExamen(st.id, nota);
@@ -182,6 +223,28 @@ export const rendirExamen = vista("el examen", (estId: string, volver: () => voi
       tabla.append(c);
     });
     cuerpo.append(tabla);
+    if (st.id === EXAMEN_CURSO) {
+      // Por sección: dónde estás más flojo.
+      const porSeccion = new Map<string, [number, number]>();
+      for (const x of reactivos) {
+        const v = porSeccion.get(x.est.nombre) ?? [0, 0];
+        v[1] += 1;
+        if (x.elegida === x.item.respuesta) v[0] += 1;
+        porSeccion.set(x.est.nombre, v);
+      }
+      const secs = mk("div", "exam-secciones");
+      secs.append(mk("h3", null, "Por sección"));
+      [...porSeccion.entries()].sort((a, b) => a[1][0] / a[1][1] - b[1][0] / b[1][1]).forEach(([nombre, [b, t]]) => {
+        const fila = mk("div", "exam-sec");
+        const barra = mk("span", "exam-sec-barra");
+        const lleno = mk("span");
+        lleno.style.width = Math.round((100 * b) / t) + "%";
+        barra.append(lleno);
+        fila.append(mk("span", "exam-sec-nombre", nombre), barra, mk("strong", null, b + "/" + t));
+        secs.append(fila);
+      });
+      cuerpo.append(secs);
+    }
     const fallas = reactivos.filter((x) => x.elegida !== x.item.respuesta).length;
     if (fallas) cuerpo.append(mk("p", "note", (fallas === 1 ? "La que fallaste o dejaste en blanco quedó" : "Las " + fallas + " que fallaste o dejaste en blanco quedaron") + " en Estudio › Mis errores."));
 
@@ -202,12 +265,13 @@ export const rendirExamen = vista("el examen", (estId: string, volver: () => voi
         const bien = x.elegida === x.item.respuesta;
         if (soloErrores && bien) return;
         const li = mk("li", bien ? "bien" : "mal");
-        li.append(mk("small", null, (i + 1) + " · " + NOMBRE_NIVEL[x.q.nivel] + " · " + (bien ? "Correcta" : x.elegida == null ? "Sin responder" : "Incorrecta")));
+        li.append(mk("small", null, (i + 1) + " · " + (st.id === EXAMEN_CURSO ? x.est.nombre + " · " : "") + NOMBRE_NIVEL[x.q.nivel] + " · " + (bien ? "Correcta" : x.elegida == null ? "Sin responder" : "Incorrecta")));
         if (x.q.caso) li.append(mk("p", "case", x.q.caso));
         li.append(mk("strong", null, enunciado(x.q)));
         if (!bien && x.elegida != null) li.append(mk("p", "exam-tuya", "Tu respuesta: " + x.item.opciones[x.elegida]));
         li.append(mk("p", "fa", "Correcta: " + x.q.correcta));
         if (x.q.explicacion) li.append(mk("p", "why", x.q.explicacion));
+        li.append(reportarError(() => ({ tipo: "examen", estacion: x.est.id, id: x.q.id, texto: (x.q.caso ? x.q.caso + " " : "") + enunciado(x.q), correcta: x.q.correcta, opciones: x.item.opciones })));
         lista.append(li);
       });
     };

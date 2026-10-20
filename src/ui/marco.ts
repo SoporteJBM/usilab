@@ -1,5 +1,5 @@
 /** Partes fijas de la página: menú superior, marcador, panel principal y foto ampliada. */
-import { $, mk } from "../lib/dom";
+import { $ } from "../lib/dom";
 import { estado } from "../estado/progreso";
 
 export type Seccion = "inicio" | "jugar" | "estudio" | "comentarios";
@@ -72,20 +72,4 @@ export function pintarInsignia(n: number | null): void {
   if (el) el.textContent = n ? String(n) : "";
 }
 
-export function verFoto(src: string, alt: string): void {
-  let v = document.getElementById("lightbox");
-  if (!v) {
-    v = mk("div", "lightbox");
-    v.id = "lightbox";
-    v.setAttribute("role", "dialog");
-    v.setAttribute("aria-label", "Foto ampliada");
-    v.onclick = () => { v!.hidden = true; };
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && v) v.hidden = true; });
-    document.body.append(v);
-  }
-  const im = mk("img");
-  im.src = src; im.alt = alt;
-  im.onerror = () => { im.replaceWith(mk("p", null, "No se pudo cargar la foto.")); };
-  v.replaceChildren(im, mk("p", null, alt + " · toca para cerrar"));
-  v.hidden = false;
-}
+export { verFoto } from "./visor";
