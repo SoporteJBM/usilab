@@ -24,7 +24,7 @@ async function arrancar(): Promise<void> {
     if (b && NAV[b.dataset.k ?? ""]) NAV[b.dataset.k!]();
   });
 
-  // La marca UsiLab lleva al inicio (si ya entró).
+  // La marca MiUsiLab lleva al inicio (si ya entró).
   $("a.marca").addEventListener("click", (e) => { e.preventDefault(); if (sesion.modo) mostrarInicio(); });
 
   mostrarLogin();

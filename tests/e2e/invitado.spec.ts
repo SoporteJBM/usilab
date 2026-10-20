@@ -14,7 +14,7 @@ test("invitado: inicio, menú y una ronda completa que guarda el avance", async 
   await nav.getByRole("button", { name: "Estudio" }).click();
   await expect(page.getByRole("heading", { name: "Estudio" })).toBeVisible();
   await nav.getByRole("button", { name: "Comentarios" }).click();
-  await expect(page.getByRole("heading", { name: "¿Cómo mejoramos UsiLab?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "¿Cómo mejoramos MiUsiLab?" })).toBeVisible();
   await expect(page.getByText("Muro de comentarios")).toHaveCount(0);
 
   // Ronda de Bacterias en fácil: 5 preguntas, todas bien.
@@ -108,9 +108,9 @@ test("pantalla angosta (340 px): nada se sale del ancho", async ({ page }) => {
   await sinScrollHorizontal(page);
 });
 
-test("la marca UsiLab está arriba a la izquierda y lleva al inicio", async ({ page }) => {
+test("la marca MiUsiLab está arriba a la izquierda y lleva al inicio", async ({ page }) => {
   await abrir(page);
-  await expect(page).toHaveTitle(/UsiLab/);
+  await expect(page).toHaveTitle(/MiUsiLab/);
   await comoInvitado(page);
   await page.locator("#topnav").getByRole("button", { name: "Jugar" }).click();
   const marca = page.locator("a.marca");

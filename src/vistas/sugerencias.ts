@@ -51,7 +51,7 @@ function areaTexto(id: string, placeholder: string, filas = 3): { caja: HTMLDivE
 export function formularioSugerencias(contenedor: HTMLElement): void {
   const tarjeta = mk("section", "sug");
   tarjeta.setAttribute("aria-labelledby", "sug-titulo");
-  const h = mk("h3", null, "¿Cómo mejoramos UsiLab?");
+  const h = mk("h3", null, "¿Cómo mejoramos MiUsiLab?");
   h.id = "sug-titulo";
   tarjeta.append(h, mk("p", "note", "Toma un minuto. Todas las preguntas son opcionales: responde las que quieras."));
 
@@ -60,7 +60,7 @@ export function formularioSugerencias(contenedor: HTMLElement): void {
   f.noValidate = true;
 
   // 1. Utilidad
-  const q1 = pregunta(1, "¿Qué tan útil te parece UsiLab para estudiar?");
+  const q1 = pregunta(1, "¿Qué tan útil te parece MiUsiLab para estudiar?");
   const escala = mk("div", "sug-rate");
   escala.setAttribute("role", "radiogroup");
   escala.setAttribute("aria-label", "Utilidad del 1 al 5");
@@ -105,8 +105,8 @@ export function formularioSugerencias(contenedor: HTMLElement): void {
   q6.append(t6.caja);
 
   // 7. Recomendaría
-  const q7 = pregunta(7, "¿Le recomendarías UsiLab a un compañero?");
-  q7.append(opciones(RECOMENDARIA, false, (s) => { datos.recomendaria = s[0] ?? null; }, "Recomendarías UsiLab"));
+  const q7 = pregunta(7, "¿Le recomendarías MiUsiLab a un compañero?");
+  q7.append(opciones(RECOMENDARIA, false, (s) => { datos.recomendaria = s[0] ?? null; }, "Recomendarías MiUsiLab"));
 
   // 8. Nombre opcional
   const q8 = pregunta(8, "Tu nombre (opcional)", "Solo si quieres que sepamos quién lo envió.");

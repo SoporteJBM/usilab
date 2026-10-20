@@ -1,5 +1,5 @@
 /**
- * Formulario "¿Cómo mejoramos UsiLab?".
+ * Formulario "¿Cómo mejoramos MiUsiLab?".
  *
  * TODAVÍA NO SE GUARDA EN LA BASE DE DATOS: `enviarSugerencia` valida y simula el envío.
  * Para conectarlo, crear la tabla `sugerencias` en Supabase (cualquiera puede insertar,
