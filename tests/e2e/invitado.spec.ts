@@ -115,9 +115,12 @@ test("la marca MiUsiLab está arriba a la izquierda y lleva al inicio", async ({
   await expect(page).toHaveTitle(/MiUsiLab/);
   await comoInvitado(page);
   await page.locator("#topnav").getByRole("button", { name: "Jugar" }).click();
+  // Va arriba y alineada a la izquierda del contenido (en pantallas de 960 px o más queda fija en el margen).
   const marca = page.locator("a.marca");
   const caja = await marca.boundingBox();
-  expect(caja!.x).toBeLessThan(40);
+  const contenido = await page.locator(".wrap").boundingBox();
+  const ancho = page.viewportSize()!.width;
+  expect(caja!.x).toBeLessThan(ancho >= 960 ? 40 : contenido!.x + 40);
   expect(caja!.y).toBeLessThan(60);
   await marca.click();
   await expect(page.locator("#topnav button.on")).toHaveText("Inicio");
